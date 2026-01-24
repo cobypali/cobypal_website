@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COBY'S BRAIN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0f0f1a 100%);
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        #loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #info-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            border-radius: 16px;
+            color: white;
+            max-width: 320px;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        #info-panel h2 {
+            margin-bottom: 12px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        #info-panel p {
+            line-height: 1.7;
+            margin-bottom: 18px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+        }
+
+        #info-panel a {
+            display: inline-block;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #info-panel a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        #close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        #close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        #instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 20, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 14px 28px;
+            border-radius: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #region-list {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 16px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        #region-list h3 {
+            margin-bottom: 12px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        #region-list ul {
+            list-style: none;
+        }
+
+        #region-list li {
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #region-list li:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #region-list li.active {
+            background: rgba(0, 212, 255, 0.3);
+        }
+
+        #region-list li .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        #region-list li .status {
+            margin-left: auto;
+            font-size: 11px;
+            opacity: 0.5;
+        }
+
+        #page-title {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            z-index: 50;
+        }
+
+        #edit-mode-btn {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 100, 100, 0.8);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 100;
+        }
+
+        #edit-mode-btn.active {
+            background: rgba(100, 255, 100, 0.8);
+        }
+
+        .hotspot-label {
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(0,0,0,0.8), 0 0 3px rgba(0,0,0,1);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        #edit-instructions {
+            position: fixed;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 200, 100, 0.9);
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            display: none;
+            z-index: 100;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Loading 3D Brain...</div>
+    </div>
+
+    <h1 id="page-title">COBY'S BRAIN</h1>
+    <button id="edit-mode-btn">Enable Edit Mode</button>
+    <div id="edit-instructions">Click on a region in the list, then click on the brain to place it</div>
+
+    <div id="info-panel">
+        <button id="close-btn">&times;</button>
+        <h2 id="panel-title">Region Name</h2>
+        <p id="panel-description">Description goes here.</p>
+        <a id="panel-link" href="#" target="_blank">Learn More</a>
+    </div>
+
+    <div id="region-list">
+        <h3>Brain Regions</h3>
+        <ul id="regions"></ul>
+    </div>
+
+    <div id="instructions">
+        Drag to rotate &bull; Scroll to zoom &bull; Click regions for info
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // CSS2D renderer for labels
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        document.getElementById('canvas-container').appendChild(labelRenderer.domElement);
+
+        // Camera position
+        camera.position.set(0, 0, 250);
+
+        // Orbit controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 100;
+        controls.maxDistance = 500;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        keyLight.position.set(5, 5, 5);
+        scene.add(keyLight);
+
+        const fillLight = new THREE.DirectionalLight(0x88ccff, 0.6);
+        fillLight.position.set(-5, 0, 5);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.DirectionalLight(0xff8866, 0.4);
+        rimLight.position.set(0, -5, -5);
+        scene.add(rimLight);
+
+        const topLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        topLight.position.set(0, 10, 0);
+        scene.add(topLight);
+
+        // Brain group
+        const brainGroup = new THREE.Group();
+        scene.add(brainGroup);
+
+        // Store brain meshes for raycasting
+        let brainMeshes = [];
+
+        // Hotspot definitions with default positions
+        const hotspotDefinitions = [
+            {
+                name: "Film and TV",
+                description: "Coby's thoughts on film and television.",
+                link: "https://docs.google.com/document/d/1LF4Pd86SBc7cbMa8eW_Qg6fAEfhDpTlrym289A__zmY/edit?tab=t.0",
+                color: 0xff4444,
+                position: new THREE.Vector3(-52.97, 23.33, -22.01)
+            },
+            {
+                name: "Thoughts",
+                description: "Coby's random thoughts and ideas.",
+                link: "https://docs.google.com/document/d/1-dkdApHnbanprAGmZI6psG-07ufG-crWUr1kvfLBqac/edit?tab=t.0",
+                color: 0x00d4ff,
+                position: new THREE.Vector3(-13.00, 34.80, 59.41)
+            },
+            {
+                name: "Books",
+                description: "Coby's book reviews and reading list.",
+                link: "https://docs.google.com/document/d/1KBcObYFV89toTkWHtJ8_IccXKmxIEbE3ggh6Q0BD8IQ/edit?tab=t.0",
+                color: 0x44ff44,
+                position: new THREE.Vector3(-34.23, 29.35, 28.31)
+            },
+            {
+                name: "Music",
+                description: "Coby's music taste and recommendations.",
+                link: "https://docs.google.com/document/d/1cVdXvcNDa8wavRjlQjZA4Kjsh_FY7fTKUei6rsclXCU/edit?tab=t.0",
+                color: 0xff44ff,
+                position: new THREE.Vector3(-36.94, 14.21, -53.12)
+            },
+            {
+                name: "Games and Interactive Media",
+                description: "Coby's gaming experiences and interactive media thoughts.",
+                link: "https://docs.google.com/document/d/1nEq3L_TFyyJJpKS-rk1dwuN8daguhfU2pTf7CZ09U-U/edit?tab=t.0",
+                color: 0xffaa00,
+                position: new THREE.Vector3(-52.49, -3.26, -12.82)
+            },
+            {
+                name: "Protocols",
+                description: "Coby's personal protocols and systems.",
+                link: "https://docs.google.com/document/d/1rgd9WmvAimxZ0yawJdr1DtKwOHNAeW0BcH8tPxhNmSk/edit?usp=drive_web&ouid=107964715465054688131",
+                color: 0x00ffaa,
+                position: new THREE.Vector3(-29.30, 19.57, 60.03)
+            },
+            {
+                name: "Principles",
+                description: "Coby's guiding principles and values.",
+                link: "https://docs.google.com/document/d/13BEUSJWXlOfAOHe8EKopDXV4ga7dA02BW1Nr5gbgMFI/edit?tab=t.0#heading=h.ca912xr11eqb",
+                color: 0xaa00ff,
+                position: new THREE.Vector3(-38.79, 7.22, 46.75)
+            },
+            {
+                name: "Food",
+                description: "Coby's food blog and culinary adventures.",
+                link: "https://www.instagram.com/cobysfoodblog/",
+                color: 0xff8844,
+                position: new THREE.Vector3(-47.86, -4.89, 11.82)
+            },
+            {
+                name: "Adventures",
+                description: "Coby's adventures and travel experiences.",
+                link: "https://www.youtube.com/channel/UCuGQRO3yHpaNdtCoWwkRocA?view_as=subscriber",
+                color: 0x44aaff,
+                position: new THREE.Vector3(-45.51, -20.94, -31.85)
+            }
+        ];
+
+        // Hotspot meshes
+        const hotspotMeshes = [];
+
+        // Edit mode state
+        let editMode = false;
+        let selectedRegionIndex = null;
+
+        // UI elements
+        const editModeBtn = document.getElementById('edit-mode-btn');
+        const editInstructions = document.getElementById('edit-instructions');
+        const regionsList = document.getElementById('regions');
+        const infoPanel = document.getElementById('info-panel');
+        const panelTitle = document.getElementById('panel-title');
+        const panelDescription = document.getElementById('panel-description');
+        const panelLink = document.getElementById('panel-link');
+        const closeBtn = document.getElementById('close-btn');
+
+        // Create region list UI
+        function createRegionList() {
+            hotspotDefinitions.forEach((def, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="dot" style="background: #${def.color.toString(16).padStart(6, '0')}"></span>
+                    ${def.name}
+                    <span class="status">${def.position ? 'placed' : 'not placed'}</span>
+                `;
+                li.addEventListener('click', () => {
+                    if (editMode) {
+                        selectRegion(index);
+                    } else if (def.position) {
+                        showInfo(index);
+                    }
+                });
+                regionsList.appendChild(li);
+            });
+        }
+
+        // Select region for placement
+        function selectRegion(index) {
+            selectedRegionIndex = index;
+            // Update UI
+            const items = regionsList.querySelectorAll('li');
+            items.forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+        }
+
+        // Create or update hotspot marker
+        function createHotspotMarker(index) {
+            const def = hotspotDefinitions[index];
+            if (!def.position) return;
+
+            // Remove existing marker if any
+            if (hotspotMeshes[index]) {
+                brainGroup.remove(hotspotMeshes[index].ring);
+                brainGroup.remove(hotspotMeshes[index].sphere);
+                brainGroup.remove(hotspotMeshes[index].glow);
+                if (hotspotMeshes[index].label) {
+                    brainGroup.remove(hotspotMeshes[index].label);
+                }
+            }
+
+            // Create marker at position
+            const ringGeometry = new THREE.TorusGeometry(3, 0.5, 16, 32);
+            const ringMaterial = new THREE.MeshBasicMaterial({
+                color: def.color,
+                transparent: true,
+                opacity: 0.9
+            });
+            const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+            ring.position.copy(def.position);
+            ring.lookAt(new THREE.Vector3(0, 0, 0));
+            brainGroup.add(ring);
+
+            const sphereGeometry = new THREE.SphereGeometry(2, 16, 16);
+            const sphereMaterial = new THREE.MeshBasicMaterial({
+                color: def.color,
+                transparent: true,
+                opacity: 0.9
+            });
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.position.copy(def.position);
+            sphere.userData = { hotspotIndex: index };
+            brainGroup.add(sphere);
+
+            const glowGeometry = new THREE.SphereGeometry(5, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: def.color,
+                transparent: true,
+                opacity: 0.15
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            glow.position.copy(def.position);
+            brainGroup.add(glow);
+
+            // Create text label
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'hotspot-label';
+            labelDiv.textContent = def.name;
+            labelDiv.style.color = '#' + def.color.toString(16).padStart(6, '0');
+            const label = new CSS2DObject(labelDiv);
+            label.position.copy(def.position);
+            label.position.y += 10; // Position above the hotspot
+            brainGroup.add(label);
+
+            hotspotMeshes[index] = { ring, sphere, glow, label };
+
+            // Update region list status
+            const items = regionsList.querySelectorAll('li');
+            const statusSpan = items[index].querySelector('.status');
+            statusSpan.textContent = 'placed';
+        }
+
+        // Show info panel
+        function showInfo(index) {
+            const def = hotspotDefinitions[index];
+            panelTitle.textContent = def.name;
+            panelTitle.style.color = '#' + def.color.toString(16).padStart(6, '0');
+            panelDescription.textContent = def.description;
+            panelLink.href = def.link;
+            infoPanel.style.display = 'block';
+        }
+
+        // Toggle edit mode
+        editModeBtn.addEventListener('click', () => {
+            editMode = !editMode;
+            editModeBtn.textContent = editMode ? 'Exit Edit Mode' : 'Enable Edit Mode';
+            editModeBtn.classList.toggle('active', editMode);
+            editInstructions.style.display = editMode ? 'block' : 'none';
+            controls.autoRotate = !editMode;
+
+            if (!editMode) {
+                selectedRegionIndex = null;
+                const items = regionsList.querySelectorAll('li');
+                items.forEach(item => item.classList.remove('active'));
+
+                // Log all positions for saving
+                console.log('--- HOTSPOT POSITIONS ---');
+                hotspotDefinitions.forEach((def, i) => {
+                    if (def.position) {
+                        console.log(`${def.name}: new THREE.Vector3(${def.position.x.toFixed(2)}, ${def.position.y.toFixed(2)}, ${def.position.z.toFixed(2)})`);
+                    }
+                });
+                console.log('-------------------------');
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            infoPanel.style.display = 'none';
+        });
+
+        // Raycaster
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // Click handler
+        function onMouseClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            if (editMode && selectedRegionIndex !== null) {
+                // Place hotspot on brain surface
+                const intersects = raycaster.intersectObjects(brainMeshes, true);
+                if (intersects.length > 0) {
+                    const point = intersects[0].point.clone();
+                    // Offset slightly along normal so marker sits on surface
+                    const normal = intersects[0].face.normal.clone();
+                    normal.transformDirection(intersects[0].object.matrixWorld);
+                    point.add(normal.multiplyScalar(4));
+
+                    hotspotDefinitions[selectedRegionIndex].position = point;
+                    createHotspotMarker(selectedRegionIndex);
+
+                    console.log(`Placed ${hotspotDefinitions[selectedRegionIndex].name} at:`, point);
+                }
+            } else {
+                // Check if clicking on hotspot
+                const spheres = hotspotMeshes.filter(h => h).map(h => h.sphere);
+                const intersects = raycaster.intersectObjects(spheres);
+                if (intersects.length > 0) {
+                    const index = intersects[0].object.userData.hotspotIndex;
+                    showInfo(index);
+                }
+            }
+        }
+
+        window.addEventListener('click', onMouseClick);
+
+        // Hover effect
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            if (editMode) {
+                // Show pointer when hovering over brain
+                const intersects = raycaster.intersectObjects(brainMeshes, true);
+                document.body.style.cursor = intersects.length > 0 ? 'crosshair' : 'grab';
+            } else {
+                const spheres = hotspotMeshes.filter(h => h).map(h => h.sphere);
+                const intersects = raycaster.intersectObjects(spheres);
+                document.body.style.cursor = intersects.length > 0 ? 'pointer' : 'grab';
+
+                hotspotMeshes.forEach((hotspot, i) => {
+                    if (!hotspot) return;
+                    const isHovered = intersects.length > 0 && intersects[0].object.userData.hotspotIndex === i;
+                    hotspot.sphere.scale.setScalar(isHovered ? 1.5 : 1);
+                    hotspot.ring.scale.setScalar(isHovered ? 1.4 : 1);
+                    hotspot.glow.scale.setScalar(isHovered ? 1.5 : 1);
+                    hotspot.glow.material.opacity = isHovered ? 0.3 : 0.15;
+                });
+            }
+        }
+
+        window.addEventListener('mousemove', onMouseMove);
+
+        // Stop auto-rotate when user interacts
+        controls.addEventListener('start', () => {
+            if (!editMode) controls.autoRotate = false;
+        });
+
+        // Load brain model
+        const loader = new GLTFLoader();
+        loader.load('3d_brain_model/scene.gltf', onModelLoaded, onLoadProgress, onLoadError);
+
+        function onModelLoaded(gltf) {
+            const brain = gltf.scene;
+
+            // Scale up
+            brain.scale.set(100, 100, 100);
+            brain.updateMatrixWorld(true);
+
+            // Center
+            const box = new THREE.Box3().setFromObject(brain);
+            const center = box.getCenter(new THREE.Vector3());
+            brain.position.sub(center);
+            brain.updateMatrixWorld(true);
+
+            const size = box.getSize(new THREE.Vector3());
+            console.log('Model size:', size);
+
+            brainGroup.add(brain);
+
+            // Collect meshes for raycasting and apply pink color
+            brain.traverse((child) => {
+                if (child.isMesh) {
+                    brainMeshes.push(child);
+                    // Apply pink brain material
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: 0xffaaaa,
+                        roughness: 0.6,
+                        metalness: 0.1,
+                        emissive: 0xff6688,
+                        emissiveIntensity: 0.1
+                    });
+                }
+            });
+
+            // Create region list
+            createRegionList();
+
+            // Create markers for hotspots with default positions
+            hotspotDefinitions.forEach((def, index) => {
+                if (def.position) {
+                    createHotspotMarker(index);
+                }
+            });
+
+            // Hide loading
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function onLoadProgress(xhr) {
+            if (xhr.lengthComputable) {
+                const percent = (xhr.loaded / xhr.total) * 100;
+                console.log(`Loading: ${percent.toFixed(0)}%`);
+            }
+        }
+
+        function onLoadError(error) {
+            console.error('Error loading model:', error);
+            document.getElementById('loading').innerHTML = `
+                <div style="color: #ff6666;">
+                    <p>Failed to load brain model.</p>
+                    <p style="font-size: 14px; margin-top: 10px;">
+                        Please ensure scene.gltf is in the 3d_brain_model folder.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Animation loop
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            hotspotMeshes.forEach((hotspot, i) => {
+                if (!hotspot) return;
+                hotspot.ring.rotation.x = time + i;
+                hotspot.ring.rotation.y = time * 0.7 + i;
+                const pulse = 1 + Math.sin(time * 2 + i * 0.5) * 0.1;
+                hotspot.glow.scale.setScalar(pulse);
+                hotspot.sphere.material.opacity = 0.7 + Math.sin(time * 3 + i) * 0.2;
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
