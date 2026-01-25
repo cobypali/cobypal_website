@@ -252,34 +252,42 @@
             opacity: 0.5;
         }
 
-        #page-title {
+        #page-header {
             position: fixed;
             top: 80px;
             left: 50%;
             transform: translateX(-50%);
+            text-align: center;
+            z-index: 50;
+        }
+
+        #page-title {
             color: #E6EDF7;
             font-size: 32px;
             font-weight: 700;
             letter-spacing: 4px;
             text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-            z-index: 50;
+            margin-bottom: 8px;
+        }
+
+        #page-subtitle {
+            color: #60A5FA;
+            font-size: 16px;
+            font-weight: 300;
         }
 
         #edit-mode-btn {
-            position: fixed;
-            top: 130px;
-            left: 50%;
-            transform: translateX(-50%);
+            width: 100%;
             background: #3B82F6;
             border: none;
             color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 10px 16px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            z-index: 100;
             transition: background 0.2s;
+            margin-bottom: 12px;
         }
 
         #edit-mode-btn:hover {
@@ -329,6 +337,10 @@
             #page-title {
                 font-size: 22px;
                 letter-spacing: 2px;
+            }
+
+            #page-subtitle {
+                font-size: 13px;
             }
 
             #edit-mode-btn,
@@ -404,8 +416,10 @@
         <div>Loading 3D Brain...</div>
     </div>
 
-    <h1 id="page-title">COBY'S BRAIN</h1>
-    <button id="edit-mode-btn">Enable Edit Mode</button>
+    <div id="page-header">
+        <h1 id="page-title">COBY'S BRAIN</h1>
+        <p id="page-subtitle">Explore a digitized map of Coby's brain</p>
+    </div>
     <div id="edit-instructions">Click on a region in the list, then click on the brain to place it</div>
 
     <div id="info-panel">
@@ -416,6 +430,7 @@
     </div>
 
     <div id="region-list">
+        <button id="edit-mode-btn">Enable Edit Mode</button>
         <h3>Brain Regions</h3>
         <ul id="regions"></ul>
     </div>
