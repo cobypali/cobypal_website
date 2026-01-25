@@ -141,6 +141,14 @@
             font-size: 14px;
         }
 
+        #panel-brain-region {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #60A5FA;
+            margin-bottom: 12px;
+        }
+
         #info-panel a {
             display: inline-block;
             background: #3B82F6;
@@ -485,6 +493,7 @@
     <div id="info-panel">
         <button id="close-btn">&times;</button>
         <h2 id="panel-title">Region Name</h2>
+        <p id="panel-brain-region"></p>
         <p id="panel-description">Description goes here.</p>
         <a id="panel-link" href="#" target="_blank">Learn More</a>
     </div>
@@ -592,65 +601,74 @@
             {
                 name: "Film and TV",
                 description: "Coby's thoughts on film and television.",
+                brainRegion: "Occipital Lobe",
                 link: "https://docs.google.com/document/d/1LF4Pd86SBc7cbMa8eW_Qg6fAEfhDpTlrym289A__zmY/edit?tab=t.0",
                 color: 0xff4444,
-                position: new THREE.Vector3(-52.97, 23.33, -22.01)
+                position: new THREE.Vector3(-30.06, 4.40, -59.25)
             },
             {
                 name: "Thoughts",
                 description: "Coby's random thoughts and ideas.",
+                brainRegion: "Anterior prefrontal cortex",
                 link: "https://docs.google.com/document/d/1-dkdApHnbanprAGmZI6psG-07ufG-crWUr1kvfLBqac/edit?tab=t.0",
                 color: 0x00d4ff,
-                position: new THREE.Vector3(-13.00, 34.80, 59.41)
+                position: new THREE.Vector3(-15.55, 20.11, 67.40)
             },
             {
                 name: "Books",
                 description: "Coby's book reviews and reading list.",
+                brainRegion: "Temporal language areas (Wernicke's area)",
                 link: "https://docs.google.com/document/d/1KBcObYFV89toTkWHtJ8_IccXKmxIEbE3ggh6Q0BD8IQ/edit?tab=t.0",
                 color: 0x44ff44,
-                position: new THREE.Vector3(-34.23, 29.35, 28.31)
+                position: new THREE.Vector3(53.49, 15.30, -18.65)
             },
             {
                 name: "Music",
                 description: "Coby's music taste and recommendations.",
+                brainRegion: "Auditory cortex",
                 link: "https://docs.google.com/document/d/1cVdXvcNDa8wavRjlQjZA4Kjsh_FY7fTKUei6rsclXCU/edit?tab=t.0",
                 color: 0xff44ff,
-                position: new THREE.Vector3(-36.94, 14.21, -53.12)
+                position: new THREE.Vector3(-55.86, 9.78, -3.42)
             },
             {
                 name: "Games and Interactive Media",
                 description: "Coby's gaming experiences and interactive media thoughts.",
+                brainRegion: "Motor cortex",
                 link: "https://docs.google.com/document/d/1nEq3L_TFyyJJpKS-rk1dwuN8daguhfU2pTf7CZ09U-U/edit?tab=t.0",
                 color: 0xffaa00,
-                position: new THREE.Vector3(-52.49, -3.26, -12.82)
+                position: new THREE.Vector3(31.93, 45.64, 12.26)
             },
             {
                 name: "Protocols",
                 description: "Coby's personal protocols and systems.",
+                brainRegion: "Dorsolateral prefrontal cortex",
                 link: "https://docs.google.com/document/d/1rgd9WmvAimxZ0yawJdr1DtKwOHNAeW0BcH8tPxhNmSk/edit?usp=drive_web&ouid=107964715465054688131",
                 color: 0x00ffaa,
-                position: new THREE.Vector3(-29.30, 19.57, 60.03)
+                position: new THREE.Vector3(-11.15, 47.78, 38.80)
             },
             {
                 name: "Principles",
                 description: "Coby's guiding principles and values.",
+                brainRegion: "Ventromedial prefrontal cortex",
                 link: "https://docs.google.com/document/d/13BEUSJWXlOfAOHe8EKopDXV4ga7dA02BW1Nr5gbgMFI/edit?tab=t.0#heading=h.ca912xr11eqb",
                 color: 0xaa00ff,
-                position: new THREE.Vector3(-38.79, 7.22, 46.75)
+                position: new THREE.Vector3(38.62, 21.26, 40.53)
             },
             {
                 name: "Food",
                 description: "Coby's food blog and culinary adventures.",
+                brainRegion: "Hypothalamus",
                 link: "https://www.instagram.com/cobysfoodblog/",
                 color: 0xff8844,
-                position: new THREE.Vector3(-47.86, -4.89, 11.82)
+                position: new THREE.Vector3(-15.16, -28.65, 1.76)
             },
             {
                 name: "Adventures",
                 description: "Coby's adventures and travel experiences.",
+                brainRegion: "Cerebellum",
                 link: "https://www.youtube.com/channel/UCuGQRO3yHpaNdtCoWwkRocA?view_as=subscriber",
                 color: 0x44aaff,
-                position: new THREE.Vector3(-45.51, -20.94, -31.85)
+                position: new THREE.Vector3(-48.33, -31.49, -23.14)
             }
         ];
 
@@ -667,6 +685,7 @@
         const regionsList = document.getElementById('regions');
         const infoPanel = document.getElementById('info-panel');
         const panelTitle = document.getElementById('panel-title');
+        const panelBrainRegion = document.getElementById('panel-brain-region');
         const panelDescription = document.getElementById('panel-description');
         const panelLink = document.getElementById('panel-link');
         const closeBtn = document.getElementById('close-btn');
@@ -772,6 +791,7 @@
             const def = hotspotDefinitions[index];
             panelTitle.textContent = def.name;
             panelTitle.style.color = '#' + def.color.toString(16).padStart(6, '0');
+            panelBrainRegion.textContent = `Located in the ${def.brainRegion}`;
             panelDescription.textContent = def.description;
             panelLink.href = def.link;
             infoPanel.style.display = 'block';
