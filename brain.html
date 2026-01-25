@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COBY'S BRAIN</title>
+    <title>Coby's Brain | Coby Palivathukal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,9 +15,72 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             overflow: hidden;
-            background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0f0f1a 100%);
+            background: #0B1220;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(11, 18, 32, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1A2438;
+        }
+
+        .logo {
+            font-family: 'Inter', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #E6EDF7;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #E6EDF7;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #3B82F6;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+            .logo {
+                font-size: 20px;
+            }
+            .nav-links {
+                gap: 20px;
+            }
+            .nav-links a {
+                font-size: 12px;
+            }
         }
 
         #canvas-container {
@@ -27,7 +93,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: white;
+            color: #3B82F6;
             font-size: 18px;
             text-align: center;
             z-index: 100;
@@ -36,8 +102,8 @@
         #loading .spinner {
             width: 50px;
             height: 50px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #00d4ff;
+            border: 3px solid rgba(59, 130, 246, 0.1);
+            border-top-color: #3B82F6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
@@ -49,16 +115,16 @@
 
         #info-panel {
             position: fixed;
-            top: 20px;
+            top: 80px;
             left: 20px;
-            background: rgba(10, 10, 20, 0.85);
+            background: #121A2B;
             backdrop-filter: blur(20px);
             padding: 24px;
             border-radius: 16px;
-            color: white;
+            color: #E6EDF7;
             max-width: 320px;
             display: none;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #1A2438;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
@@ -71,34 +137,35 @@
         #info-panel p {
             line-height: 1.7;
             margin-bottom: 18px;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(230, 237, 247, 0.85);
             font-size: 14px;
         }
 
         #info-panel a {
             display: inline-block;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            background: #3B82F6;
             color: white;
             padding: 10px 20px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
             font-size: 14px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
         }
 
         #info-panel a:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+            background: #2563EB;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
         }
 
         #close-btn {
             position: absolute;
             top: 12px;
             right: 12px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(59, 130, 246, 0.2);
             border: none;
-            color: white;
+            color: #E6EDF7;
             font-size: 18px;
             cursor: pointer;
             width: 28px;
@@ -111,7 +178,7 @@
         }
 
         #close-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(59, 130, 246, 0.4);
         }
 
         #instructions {
@@ -119,25 +186,25 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(10, 10, 20, 0.7);
+            background: #121A2B;
             backdrop-filter: blur(10px);
             padding: 14px 28px;
             border-radius: 30px;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(230, 237, 247, 0.8);
             font-size: 13px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #1A2438;
         }
 
         #region-list {
             position: fixed;
-            top: 20px;
+            top: 80px;
             right: 20px;
-            background: rgba(10, 10, 20, 0.85);
+            background: #121A2B;
             backdrop-filter: blur(20px);
             padding: 20px;
             border-radius: 16px;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #E6EDF7;
+            border: 1px solid #1A2438;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
@@ -146,7 +213,7 @@
             font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(230, 237, 247, 0.5);
         }
 
         #region-list ul {
@@ -166,11 +233,11 @@
         }
 
         #region-list li:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(59, 130, 246, 0.2);
         }
 
         #region-list li.active {
-            background: rgba(0, 212, 255, 0.3);
+            background: rgba(59, 130, 246, 0.3);
         }
 
         #region-list li .dot {
@@ -187,23 +254,23 @@
 
         #page-title {
             position: fixed;
-            top: 20px;
+            top: 80px;
             left: 50%;
             transform: translateX(-50%);
-            color: white;
+            color: #E6EDF7;
             font-size: 32px;
             font-weight: 700;
             letter-spacing: 4px;
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
             z-index: 50;
         }
 
         #edit-mode-btn {
             position: fixed;
-            top: 70px;
+            top: 130px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 100, 100, 0.8);
+            background: #3B82F6;
             border: none;
             color: white;
             padding: 10px 20px;
@@ -212,14 +279,19 @@
             font-size: 14px;
             font-weight: 600;
             z-index: 100;
+            transition: background 0.2s;
+        }
+
+        #edit-mode-btn:hover {
+            background: #2563EB;
         }
 
         #edit-mode-btn.active {
-            background: rgba(100, 255, 100, 0.8);
+            background: #60A5FA;
         }
 
         .hotspot-label {
-            color: white;
+            color: #E6EDF7;
             font-size: 12px;
             font-weight: 600;
             text-shadow: 0 0 8px rgba(0,0,0,0.8), 0 0 3px rgba(0,0,0,1);
@@ -229,11 +301,11 @@
 
         #edit-instructions {
             position: fixed;
-            top: 120px;
+            top: 180px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 200, 100, 0.9);
-            color: #333;
+            background: #60A5FA;
+            color: #0B1220;
             padding: 10px 20px;
             border-radius: 10px;
             font-size: 13px;
@@ -316,6 +388,15 @@
     </style>
 </head>
 <body>
+    <nav>
+        <a href="index.html" class="logo">COBYPAL</a>
+        <div class="nav-links">
+            <a href="about.html">About</a>
+            <a href="kippy-studios.html">Kippy Studios</a>
+            <a href="brain.html" class="active">Coby's Brain</a>
+        </div>
+    </nav>
+
     <div id="canvas-container"></div>
 
     <div id="loading">

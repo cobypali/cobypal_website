@@ -6,7 +6,7 @@
     <title>Coby Palivathukal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -15,255 +15,364 @@
         }
 
         body {
-            font-family: 'Lato', sans-serif;
-            background-color: #080400;
-            color: #d0cecc;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            background: rgba(8, 4, 0, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(194, 160, 109, 0.2);
-        }
-
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: #c2a06d;
-            letter-spacing: 2px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 40px;
-        }
-
-        .nav-links a {
-            font-size: 14px;
-            font-weight: 400;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: #c2a06d;
-        }
-
-        /* Main Content */
-        main {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 120px 50px 80px;
-        }
-
-        .about-container {
-            max-width: 900px;
-            display: flex;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .profile-image {
-            flex-shrink: 0;
-            width: 280px;
-            height: 280px;
-            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            background: #0B1220;
+            color: #E6EDF7;
             overflow: hidden;
-            border: 2px solid rgba(194, 160, 109, 0.3);
         }
 
-        .profile-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
         }
 
-        .profile-image.placeholder {
-            background: linear-gradient(135deg, #1a1410 0%, #0d0a08 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #c2a06d;
+        #page-title {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Inter', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #E6EDF7;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+            z-index: 50;
+        }
+
+        #instructions {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #121A2B;
+            backdrop-filter: blur(10px);
+            padding: 14px 28px;
+            border-radius: 30px;
+            color: rgba(230, 237, 247, 0.8);
             font-size: 14px;
+            border: 1px solid #1A2438;
+            z-index: 50;
         }
 
-        .about-content h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 42px;
-            font-weight: 600;
-            color: #c2a06d;
-            margin-bottom: 24px;
-        }
-
-        .about-content .tagline {
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #3B82F6;
             font-size: 18px;
-            font-weight: 300;
-            margin-bottom: 30px;
-            color: #d0cecc;
-        }
-
-        .about-content p {
-            font-size: 16px;
-            line-height: 1.8;
-            color: rgba(208, 206, 204, 0.85);
-        }
-
-        .about-content a {
-            color: #c2a06d;
-            transition: opacity 0.3s;
-        }
-
-        .about-content a:hover {
-            opacity: 0.8;
-        }
-
-        /* Footer */
-        footer {
-            padding: 30px 50px;
             text-align: center;
-            border-top: 1px solid rgba(194, 160, 109, 0.2);
+            z-index: 100;
         }
 
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 20px;
+        #loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(59, 130, 246, 0.1);
+            border-top-color: #3B82F6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
 
-        .social-links a {
-            font-size: 20px;
-            color: #d0cecc;
-            transition: color 0.3s;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .social-links a:hover {
-            color: #c2a06d;
+        .model-label {
+            color: #E6EDF7;
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            pointer-events: none;
+            transition: transform 0.3s, color 0.3s;
         }
 
-        .copyright {
-            font-size: 12px;
-            color: rgba(208, 206, 204, 0.5);
+        .model-label.hovered {
+            transform: scale(1.1);
+            color: #60A5FA;
         }
 
-        /* Mobile Responsive */
+        /* Mobile */
         @media (max-width: 768px) {
-            nav {
-                padding: 15px 20px;
+            #page-title {
+                font-size: 24px;
+                letter-spacing: 2px;
             }
 
-            .logo {
-                font-size: 20px;
-            }
-
-            .nav-links {
-                gap: 20px;
-            }
-
-            .nav-links a {
+            #instructions {
                 font-size: 12px;
+                padding: 10px 20px;
             }
 
-            main {
-                padding: 100px 20px 60px;
-            }
-
-            .about-container {
-                flex-direction: column;
-                gap: 30px;
-                text-align: center;
-            }
-
-            .profile-image {
-                width: 200px;
-                height: 200px;
-            }
-
-            .about-content h1 {
-                font-size: 32px;
-            }
-
-            .about-content .tagline {
-                font-size: 16px;
-            }
-
-            .about-content p {
+            .model-label {
                 font-size: 14px;
-            }
-
-            footer {
-                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="index.html" class="logo">COBYPAL</a>
-        <div class="nav-links">
-            <a href="index.html" class="active">About</a>
-            <a href="kippy-studios.html">Kippy Studios</a>
-            <a href="brain.html">Coby's Brain</a>
-        </div>
-    </nav>
+    <div id="canvas-container"></div>
 
-    <main>
-        <div class="about-container">
-            <div class="profile-image placeholder">
-                [Your Logo]
-            </div>
-            <div class="about-content">
-                <h1>About Coby</h1>
-                <p class="tagline">Los Angeles-based filmmaker and creative producer.</p>
-                <p>
-                    Coby is the founder and Executive Producer at <a href="kippy-studios.html">Kippy Studios</a> and also works as a Producer for Meta. In his free time, he enjoys writing about media, philosophy, and other topics that you can read via <a href="brain.html">Coby's Brain</a>. He also likes adventures with friends and family, health and fitness, and learning new things. He has a BA from Stanford in Philosophy with a minor in Film and Media Studies and an MFA in Animation and Digital Arts from USC's School of Cinematic Arts.
-                </p>
-            </div>
-        </div>
-    </main>
+    <h1 id="page-title">COBYPAL</h1>
 
-    <footer>
-        <div class="social-links">
-            <a href="#" title="Instagram">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-            </a>
-            <a href="#" title="YouTube">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-                </svg>
-            </a>
-            <a href="#" title="LinkedIn">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/>
-                </svg>
-            </a>
-        </div>
-        <p class="copyright">&copy; 2025 Coby Palivathukal. All rights reserved.</p>
-    </footer>
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Loading...</div>
+    </div>
+
+    <div id="instructions">
+        Click a model to explore
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Label renderer
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        document.getElementById('canvas-container').appendChild(labelRenderer.domElement);
+
+        // Camera position
+        camera.position.set(0, 2, 12);
+
+        // Orbit controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 8;
+        controls.maxDistance = 20;
+        controls.enablePan = false;
+        controls.maxPolarAngle = Math.PI / 1.8;
+        controls.minPolarAngle = Math.PI / 4;
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        keyLight.position.set(5, 5, 5);
+        scene.add(keyLight);
+
+        const fillLight = new THREE.DirectionalLight(0x60A5FA, 0.4);
+        fillLight.position.set(-5, 0, 5);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.DirectionalLight(0x3B82F6, 0.3);
+        rimLight.position.set(0, 5, -5);
+        scene.add(rimLight);
+
+        // Model data
+        const modelData = [
+            {
+                path: '3d_models/coby_face_v02.glb',
+                name: 'About',
+                link: 'about.html',
+                position: new THREE.Vector3(-4, 0, 0)
+            },
+            {
+                path: '3d_models/manny_v01.glb',
+                name: 'Kippy Studios',
+                link: 'kippy-studios.html',
+                position: new THREE.Vector3(0, 0, 0)
+            },
+            {
+                path: '3d_models/brain_v01.glb',
+                name: "Coby's Brain",
+                link: 'brain.html',
+                position: new THREE.Vector3(4, 0, 0)
+            }
+        ];
+
+        // Store loaded models
+        const models = [];
+        const modelGroups = [];
+        let loadedCount = 0;
+
+        // Load models
+        const loader = new GLTFLoader();
+
+        modelData.forEach((data, index) => {
+            const group = new THREE.Group();
+            group.position.copy(data.position);
+            group.userData = { link: data.link, index: index };
+            scene.add(group);
+            modelGroups.push(group);
+
+            loader.load(data.path, (gltf) => {
+                const model = gltf.scene;
+
+                // Center and scale model
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 2.5 / maxDim;
+
+                model.scale.setScalar(scale);
+                model.position.sub(center.multiplyScalar(scale));
+
+
+                group.add(model);
+                models[index] = model;
+
+                // Add label below model
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'model-label';
+                labelDiv.textContent = data.name;
+                const label = new CSS2DObject(labelDiv);
+                label.position.set(0, -2, 0);
+                group.add(label);
+                group.userData.labelDiv = labelDiv;
+
+                loadedCount++;
+                if (loadedCount === modelData.length) {
+                    document.getElementById('loading').style.display = 'none';
+                }
+            });
+        });
+
+        // Raycaster for click detection
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredGroup = null;
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+
+            // Reset previous hover
+            if (hoveredGroup) {
+                hoveredGroup.userData.labelDiv?.classList.remove('hovered');
+                hoveredGroup = null;
+            }
+
+            document.body.style.cursor = 'grab';
+
+            for (const intersect of intersects) {
+                let obj = intersect.object;
+                while (obj.parent && !obj.userData.link) {
+                    obj = obj.parent;
+                }
+                if (obj.userData.link) {
+                    hoveredGroup = obj;
+                    hoveredGroup.userData.labelDiv?.classList.add('hovered');
+                    document.body.style.cursor = 'pointer';
+                    break;
+                }
+            }
+        }
+
+        function onMouseClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+
+            for (const intersect of intersects) {
+                let obj = intersect.object;
+                while (obj.parent && !obj.userData.link) {
+                    obj = obj.parent;
+                }
+                if (obj.userData.link) {
+                    window.location.href = obj.userData.link;
+                    break;
+                }
+            }
+        }
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('click', onMouseClick);
+
+        // Touch support
+        window.addEventListener('touchstart', (event) => {
+            if (event.touches.length === 1) {
+                const touch = event.touches[0];
+                mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(scene.children, true);
+
+                for (const intersect of intersects) {
+                    let obj = intersect.object;
+                    while (obj.parent && !obj.userData.link) {
+                        obj = obj.parent;
+                    }
+                    if (obj.userData.link) {
+                        window.location.href = obj.userData.link;
+                        break;
+                    }
+                }
+            }
+        }, { passive: true });
+
+        // Animation loop
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Gentle rotation for each model
+            modelGroups.forEach((group, i) => {
+                group.rotation.y = Math.sin(time + i * 2) * 0.2;
+
+                // Hover effect - scale up
+                if (group === hoveredGroup) {
+                    group.scale.lerp(new THREE.Vector3(1.1, 1.1, 1.1), 0.1);
+                } else {
+                    group.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
+                }
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
 </body>
 </html>
