@@ -499,12 +499,70 @@
 
                 // Store pivot for rotation
                 iconContainer._pivot = pivot;
+                iconContainer._manualRotation = 0;
+                iconContainer._isDragging = false;
+                iconContainer._hasDragged = false;
+                iconContainer._lastX = 0;
             });
 
             socialScenes.push({ scene: iconScene, camera: iconCamera, renderer: iconRenderer, model: () => iconModel });
 
-            iconContainer.addEventListener('click', () => {
-                window.open(link, '_blank');
+            // Drag to spin functionality
+            const onDragStart = (clientX) => {
+                iconContainer._isDragging = true;
+                iconContainer._hasDragged = false;
+                iconContainer._lastX = clientX;
+            };
+
+            const onDragMove = (clientX) => {
+                if (iconContainer._isDragging && iconContainer._pivot) {
+                    const deltaX = clientX - iconContainer._lastX;
+                    if (Math.abs(deltaX) > 2) {
+                        iconContainer._hasDragged = true;
+                    }
+                    iconContainer._manualRotation += deltaX * 0.02;
+                    iconContainer._lastX = clientX;
+                }
+            };
+
+            const onDragEnd = () => {
+                iconContainer._isDragging = false;
+            };
+
+            // Mouse events
+            iconContainer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                onDragStart(e.clientX);
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                onDragMove(e.clientX);
+            });
+
+            window.addEventListener('mouseup', () => {
+                onDragEnd();
+            });
+
+            // Touch events
+            iconContainer.addEventListener('touchstart', (e) => {
+                onDragStart(e.touches[0].clientX);
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (iconContainer._isDragging) {
+                    onDragMove(e.touches[0].clientX);
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                onDragEnd();
+            });
+
+            // Click handler - only open link if not dragged
+            iconContainer.addEventListener('click', (e) => {
+                if (!iconContainer._hasDragged) {
+                    window.open(link, '_blank');
+                }
             });
         });
 
@@ -515,7 +573,13 @@
             socialIcons.forEach((iconContainer, i) => {
                 const pivot = iconContainer._pivot;
                 if (pivot) {
-                    pivot.rotation.y = iconTime + i * 0.5;
+                    if (iconContainer._isDragging) {
+                        pivot.rotation.y = iconContainer._manualRotation;
+                    } else {
+                        const autoRotation = iconTime + i * 0.5;
+                        iconContainer._manualRotation = autoRotation;
+                        pivot.rotation.y = autoRotation;
+                    }
                 }
             });
 
