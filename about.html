@@ -373,15 +373,28 @@
 
             iconLoader.load(modelPath, (gltf) => {
                 iconModel = gltf.scene;
+
+                // First scale the model
                 const box = new THREE.Box3().setFromObject(iconModel);
-                const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3());
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const scale = 1.8 / maxDim;
-
                 iconModel.scale.setScalar(scale);
-                iconModel.position.sub(center.multiplyScalar(scale));
-                iconScene.add(iconModel);
+
+                // Recalculate bounding box after scaling
+                const scaledBox = new THREE.Box3().setFromObject(iconModel);
+                const center = scaledBox.getCenter(new THREE.Vector3());
+
+                // Center the model at origin
+                iconModel.position.set(-center.x, -center.y, -center.z);
+
+                // Add to a pivot group so rotation happens around center
+                const pivot = new THREE.Group();
+                pivot.add(iconModel);
+                iconScene.add(pivot);
+
+                // Store pivot for rotation instead of model directly
+                iconContainer._pivot = pivot;
             });
 
             socialScenes.push({ scene: iconScene, camera: iconCamera, renderer: iconRenderer, model: () => iconModel });
@@ -397,11 +410,14 @@
             requestAnimationFrame(animateSocialIcons);
             const time = Date.now() * 0.001;
 
-            socialScenes.forEach((item, i) => {
-                const model = item.model();
-                if (model) {
-                    model.rotation.y = time + i * 0.5;
+            socialIcons.forEach((iconContainer, i) => {
+                const pivot = iconContainer._pivot;
+                if (pivot) {
+                    pivot.rotation.y = time + i * 0.5;
                 }
+            });
+
+            socialScenes.forEach((item) => {
                 item.renderer.render(item.scene, item.camera);
             });
         }
