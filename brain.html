@@ -287,7 +287,7 @@
             font-size: 13px;
             font-weight: 600;
             transition: background 0.2s;
-            margin-bottom: 12px;
+            margin-top: 12px;
         }
 
         #edit-mode-btn:hover {
@@ -430,9 +430,9 @@
     </div>
 
     <div id="region-list">
-        <button id="edit-mode-btn">Enable Edit Mode</button>
         <h3>Brain Regions</h3>
         <ul id="regions"></ul>
+        <button id="edit-mode-btn">Enable Edit Mode</button>
     </div>
 
     <div id="instructions">
@@ -759,19 +759,20 @@
                     console.log(`Placed ${hotspotDefinitions[selectedRegionIndex].name} at:`, point);
                 }
             } else {
-                // Check if clicking on hotspot
+                // Check if clicking on hotspot - go directly to link
                 const spheres = hotspotMeshes.filter(h => h).map(h => h.sphere);
                 const intersects = raycaster.intersectObjects(spheres);
                 if (intersects.length > 0) {
                     const index = intersects[0].object.userData.hotspotIndex;
-                    showInfo(index);
+                    const def = hotspotDefinitions[index];
+                    window.open(def.link, '_blank');
                 }
             }
         }
 
         window.addEventListener('click', onMouseClick);
 
-        // Touch support for mobile
+        // Touch support for mobile - go directly to link
         window.addEventListener('touchstart', (event) => {
             if (event.touches.length === 1) {
                 const touch = event.touches[0];
@@ -784,7 +785,8 @@
                 const intersects = raycaster.intersectObjects(spheres);
                 if (intersects.length > 0) {
                     const index = intersects[0].object.userData.hotspotIndex;
-                    showInfo(index);
+                    const def = hotspotDefinitions[index];
+                    window.open(def.link, '_blank');
                 }
             }
         }, { passive: true });
