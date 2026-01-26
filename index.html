@@ -18,41 +18,26 @@
             font-family: 'Inter', sans-serif;
             background: #0B1220;
             color: #E6EDF7;
-            overflow: hidden;
-        }
-
-        #canvas-container {
-            width: 100vw;
-            height: 100vh;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
         #page-title {
-            position: fixed;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            text-align: center;
+            padding: 30px 20px 20px;
             font-family: 'Inter', sans-serif;
             font-size: 36px;
             font-weight: 700;
             color: #E6EDF7;
             letter-spacing: 4px;
             text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-            z-index: 50;
         }
 
         #instructions {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #121A2B;
-            backdrop-filter: blur(10px);
-            padding: 14px 28px;
-            border-radius: 30px;
+            text-align: center;
+            margin-bottom: 30px;
             color: rgba(230, 237, 247, 0.8);
             font-size: 14px;
-            border: 1px solid #1A2438;
-            z-index: 50;
         }
 
         #loading {
@@ -80,34 +65,72 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Model containers */
+        #models-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            padding: 20px;
+            min-height: calc(100vh - 300px);
+        }
+
+        .model-container {
+            width: 280px;
+            height: 320px;
+            background: #121A2B;
+            border-radius: 20px;
+            border: 1px solid #1A2438;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            overflow: hidden;
+        }
+
+        .model-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+            border-color: #3B82F6;
+        }
+
+        .model-canvas-wrapper {
+            width: 100%;
+            height: 240px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .model-canvas-wrapper canvas {
+            width: 100%;
+            height: 100%;
+        }
+
         .model-label {
             color: #E6EDF7;
             font-family: 'Inter', sans-serif;
             font-size: 18px;
             font-weight: 600;
             text-align: center;
-            text-shadow: 0 0 10px rgba(0,0,0,0.8);
-            pointer-events: none;
-            transition: transform 0.3s, color 0.3s;
+            padding: 15px;
+            transition: color 0.3s;
         }
 
-        .model-label.hovered {
-            transform: scale(1.1);
+        .model-container:hover .model-label {
             color: #60A5FA;
         }
 
         /* Footer */
         footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 12px 30px 25px;
+            padding: 20px 30px 25px;
             text-align: center;
             background: rgba(11, 18, 32, 0.9);
             backdrop-filter: blur(10px);
             border-top: 1px solid #1A2438;
-            z-index: 50;
+            margin-top: auto;
         }
 
         .social-links-3d {
@@ -144,15 +167,31 @@
             #page-title {
                 font-size: 24px;
                 letter-spacing: 2px;
+                padding: 20px 20px 15px;
             }
 
             #instructions {
                 font-size: 12px;
-                padding: 10px 20px;
+                margin-bottom: 20px;
+            }
+
+            #models-section {
+                gap: 20px;
+                padding: 10px;
+            }
+
+            .model-container {
+                width: 240px;
+                height: 280px;
+            }
+
+            .model-canvas-wrapper {
+                height: 200px;
             }
 
             .model-label {
-                font-size: 14px;
+                font-size: 16px;
+                padding: 12px;
             }
 
             footer {
@@ -176,17 +215,30 @@
     </style>
 </head>
 <body>
-    <div id="canvas-container"></div>
-
     <h1 id="page-title">COBYPAL</h1>
+
+    <div id="instructions">
+        Hold and drag to rotate • Tap to explore
+    </div>
 
     <div id="loading">
         <div class="spinner"></div>
         <div>Loading...</div>
     </div>
 
-    <div id="instructions">
-        Click a model to explore
+    <div id="models-section">
+        <div class="model-container" data-model="3d_models/coby_face_v02.glb" data-link="about.html" data-name="About">
+            <div class="model-canvas-wrapper"></div>
+            <div class="model-label">About</div>
+        </div>
+        <div class="model-container" data-model="3d_models/manny_v01.glb" data-link="kippystudios.html" data-name="Kippy Studios">
+            <div class="model-canvas-wrapper"></div>
+            <div class="model-label">Kippy Studios</div>
+        </div>
+        <div class="model-container" data-model="3d_models/brain_v01.glb" data-link="brain.html" data-name="Coby's Brain">
+            <div class="model-canvas-wrapper"></div>
+            <div class="model-label">Coby's Brain</div>
+        </div>
     </div>
 
     <footer>
@@ -213,255 +265,210 @@
 
     <script type="module">
         import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-        // Scene setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.2;
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-        // Label renderer
-        const labelRenderer = new CSS2DRenderer();
-        labelRenderer.setSize(window.innerWidth, window.innerHeight);
-        labelRenderer.domElement.style.position = 'absolute';
-        labelRenderer.domElement.style.top = '0';
-        labelRenderer.domElement.style.pointerEvents = 'none';
-        document.getElementById('canvas-container').appendChild(labelRenderer.domElement);
-
-        // Camera position - adjust for mobile
-        const isMobile = window.innerWidth <= 768;
-        function updateCameraForScreenSize() {
-            const mobile = window.innerWidth <= 768;
-            if (mobile) {
-                // Zoom out more on mobile and shift up to center between header and footer
-                camera.position.set(0, -3, 22);
-                controls.target.set(0, 0, 0);
-            } else {
-                camera.position.set(0, 1, 12);
-                controls.target.set(0, 0, 0);
-            }
-        }
-
-        // Orbit controls
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.minDistance = 8;
-        controls.maxDistance = 20;
-        controls.enablePan = false;
-        controls.maxPolarAngle = Math.PI / 1.8;
-        controls.minPolarAngle = Math.PI / 4;
-
-        // Apply initial camera position for screen size
-        updateCameraForScreenSize();
-
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-
-        const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
-        keyLight.position.set(5, 5, 5);
-        scene.add(keyLight);
-
-        const fillLight = new THREE.DirectionalLight(0x60A5FA, 0.4);
-        fillLight.position.set(-5, 0, 5);
-        scene.add(fillLight);
-
-        const rimLight = new THREE.DirectionalLight(0x3B82F6, 0.3);
-        rimLight.position.set(0, 5, -5);
-        scene.add(rimLight);
-
-        // Model data
-        const modelData = [
-            {
-                path: '3d_models/coby_face_v02.glb',
-                name: 'About',
-                link: 'about.html',
-                position: new THREE.Vector3(-4, 0, 0)
-            },
-            {
-                path: '3d_models/manny_v01.glb',
-                name: 'Kippy Studios',
-                link: 'kippystudios.html',
-                position: new THREE.Vector3(0, 0, 0)
-            },
-            {
-                path: '3d_models/brain_v01.glb',
-                name: "Coby's Brain",
-                link: 'brain.html',
-                position: new THREE.Vector3(4, 0, 0)
-            }
-        ];
-
-        // Store loaded models
-        const models = [];
-        const modelGroups = [];
+        const loader = new GLTFLoader();
+        const modelContainers = document.querySelectorAll('.model-container');
+        const modelScenes = [];
         let loadedCount = 0;
 
-        // Load models
-        const loader = new GLTFLoader();
+        // Initialize each model container
+        modelContainers.forEach((container, index) => {
+            const modelPath = container.dataset.model;
+            const link = container.dataset.link;
+            const canvasWrapper = container.querySelector('.model-canvas-wrapper');
 
-        modelData.forEach((data, index) => {
-            const group = new THREE.Group();
-            group.position.copy(data.position);
-            group.userData = { link: data.link, index: index };
-            scene.add(group);
-            modelGroups.push(group);
+            // Create scene for this model
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(50, 280 / 240, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-            loader.load(data.path, (gltf) => {
+            renderer.setSize(280, 240);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
+            canvasWrapper.appendChild(renderer.domElement);
+
+            camera.position.set(0, 0, 4);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            keyLight.position.set(5, 5, 5);
+            scene.add(keyLight);
+
+            const fillLight = new THREE.DirectionalLight(0x60A5FA, 0.4);
+            fillLight.position.set(-5, 0, 5);
+            scene.add(fillLight);
+
+            const rimLight = new THREE.DirectionalLight(0x3B82F6, 0.3);
+            rimLight.position.set(0, 5, -5);
+            scene.add(rimLight);
+
+            // Store scene data
+            const sceneData = {
+                scene,
+                camera,
+                renderer,
+                pivot: null,
+                rotationX: 0,
+                rotationY: 0,
+                isDragging: false,
+                hasDragged: false,
+                lastX: 0,
+                lastY: 0,
+                dragStartTime: 0
+            };
+            modelScenes.push(sceneData);
+
+            // Load model
+            loader.load(modelPath, (gltf) => {
                 const model = gltf.scene;
 
-                // Center and scale model
+                // Scale model
                 const box = new THREE.Box3().setFromObject(model);
-                const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3());
                 const maxDim = Math.max(size.x, size.y, size.z);
-                const scale = 2.5 / maxDim;
-
+                const scale = 2.2 / maxDim;
                 model.scale.setScalar(scale);
-                model.position.sub(center.multiplyScalar(scale));
 
+                // Recalculate and center
+                const scaledBox = new THREE.Box3().setFromObject(model);
+                const center = scaledBox.getCenter(new THREE.Vector3());
+                model.position.set(-center.x, -center.y, -center.z);
 
-                group.add(model);
-                models[index] = model;
-
-                // Add label below model
-                const labelDiv = document.createElement('div');
-                labelDiv.className = 'model-label';
-                labelDiv.textContent = data.name;
-                const label = new CSS2DObject(labelDiv);
-                label.position.set(0, -2, 0);
-                group.add(label);
-                group.userData.labelDiv = labelDiv;
+                // Create pivot for rotation
+                const pivot = new THREE.Group();
+                pivot.add(model);
+                scene.add(pivot);
+                sceneData.pivot = pivot;
 
                 loadedCount++;
-                if (loadedCount === modelData.length) {
+                if (loadedCount === modelContainers.length) {
                     document.getElementById('loading').style.display = 'none';
                 }
             });
-        });
 
-        // Raycaster for click detection
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        let hoveredGroup = null;
+            // Drag handlers
+            const onDragStart = (clientX, clientY) => {
+                sceneData.isDragging = true;
+                sceneData.hasDragged = false;
+                sceneData.lastX = clientX;
+                sceneData.lastY = clientY;
+                sceneData.dragStartTime = Date.now();
+            };
 
-        function onMouseMove(event) {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            const onDragMove = (clientX, clientY) => {
+                if (sceneData.isDragging && sceneData.pivot) {
+                    const deltaX = clientX - sceneData.lastX;
+                    const deltaY = clientY - sceneData.lastY;
 
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(scene.children, true);
-
-            // Reset previous hover
-            if (hoveredGroup) {
-                hoveredGroup.userData.labelDiv?.classList.remove('hovered');
-                hoveredGroup = null;
-            }
-
-            document.body.style.cursor = 'grab';
-
-            for (const intersect of intersects) {
-                let obj = intersect.object;
-                while (obj.parent && !obj.userData.link) {
-                    obj = obj.parent;
-                }
-                if (obj.userData.link) {
-                    hoveredGroup = obj;
-                    hoveredGroup.userData.labelDiv?.classList.add('hovered');
-                    document.body.style.cursor = 'pointer';
-                    break;
-                }
-            }
-        }
-
-        function onMouseClick(event) {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(scene.children, true);
-
-            for (const intersect of intersects) {
-                let obj = intersect.object;
-                while (obj.parent && !obj.userData.link) {
-                    obj = obj.parent;
-                }
-                if (obj.userData.link) {
-                    window.location.href = obj.userData.link;
-                    break;
-                }
-            }
-        }
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('click', onMouseClick);
-
-        // Touch support
-        window.addEventListener('touchstart', (event) => {
-            if (event.touches.length === 1) {
-                const touch = event.touches[0];
-                mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
-
-                raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(scene.children, true);
-
-                for (const intersect of intersects) {
-                    let obj = intersect.object;
-                    while (obj.parent && !obj.userData.link) {
-                        obj = obj.parent;
+                    if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
+                        sceneData.hasDragged = true;
                     }
-                    if (obj.userData.link) {
-                        window.location.href = obj.userData.link;
-                        break;
-                    }
+
+                    sceneData.rotationY += deltaX * 0.01;
+                    sceneData.rotationX += deltaY * 0.01;
+                    sceneData.rotationX = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, sceneData.rotationX));
+
+                    sceneData.lastX = clientX;
+                    sceneData.lastY = clientY;
                 }
-            }
-        }, { passive: true });
+            };
 
-        // Animation loop
-        let time = 0;
-        function animate() {
-            requestAnimationFrame(animate);
-            time += 0.01;
+            const onDragEnd = () => {
+                sceneData.isDragging = false;
+            };
 
-            // Gentle rotation for each model
-            modelGroups.forEach((group, i) => {
-                group.rotation.y = Math.sin(time + i * 2) * 0.2;
+            // Mouse events on canvas wrapper
+            canvasWrapper.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDragStart(e.clientX, e.clientY);
+            });
 
-                // Hover effect - scale up
-                if (group === hoveredGroup) {
-                    group.scale.lerp(new THREE.Vector3(1.1, 1.1, 1.1), 0.1);
-                } else {
-                    group.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
+            window.addEventListener('mousemove', (e) => {
+                if (sceneData.isDragging) {
+                    onDragMove(e.clientX, e.clientY);
                 }
             });
 
-            controls.update();
-            renderer.render(scene, camera);
-            labelRenderer.render(scene, camera);
-        }
+            window.addEventListener('mouseup', () => {
+                onDragEnd();
+            });
 
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            labelRenderer.setSize(window.innerWidth, window.innerHeight);
-            updateCameraForScreenSize();
+            // Touch events on canvas wrapper
+            canvasWrapper.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (sceneData.isDragging) {
+                    onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                onDragEnd();
+            });
+
+            // Click handler - navigate if not dragged
+            container.addEventListener('click', (e) => {
+                if (!sceneData.hasDragged) {
+                    window.location.href = link;
+                }
+            });
+
+            // Touch tap handler for mobile
+            container.addEventListener('touchend', (e) => {
+                const dragDuration = Date.now() - sceneData.dragStartTime;
+                if (!sceneData.hasDragged && dragDuration < 200) {
+                    window.location.href = link;
+                }
+            });
         });
 
-        animate();
+        // Animation loop for main models
+        function animateModels() {
+            requestAnimationFrame(animateModels);
+            const time = Date.now() * 0.001;
+
+            modelScenes.forEach((sceneData, i) => {
+                if (sceneData.pivot) {
+                    if (sceneData.isDragging) {
+                        sceneData.pivot.rotation.x = sceneData.rotationX;
+                        sceneData.pivot.rotation.y = sceneData.rotationY;
+                    } else {
+                        // Gentle auto-rotation when not dragging
+                        const autoRotation = Math.sin(time + i * 2) * 0.3;
+                        sceneData.rotationY += (autoRotation - sceneData.pivot.rotation.y) * 0.02;
+                        sceneData.rotationX *= 0.98; // Slowly return to center
+                        sceneData.pivot.rotation.x = sceneData.rotationX;
+                        sceneData.pivot.rotation.y = sceneData.rotationY;
+                    }
+                }
+                sceneData.renderer.render(sceneData.scene, sceneData.camera);
+            });
+        }
+
+        animateModels();
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            const isMobile = window.innerWidth <= 768;
+            const width = isMobile ? 240 : 280;
+            const height = isMobile ? 200 : 240;
+
+            modelScenes.forEach((sceneData) => {
+                sceneData.camera.aspect = width / height;
+                sceneData.camera.updateProjectionMatrix();
+                sceneData.renderer.setSize(width, height);
+            });
+        });
 
         // 3D Social Icons
         const socialIcons = document.querySelectorAll('.social-icon-container');
