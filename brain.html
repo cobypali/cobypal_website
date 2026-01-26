@@ -582,6 +582,25 @@
         let targetCameraPosition = null;
         let targetLookAt = null;
         let isAnimating = false;
+        let isZoomedIn = false;
+        let currentShownRegion = null;
+
+        // Original camera position based on screen size
+        function getOriginalCameraPosition() {
+            const mobile = window.innerWidth <= 768;
+            return mobile ? new THREE.Vector3(0, 20, 350) : new THREE.Vector3(0, 0, 250);
+        }
+
+        // Reset to original camera position
+        function resetToOriginalPosition() {
+            targetCameraPosition = getOriginalCameraPosition();
+            targetLookAt = new THREE.Vector3(0, 0, 0);
+            isAnimating = true;
+            isZoomedIn = false;
+            controls.autoRotate = true;
+            infoPanel.style.display = 'none';
+            currentShownRegion = null;
+        }
 
         // Zoom to hotspot function
         function zoomToHotspot(index) {
@@ -599,7 +618,22 @@
             targetCameraPosition = direction.multiplyScalar(zoomDistance).add(hotspotPos.clone().multiplyScalar(0.3));
             targetLookAt = hotspotPos.clone();
             isAnimating = true;
+            isZoomedIn = true;
         }
+
+        // Detect manual zoom out and reset camera
+        controls.addEventListener('change', () => {
+            if (isZoomedIn && !isAnimating) {
+                const originalPos = getOriginalCameraPosition();
+                const distanceFromOrigin = camera.position.length();
+                const originalDistance = originalPos.length();
+
+                // If user has zoomed out past 80% of original distance, reset fully
+                if (distanceFromOrigin > originalDistance * 0.8) {
+                    resetToOriginalPosition();
+                }
+            }
+        });
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -721,9 +755,6 @@
         const panelDescription = document.getElementById('panel-description');
         const panelLink = document.getElementById('panel-link');
         const closeBtn = document.getElementById('close-btn');
-
-        // Track currently shown region
-        let currentShownRegion = null;
 
         // Create region list UI
         function createRegionList() {
