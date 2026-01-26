@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Film & TV Blog | Coby Palivathukal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B1220;
+            color: #E6EDF7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(11, 18, 32, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1A2438;
+        }
+
+        .logo {
+            font-family: 'Inter', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #E6EDF7;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #3B82F6;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 120px 50px 80px;
+        }
+
+        .blog-section {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 48px;
+            font-weight: 600;
+            color: #E6EDF7;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .tagline {
+            font-size: 18px;
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #60A5FA;
+        }
+
+        /* Sort Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .sort-btn {
+            background: rgba(26, 36, 56, 0.8);
+            border: 1px solid #1A2438;
+            color: #E6EDF7;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sort-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3B82F6;
+        }
+
+        .sort-btn.active {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: #3B82F6;
+            color: #60A5FA;
+        }
+
+        .sort-btn .arrow {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #60A5FA;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #1A2438;
+            border-top-color: #3B82F6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Films Grid */
+        .films-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .film-card {
+            background: rgba(18, 26, 43, 0.8);
+            border: 1px solid #1A2438;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .film-card:hover {
+            border-color: #3B82F6;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
+        }
+
+        .film-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #E6EDF7;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .film-title:hover {
+            color: #60A5FA;
+        }
+
+        .film-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 14px;
+            color: rgba(230, 237, 247, 0.7);
+        }
+
+        .film-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .film-meta-label {
+            color: rgba(230, 237, 247, 0.5);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .film-rating {
+            background: linear-gradient(135deg, #3B82F6, #60A5FA);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .film-rating.high {
+            background: linear-gradient(135deg, #10B981, #34D399);
+        }
+
+        .film-rating.medium {
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+        }
+
+        .film-rating.low {
+            background: linear-gradient(135deg, #EF4444, #F87171);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(11, 18, 32, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: #121A2B;
+            border: 1px solid #1A2438;
+            border-radius: 16px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(26, 36, 56, 0.8);
+            border: 1px solid #1A2438;
+            color: #E6EDF7;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: #EF4444;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #E6EDF7;
+            margin-bottom: 16px;
+            padding-right: 40px;
+        }
+
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #1A2438;
+        }
+
+        .modal-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .modal-meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(230, 237, 247, 0.5);
+        }
+
+        .modal-meta-value {
+            font-size: 16px;
+            color: #E6EDF7;
+            font-weight: 500;
+        }
+
+        .modal-review {
+            font-size: 16px;
+            line-height: 1.8;
+            color: rgba(230, 237, 247, 0.9);
+            white-space: pre-wrap;
+        }
+
+        .no-review {
+            color: rgba(230, 237, 247, 0.5);
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            padding: 20px 50px 40px;
+            text-align: center;
+            border-top: 1px solid #1A2438;
+        }
+
+        .social-links-3d {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-icon-container {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .social-icon-container:hover {
+            transform: scale(1.15);
+        }
+
+        .social-icon-container canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .copyright {
+            font-size: 12px;
+            color: rgba(230, 237, 247, 0.5);
+        }
+
+        /* Item count */
+        .item-count {
+            text-align: center;
+            font-size: 13px;
+            color: rgba(230, 237, 247, 0.5);
+            margin-bottom: 20px;
+        }
+
+        /* Error State */
+        .error {
+            text-align: center;
+            padding: 60px;
+            color: #EF4444;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .nav-links {
+                gap: 20px;
+                margin-left: 30px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+
+            main {
+                padding: 100px 20px 60px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .tagline {
+                font-size: 15px;
+            }
+
+            .controls {
+                gap: 8px;
+            }
+
+            .sort-btn {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+
+            .films-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .film-card {
+                padding: 20px;
+            }
+
+            .modal {
+                padding: 24px;
+            }
+
+            .modal-title {
+                font-size: 22px;
+            }
+
+            footer {
+                padding: 20px;
+            }
+
+            .social-links-3d {
+                gap: 20px;
+                margin-left: -25px;
+            }
+
+            .social-icon-container {
+                width: 70px;
+                height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">COBYPAL</a>
+        <div class="nav-links">
+            <a href="about.html">About</a>
+            <a href="kippystudios.html">Kippy Studios</a>
+            <a href="brain.html">Coby's Brain</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="blog-section">
+            <h1 class="page-title">Coby's Film and TV Blog</h1>
+            <p class="tagline">Reviews and ratings, sorted and searchable</p>
+
+            <div class="controls">
+                <button class="sort-btn active" data-sort="rating" data-order="desc">
+                    Rating <span class="arrow">&#9660;</span>
+                </button>
+                <button class="sort-btn" data-sort="title" data-order="asc">
+                    Title <span class="arrow">&#9650;</span>
+                </button>
+                <button class="sort-btn" data-sort="year" data-order="desc">
+                    Year <span class="arrow">&#9660;</span>
+                </button>
+                <button class="sort-btn" data-sort="director" data-order="asc">
+                    Director <span class="arrow">&#9650;</span>
+                </button>
+                <button class="sort-btn" data-sort="reviewDate" data-order="desc">
+                    Review Date <span class="arrow">&#9660;</span>
+                </button>
+            </div>
+
+            <p class="item-count" id="item-count"></p>
+
+            <div id="content">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading reviews...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Review Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <h2 class="modal-title" id="modal-title"></h2>
+            <div class="modal-meta" id="modal-meta"></div>
+            <div class="modal-review" id="modal-review"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="social-links-3d" id="social-links-3d">
+            <div class="social-icon-container" data-link="https://www.youtube.com/user/cobypalivathukal" data-model="socials/youtube_icon/scene.gltf" title="YouTube"></div>
+            <div class="social-icon-container" data-link="https://www.instagram.com/cobypal" data-model="socials/instagram_icon/scene.gltf" title="Instagram"></div>
+            <div class="social-icon-container" data-link="https://www.tiktok.com/@cobypal?lang=en" data-model="socials/tiktok_icon/scene.gltf" title="TikTok"></div>
+            <div class="social-icon-container" data-link="https://www.twitter.com/cobypal" data-model="socials/x_icon/scene.gltf" title="X"></div>
+            <div class="social-icon-container" data-link="http://threads.net/@cobypal" data-model="socials/threads_icon/scene.gltf" title="Threads"></div>
+            <div class="social-icon-container" data-link="https://www.linkedin.com/in/cobypalivathukal/" data-model="socials/linkedin_icon/scene.gltf" title="LinkedIn"></div>
+            <div class="social-icon-container" data-link="https://www.facebook.com/coby.palivathukal" data-model="socials/facebook_icon/scene.gltf" title="Facebook"></div>
+        </div>
+        <p class="copyright">&copy; 2026 Coby Palivathukal. All rights reserved.</p>
+    </footer>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // Google Sheet configuration
+        const SHEET_ID = '1g9WpJ3Si7X42lhDd_5_Ft3wWnzwy6965GApO9rwG0I8';
+        const GID = '1517197804';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+
+        let allFilms = [];
+        let currentSort = { field: 'rating', order: 'desc' };
+
+        // Fetch data from Google Sheet
+        async function fetchSheetData() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const text = await response.text();
+
+                // Google returns JSONP-like response, extract JSON
+                const jsonStart = text.indexOf('{');
+                const jsonEnd = text.lastIndexOf('}') + 1;
+                const jsonString = text.substring(jsonStart, jsonEnd);
+                const data = JSON.parse(jsonString);
+
+                // Parse rows (skip header row)
+                const rows = data.table.rows;
+                allFilms = rows.slice(1).map((row, index) => {
+                    const cells = row.c || [];
+                    return {
+                        id: index,
+                        title: cells[0]?.v || '',
+                        rating: parseFloat(cells[1]?.v) || 0,
+                        year: cells[2]?.v ? String(cells[2].v) : '',
+                        director: cells[3]?.v || '',
+                        reviewDate: cells[4]?.v || cells[4]?.f || '',
+                        review: cells[5]?.v || ''
+                    };
+                }).filter(film => film.title); // Filter out empty rows
+
+                // Limit to 100 items
+                allFilms = allFilms.slice(0, 100);
+
+                renderFilms();
+            } catch (error) {
+                console.error('Error fetching sheet data:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="error">
+                        <div class="error-icon">!</div>
+                        <p>Unable to load reviews. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Sort films
+        function sortFilms(field, order) {
+            const sorted = [...allFilms].sort((a, b) => {
+                let valA = a[field];
+                let valB = b[field];
+
+                // Handle different field types
+                if (field === 'rating' || field === 'year') {
+                    valA = parseFloat(valA) || 0;
+                    valB = parseFloat(valB) || 0;
+                } else if (field === 'reviewDate') {
+                    valA = new Date(valA) || new Date(0);
+                    valB = new Date(valB) || new Date(0);
+                } else {
+                    valA = String(valA).toLowerCase();
+                    valB = String(valB).toLowerCase();
+                }
+
+                if (order === 'asc') {
+                    return valA > valB ? 1 : valA < valB ? -1 : 0;
+                } else {
+                    return valA < valB ? 1 : valA > valB ? -1 : 0;
+                }
+            });
+
+            return sorted;
+        }
+
+        // Get rating class for color coding
+        function getRatingClass(rating) {
+            if (rating >= 8) return 'high';
+            if (rating >= 6) return 'medium';
+            if (rating > 0) return 'low';
+            return '';
+        }
+
+        // Render films grid
+        function renderFilms() {
+            const sorted = sortFilms(currentSort.field, currentSort.order);
+            const container = document.getElementById('content');
+            const countEl = document.getElementById('item-count');
+
+            countEl.textContent = `Showing ${sorted.length} review${sorted.length !== 1 ? 's' : ''}`;
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="loading"><p>No reviews found.</p></div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="films-grid">
+                    ${sorted.map(film => `
+                        <div class="film-card" data-id="${film.id}">
+                            <h3 class="film-title">${escapeHtml(film.title)}</h3>
+                            <div class="film-meta">
+                                ${film.rating ? `
+                                    <div class="film-meta-item">
+                                        <span class="film-rating ${getRatingClass(film.rating)}">${film.rating.toFixed(1)}</span>
+                                    </div>
+                                ` : ''}
+                                ${film.year ? `
+                                    <div class="film-meta-item">
+                                        <span class="film-meta-label">Year</span>
+                                        <span>${escapeHtml(film.year)}</span>
+                                    </div>
+                                ` : ''}
+                                ${film.director ? `
+                                    <div class="film-meta-item">
+                                        <span class="film-meta-label">Director</span>
+                                        <span>${escapeHtml(film.director)}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // Add click handlers to cards
+            document.querySelectorAll('.film-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const id = parseInt(card.dataset.id);
+                    const film = allFilms.find(f => f.id === id);
+                    if (film) openModal(film);
+                });
+            });
+        }
+
+        // Escape HTML for security
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Modal functionality
+        function openModal(film) {
+            const overlay = document.getElementById('modal-overlay');
+            const title = document.getElementById('modal-title');
+            const meta = document.getElementById('modal-meta');
+            const review = document.getElementById('modal-review');
+
+            title.textContent = film.title;
+
+            meta.innerHTML = `
+                ${film.rating ? `
+                    <div class="modal-meta-item">
+                        <span class="modal-meta-label">Rating</span>
+                        <span class="modal-meta-value">${film.rating.toFixed(1)} / 10</span>
+                    </div>
+                ` : ''}
+                ${film.year ? `
+                    <div class="modal-meta-item">
+                        <span class="modal-meta-label">Year</span>
+                        <span class="modal-meta-value">${escapeHtml(film.year)}</span>
+                    </div>
+                ` : ''}
+                ${film.director ? `
+                    <div class="modal-meta-item">
+                        <span class="modal-meta-label">Director</span>
+                        <span class="modal-meta-value">${escapeHtml(film.director)}</span>
+                    </div>
+                ` : ''}
+                ${film.reviewDate ? `
+                    <div class="modal-meta-item">
+                        <span class="modal-meta-label">Reviewed</span>
+                        <span class="modal-meta-value">${escapeHtml(film.reviewDate)}</span>
+                    </div>
+                ` : ''}
+            `;
+
+            if (film.review) {
+                review.innerHTML = escapeHtml(film.review);
+                review.classList.remove('no-review');
+            } else {
+                review.textContent = 'No review written yet.';
+                review.classList.add('no-review');
+            }
+
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Event listeners
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Sort button handlers
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const field = btn.dataset.sort;
+                let order = btn.dataset.order;
+
+                // If clicking same button, toggle order
+                if (currentSort.field === field) {
+                    order = currentSort.order === 'asc' ? 'desc' : 'asc';
+                    btn.dataset.order = order;
+                    btn.querySelector('.arrow').innerHTML = order === 'asc' ? '&#9650;' : '&#9660;';
+                }
+
+                currentSort = { field, order };
+
+                // Update active state
+                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                renderFilms();
+            });
+        });
+
+        // Initialize
+        fetchSheetData();
+
+        // Refresh data every 5 minutes for live updates
+        setInterval(fetchSheetData, 5 * 60 * 1000);
+
+        // 3D Social Icons
+        const socialIcons = document.querySelectorAll('.social-icon-container');
+        const socialScenes = [];
+
+        socialIcons.forEach((iconContainer, index) => {
+            const modelPath = iconContainer.dataset.model;
+            const link = iconContainer.dataset.link;
+
+            const iconScene = new THREE.Scene();
+            const iconCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+            const iconRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+            iconRenderer.setSize(100, 100);
+            iconRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            iconContainer.appendChild(iconRenderer.domElement);
+
+            iconCamera.position.set(0, 0, 3);
+
+            const iconAmbient = new THREE.AmbientLight(0xffffff, 0.8);
+            iconScene.add(iconAmbient);
+
+            const iconKey = new THREE.DirectionalLight(0xffffff, 1.2);
+            iconKey.position.set(2, 2, 2);
+            iconScene.add(iconKey);
+
+            const iconLoader = new GLTFLoader();
+            let iconModel = null;
+
+            iconLoader.load(modelPath, (gltf) => {
+                iconModel = gltf.scene;
+
+                const box = new THREE.Box3().setFromObject(iconModel);
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 1.8 / maxDim;
+                iconModel.scale.setScalar(scale);
+
+                const scaledBox = new THREE.Box3().setFromObject(iconModel);
+                const center = scaledBox.getCenter(new THREE.Vector3());
+
+                iconModel.position.set(-center.x, -center.y, -center.z);
+
+                const pivot = new THREE.Group();
+                pivot.add(iconModel);
+                iconScene.add(pivot);
+
+                iconContainer._pivot = pivot;
+                iconContainer._manualRotation = 0;
+                iconContainer._isDragging = false;
+                iconContainer._hasDragged = false;
+                iconContainer._lastX = 0;
+            });
+
+            socialScenes.push({ scene: iconScene, camera: iconCamera, renderer: iconRenderer, model: () => iconModel });
+
+            const onDragStart = (clientX) => {
+                iconContainer._isDragging = true;
+                iconContainer._hasDragged = false;
+                iconContainer._lastX = clientX;
+            };
+
+            const onDragMove = (clientX) => {
+                if (iconContainer._isDragging && iconContainer._pivot) {
+                    const deltaX = clientX - iconContainer._lastX;
+                    if (Math.abs(deltaX) > 2) {
+                        iconContainer._hasDragged = true;
+                    }
+                    iconContainer._manualRotation += deltaX * 0.02;
+                    iconContainer._lastX = clientX;
+                }
+            };
+
+            const onDragEnd = () => {
+                iconContainer._isDragging = false;
+            };
+
+            iconContainer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                onDragStart(e.clientX);
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                onDragMove(e.clientX);
+            });
+
+            window.addEventListener('mouseup', () => {
+                onDragEnd();
+            });
+
+            iconContainer.addEventListener('touchstart', (e) => {
+                onDragStart(e.touches[0].clientX);
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (iconContainer._isDragging) {
+                    onDragMove(e.touches[0].clientX);
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                onDragEnd();
+            });
+
+            iconContainer.addEventListener('click', (e) => {
+                if (!iconContainer._hasDragged) {
+                    window.open(link, '_blank');
+                }
+            });
+        });
+
+        function animateSocialIcons() {
+            requestAnimationFrame(animateSocialIcons);
+            const time = Date.now() * 0.001;
+
+            socialIcons.forEach((iconContainer, i) => {
+                const pivot = iconContainer._pivot;
+                if (pivot) {
+                    if (iconContainer._isDragging) {
+                        pivot.rotation.y = iconContainer._manualRotation;
+                    } else {
+                        const autoRotation = time + i * 0.5;
+                        iconContainer._manualRotation = autoRotation;
+                        pivot.rotation.y = autoRotation;
+                    }
+                }
+            });
+
+            socialScenes.forEach((item) => {
+                item.renderer.render(item.scene, item.camera);
+            });
+        }
+
+        animateSocialIcons();
+    </script>
+</body>
+</html>
