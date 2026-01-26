@@ -454,6 +454,7 @@
 
             .social-links-3d {
                 gap: 15px;
+                margin-left: -10px;
             }
 
             .social-icon-container {
@@ -577,6 +578,29 @@
         controls.maxDistance = 500;
         controls.autoRotate = true;
         controls.autoRotateSpeed = 0.5;
+
+        // Camera animation state
+        let targetCameraPosition = null;
+        let targetLookAt = null;
+        let isAnimating = false;
+
+        // Zoom to hotspot function
+        function zoomToHotspot(index) {
+            const def = hotspotDefinitions[index];
+            if (!def.position) return;
+
+            // Stop auto-rotate during zoom
+            controls.autoRotate = false;
+
+            // Calculate camera position: offset from hotspot position
+            const hotspotPos = def.position.clone();
+            const direction = hotspotPos.clone().normalize();
+            const zoomDistance = 120; // How close to zoom in
+
+            targetCameraPosition = direction.multiplyScalar(zoomDistance).add(hotspotPos.clone().multiplyScalar(0.3));
+            targetLookAt = hotspotPos.clone();
+            isAnimating = true;
+        }
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -712,6 +736,7 @@
                     if (editMode) {
                         selectRegion(index);
                     } else if (def.position) {
+                        zoomToHotspot(index);
                         showInfo(index);
                     }
                 });
@@ -1002,6 +1027,17 @@
         function animate() {
             requestAnimationFrame(animate);
             time += 0.01;
+
+            // Camera zoom animation
+            if (isAnimating && targetCameraPosition && targetLookAt) {
+                camera.position.lerp(targetCameraPosition, 0.05);
+                controls.target.lerp(targetLookAt, 0.05);
+
+                // Check if animation is complete
+                if (camera.position.distanceTo(targetCameraPosition) < 1) {
+                    isAnimating = false;
+                }
+            }
 
             hotspotMeshes.forEach((hotspot, i) => {
                 if (!hotspot) return;
