@@ -182,12 +182,12 @@
             }
 
             .model-container {
-                width: 320px;
-                height: 380px;
+                width: 260px;
+                height: 310px;
             }
 
             .model-canvas-wrapper {
-                height: 300px;
+                height: 240px;
             }
 
             .model-label {
@@ -471,8 +471,8 @@
         // Handle resize
         window.addEventListener('resize', () => {
             const isMobile = window.innerWidth <= 768;
-            const width = isMobile ? 320 : 400;
-            const height = isMobile ? 300 : 380;
+            const width = isMobile ? 260 : 400;
+            const height = isMobile ? 240 : 380;
 
             modelScenes.forEach((sceneData) => {
                 sceneData.camera.aspect = width / height;
