@@ -87,7 +87,44 @@
             font-weight: 600;
             color: #E6EDF7;
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 24px;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .toggle-switch {
+            display: flex;
+            background: rgba(26, 36, 56, 0.8);
+            border: 1px solid #1A2438;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .toggle-btn {
+            padding: 12px 28px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(230, 237, 247, 0.7);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            color: #E6EDF7;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .toggle-btn.active {
+            color: #E6EDF7;
+            background: rgba(59, 130, 246, 0.3);
         }
 
         /* Loading State */
@@ -465,6 +502,12 @@
     <main>
         <div class="blog-section">
             <h1 class="page-title">Coby's Film and TV Blog</h1>
+            <div class="toggle-container">
+                <div class="toggle-switch">
+                    <button class="toggle-btn active" data-type="movies">Movies</button>
+                    <button class="toggle-btn" data-type="tv">TV Shows</button>
+                </div>
+            </div>
             <p class="item-count" id="item-count"></p>
             <div id="content">
                 <div class="loading">
@@ -513,16 +556,21 @@
 
         // Google Sheet configuration
         const SHEET_ID = '1g9WpJ3Si7X42lhDd_5_Ft3wWnzwy6965GApO9rwG0I8';
-        const GID = '1517197804';
-        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+        const GIDS = {
+            movies: '1517197804',
+            tv: '1920466216'
+        };
 
         let allFilms = [];
         let currentSort = { field: 'rating', order: 'desc' };
+        let currentType = 'movies';
 
         // Fetch data from Google Sheet
         async function fetchSheetData() {
             try {
-                const response = await fetch(SHEET_URL);
+                const gid = GIDS[currentType];
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}`;
+                const response = await fetch(url);
                 const text = await response.text();
 
                 const jsonStart = text.indexOf('{');
@@ -544,7 +592,7 @@
                     };
                 }).filter(film => film.title);
 
-                allFilms = allFilms.slice(0, 100);
+                allFilms = allFilms.slice(0, 250);
                 renderTable();
             } catch (error) {
                 console.error('Error fetching sheet data:', error);
@@ -751,6 +799,25 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
+        });
+
+        // Toggle handlers
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.dataset.type;
+                if (type !== currentType) {
+                    currentType = type;
+                    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById('content').innerHTML = `
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading reviews...</p>
+                        </div>
+                    `;
+                    fetchSheetData();
+                }
+            });
         });
 
         // Initialize
