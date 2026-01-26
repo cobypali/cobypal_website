@@ -722,6 +722,9 @@
         const panelLink = document.getElementById('panel-link');
         const closeBtn = document.getElementById('close-btn');
 
+        // Track currently shown region
+        let currentShownRegion = null;
+
         // Create region list UI
         function createRegionList() {
             hotspotDefinitions.forEach((def, index) => {
@@ -735,8 +738,15 @@
                     if (editMode) {
                         selectRegion(index);
                     } else if (def.position) {
-                        zoomToHotspot(index);
-                        showInfo(index);
+                        if (currentShownRegion === index) {
+                            // Second click - open the link
+                            window.open(def.link, '_blank');
+                        } else {
+                            // First click - zoom and show info
+                            zoomToHotspot(index);
+                            showInfo(index);
+                            currentShownRegion = index;
+                        }
                     }
                 });
                 regionsList.appendChild(li);
@@ -856,6 +866,7 @@
 
         closeBtn.addEventListener('click', () => {
             infoPanel.style.display = 'none';
+            currentShownRegion = null;
         });
 
         // Raycaster
