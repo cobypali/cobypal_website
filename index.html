@@ -236,8 +236,19 @@
         labelRenderer.domElement.style.pointerEvents = 'none';
         document.getElementById('canvas-container').appendChild(labelRenderer.domElement);
 
-        // Camera position
-        camera.position.set(0, 2, 12);
+        // Camera position - adjust for mobile
+        const isMobile = window.innerWidth <= 768;
+        function updateCameraForScreenSize() {
+            const mobile = window.innerWidth <= 768;
+            if (mobile) {
+                // Zoom out more on mobile and shift up to center between header and footer
+                camera.position.set(0, 1, 18);
+                controls.target.set(0, 0.5, 0);
+            } else {
+                camera.position.set(0, 2, 12);
+                controls.target.set(0, 0, 0);
+            }
+        }
 
         // Orbit controls
         const controls = new OrbitControls(camera, renderer.domElement);
@@ -248,6 +259,9 @@
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI / 1.8;
         controls.minPolarAngle = Math.PI / 4;
+
+        // Apply initial camera position for screen size
+        updateCameraForScreenSize();
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -276,7 +290,7 @@
             {
                 path: '3d_models/manny_v01.glb',
                 name: 'Kippy Studios',
-                link: 'kippy-studios.html',
+                link: 'kippystudios.html',
                 position: new THREE.Vector3(0, 0, 0)
             },
             {
@@ -443,6 +457,7 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            updateCameraForScreenSize();
         });
 
         animate();
