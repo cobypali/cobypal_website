@@ -583,32 +583,6 @@
         let targetCameraPosition = null;
         let targetLookAt = null;
         let isAnimating = false;
-        let currentZoomedIndex = null;
-
-        // Store original camera position
-        const originalCameraPosition = new THREE.Vector3();
-        const originalLookAt = new THREE.Vector3(0, 0, 0);
-
-        function storeOriginalCameraPosition() {
-            const mobile = window.innerWidth <= 768;
-            if (mobile) {
-                originalCameraPosition.set(0, 20, 350);
-            } else {
-                originalCameraPosition.set(0, 0, 250);
-            }
-        }
-        storeOriginalCameraPosition();
-
-        // Reset camera to original position
-        function resetCamera() {
-            storeOriginalCameraPosition();
-            targetCameraPosition = originalCameraPosition.clone();
-            targetLookAt = originalLookAt.clone();
-            isAnimating = true;
-            currentZoomedIndex = null;
-            controls.autoRotate = true;
-            infoPanel.style.display = 'none';
-        }
 
         // Zoom to hotspot function
         function zoomToHotspot(index) {
@@ -762,15 +736,8 @@
                     if (editMode) {
                         selectRegion(index);
                     } else if (def.position) {
-                        if (currentZoomedIndex === index) {
-                            // Second click - open the link
-                            window.open(def.link, '_blank');
-                        } else {
-                            // First click - zoom to hotspot
-                            zoomToHotspot(index);
-                            showInfo(index);
-                            currentZoomedIndex = index;
-                        }
+                        zoomToHotspot(index);
+                        showInfo(index);
                     }
                 });
                 regionsList.appendChild(li);
@@ -921,18 +888,11 @@
             } else {
                 // Check if clicking on hotspot - go directly to link
                 const spheres = hotspotMeshes.filter(h => h).map(h => h.sphere);
-                const hotspotIntersects = raycaster.intersectObjects(spheres);
-                if (hotspotIntersects.length > 0) {
-                    const index = hotspotIntersects[0].object.userData.hotspotIndex;
+                const intersects = raycaster.intersectObjects(spheres);
+                if (intersects.length > 0) {
+                    const index = intersects[0].object.userData.hotspotIndex;
                     const def = hotspotDefinitions[index];
                     window.open(def.link, '_blank');
-                } else {
-                    // Check if clicking on brain
-                    const brainIntersects = raycaster.intersectObjects(brainMeshes, true);
-                    if (brainIntersects.length === 0 && currentZoomedIndex !== null) {
-                        // Clicked on empty space - reset camera
-                        resetCamera();
-                    }
                 }
             }
         }
@@ -987,10 +947,9 @@
 
         window.addEventListener('mousemove', onMouseMove);
 
-        // Stop auto-rotate when user interacts and reset zoom state
+        // Stop auto-rotate when user interacts
         controls.addEventListener('start', () => {
             if (!editMode) controls.autoRotate = false;
-            currentZoomedIndex = null;
         });
 
         // Load brain model
