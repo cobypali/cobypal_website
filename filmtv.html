@@ -272,10 +272,11 @@
             z-index: 200;
             display: none;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 40px 20px;
             opacity: 0;
             transition: opacity 0.3s;
+            overflow-y: auto;
         }
 
         .modal-overlay.active {
@@ -289,12 +290,11 @@
             border-radius: 16px;
             max-width: 700px;
             width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
             padding: 40px;
             position: relative;
             transform: scale(0.95);
             transition: transform 0.3s;
+            margin: auto 0;
         }
 
         .modal-overlay.active .modal {
@@ -581,18 +581,28 @@
                 const rows = data.table.rows;
                 allFilms = rows.map((row, index) => {
                     const cells = row.c || [];
+                    // Handle date - prefer formatted value, fallback to raw value
+                    let reviewDate = cells[4]?.f || cells[4]?.v || '';
+                    // If it's a Date object string like "Date(2024,10,28)", parse it
+                    if (typeof cells[4]?.v === 'string' && cells[4]?.v.startsWith('Date(')) {
+                        const match = cells[4].v.match(/Date\((\d+),(\d+),(\d+)\)/);
+                        if (match) {
+                            const [, year, month, day] = match;
+                            reviewDate = `${parseInt(month) + 1}/${day}/${year}`;
+                        }
+                    }
                     return {
                         id: index,
                         title: cells[0]?.v || '',
                         rating: parseFloat(cells[1]?.v) || 0,
                         year: cells[2]?.v ? String(cells[2].v) : '',
                         director: cells[3]?.v || '',
-                        reviewDate: cells[4]?.v || cells[4]?.f || '',
+                        reviewDate: reviewDate,
                         review: cells[5]?.v || ''
                     };
                 }).filter(film => film.title);
 
-                allFilms = allFilms.slice(0, 250);
+                // Keep all films for sorting, display limited in renderTable
                 renderTable();
             } catch (error) {
                 console.error('Error fetching sheet data:', error);
@@ -647,6 +657,10 @@
         // Format date as MM/DD/YYYY
         function formatDate(dateStr) {
             if (!dateStr) return '-';
+            // If already in MM/DD/YYYY format, return as is
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+                return escapeHtml(dateStr);
+            }
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return escapeHtml(dateStr);
             const month = date.getMonth() + 1;
@@ -658,12 +672,17 @@
         // Render table
         function renderTable() {
             const sorted = sortFilms(currentSort.field, currentSort.order);
+            const displayed = sorted.slice(0, 250);
             const container = document.getElementById('content');
             const countEl = document.getElementById('item-count');
 
-            countEl.textContent = `${sorted.length} review${sorted.length !== 1 ? 's' : ''}`;
+            const totalCount = sorted.length;
+            const showingCount = displayed.length;
+            countEl.textContent = totalCount > 250
+                ? `Showing ${showingCount} of ${totalCount} reviews`
+                : `${totalCount} review${totalCount !== 1 ? 's' : ''}`;
 
-            if (sorted.length === 0) {
+            if (displayed.length === 0) {
                 container.innerHTML = '<div class="loading"><p>No reviews found.</p></div>';
                 return;
             }
@@ -696,7 +715,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${sorted.map((film, index) => `
+                            ${displayed.map((film, index) => `
                                 <tr>
                                     <td class="row-num">${index + 1}</td>
                                     <td class="title-cell" data-id="${film.id}">${escapeHtml(film.title)}</td>
