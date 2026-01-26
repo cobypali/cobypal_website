@@ -77,7 +77,7 @@
         }
 
         .blog-section {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -87,56 +87,7 @@
             font-weight: 600;
             color: #E6EDF7;
             text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .tagline {
-            font-size: 18px;
-            font-weight: 300;
-            text-align: center;
             margin-bottom: 40px;
-            color: #60A5FA;
-        }
-
-        /* Sort Controls */
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .sort-btn {
-            background: rgba(26, 36, 56, 0.8);
-            border: 1px solid #1A2438;
-            color: #E6EDF7;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .sort-btn:hover {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: #3B82F6;
-        }
-
-        .sort-btn.active {
-            background: rgba(59, 130, 246, 0.3);
-            border-color: #3B82F6;
-            color: #60A5FA;
-        }
-
-        .sort-btn .arrow {
-            font-size: 10px;
-            opacity: 0.7;
         }
 
         /* Loading State */
@@ -160,80 +111,99 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Films Grid */
-        .films-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .film-card {
-            background: rgba(18, 26, 43, 0.8);
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
             border: 1px solid #1A2438;
             border-radius: 12px;
-            padding: 24px;
-            transition: all 0.3s;
-            cursor: pointer;
+            background: rgba(18, 26, 43, 0.5);
         }
 
-        .film-card:hover {
-            border-color: #3B82F6;
-            transform: translateY(-4px);
-            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
         }
 
-        .film-title {
-            font-size: 18px;
+        thead {
+            background: rgba(26, 36, 56, 0.8);
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 16px 20px;
+            text-align: left;
             font-weight: 600;
-            color: #E6EDF7;
-            margin-bottom: 12px;
-            line-height: 1.3;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #60A5FA;
+            border-bottom: 1px solid #1A2438;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+            white-space: nowrap;
         }
 
-        .film-title:hover {
+        th:hover {
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        th.sorted {
+            color: #3B82F6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        th .sort-arrow {
+            margin-left: 6px;
+            opacity: 0.5;
+            font-size: 10px;
+        }
+
+        th.sorted .sort-arrow {
+            opacity: 1;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(26, 36, 56, 0.5);
+            color: rgba(230, 237, 247, 0.9);
+        }
+
+        tr:hover td {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Title column - clickable */
+        .title-cell {
+            color: #E6EDF7;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .title-cell:hover {
             color: #60A5FA;
         }
 
-        .film-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            font-size: 14px;
-            color: rgba(230, 237, 247, 0.7);
-        }
-
-        .film-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .film-meta-label {
-            color: rgba(230, 237, 247, 0.5);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .film-rating {
-            background: linear-gradient(135deg, #3B82F6, #60A5FA);
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 6px;
+        /* Rating styling */
+        .rating-cell {
             font-weight: 600;
-            font-size: 14px;
+            font-variant-numeric: tabular-nums;
         }
 
-        .film-rating.high {
-            background: linear-gradient(135deg, #10B981, #34D399);
-        }
+        .rating-cell.high { color: #34D399; }
+        .rating-cell.medium { color: #FBBF24; }
+        .rating-cell.low { color: #F87171; }
 
-        .film-rating.medium {
-            background: linear-gradient(135deg, #F59E0B, #FBBF24);
-        }
-
-        .film-rating.low {
-            background: linear-gradient(135deg, #EF4444, #F87171);
+        /* Year column */
+        .year-cell {
+            font-variant-numeric: tabular-nums;
         }
 
         /* Modal */
@@ -386,10 +356,10 @@
 
         /* Item count */
         .item-count {
-            text-align: center;
+            text-align: right;
             font-size: 13px;
             color: rgba(230, 237, 247, 0.5);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         /* Error State */
@@ -397,11 +367,6 @@
             text-align: center;
             padding: 60px;
             color: #EF4444;
-        }
-
-        .error-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
         }
 
         /* Mobile Responsive */
@@ -424,32 +389,24 @@
             }
 
             main {
-                padding: 100px 20px 60px;
+                padding: 100px 15px 60px;
             }
 
             .page-title {
-                font-size: 32px;
+                font-size: 28px;
+                margin-bottom: 24px;
             }
 
-            .tagline {
-                font-size: 15px;
+            table {
+                font-size: 13px;
             }
 
-            .controls {
-                gap: 8px;
+            th, td {
+                padding: 12px 14px;
             }
 
-            .sort-btn {
-                padding: 8px 14px;
-                font-size: 12px;
-            }
-
-            .films-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .film-card {
-                padding: 20px;
+            th {
+                font-size: 11px;
             }
 
             .modal {
@@ -489,28 +446,7 @@
     <main>
         <div class="blog-section">
             <h1 class="page-title">Coby's Film and TV Blog</h1>
-            <p class="tagline">Reviews and ratings, sorted and searchable</p>
-
-            <div class="controls">
-                <button class="sort-btn active" data-sort="rating" data-order="desc">
-                    Rating <span class="arrow">&#9660;</span>
-                </button>
-                <button class="sort-btn" data-sort="title" data-order="asc">
-                    Title <span class="arrow">&#9650;</span>
-                </button>
-                <button class="sort-btn" data-sort="year" data-order="desc">
-                    Year <span class="arrow">&#9660;</span>
-                </button>
-                <button class="sort-btn" data-sort="director" data-order="asc">
-                    Director <span class="arrow">&#9650;</span>
-                </button>
-                <button class="sort-btn" data-sort="reviewDate" data-order="desc">
-                    Review Date <span class="arrow">&#9660;</span>
-                </button>
-            </div>
-
             <p class="item-count" id="item-count"></p>
-
             <div id="content">
                 <div class="loading">
                     <div class="loading-spinner"></div>
@@ -570,13 +506,11 @@
                 const response = await fetch(SHEET_URL);
                 const text = await response.text();
 
-                // Google returns JSONP-like response, extract JSON
                 const jsonStart = text.indexOf('{');
                 const jsonEnd = text.lastIndexOf('}') + 1;
                 const jsonString = text.substring(jsonStart, jsonEnd);
                 const data = JSON.parse(jsonString);
 
-                // Parse rows (skip header row)
                 const rows = data.table.rows;
                 allFilms = rows.slice(1).map((row, index) => {
                     const cells = row.c || [];
@@ -589,17 +523,14 @@
                         reviewDate: cells[4]?.v || cells[4]?.f || '',
                         review: cells[5]?.v || ''
                     };
-                }).filter(film => film.title); // Filter out empty rows
+                }).filter(film => film.title);
 
-                // Limit to 100 items
                 allFilms = allFilms.slice(0, 100);
-
-                renderFilms();
+                renderTable();
             } catch (error) {
                 console.error('Error fetching sheet data:', error);
                 document.getElementById('content').innerHTML = `
                     <div class="error">
-                        <div class="error-icon">!</div>
                         <p>Unable to load reviews. Please try again later.</p>
                     </div>
                 `;
@@ -608,11 +539,10 @@
 
         // Sort films
         function sortFilms(field, order) {
-            const sorted = [...allFilms].sort((a, b) => {
+            return [...allFilms].sort((a, b) => {
                 let valA = a[field];
                 let valB = b[field];
 
-                // Handle different field types
                 if (field === 'rating' || field === 'year') {
                     valA = parseFloat(valA) || 0;
                     valB = parseFloat(valB) || 0;
@@ -630,11 +560,9 @@
                     return valA < valB ? 1 : valA > valB ? -1 : 0;
                 }
             });
-
-            return sorted;
         }
 
-        // Get rating class for color coding
+        // Get rating class
         function getRatingClass(rating) {
             if (rating >= 8) return 'high';
             if (rating >= 6) return 'medium';
@@ -642,63 +570,93 @@
             return '';
         }
 
-        // Render films grid
-        function renderFilms() {
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Render table
+        function renderTable() {
             const sorted = sortFilms(currentSort.field, currentSort.order);
             const container = document.getElementById('content');
             const countEl = document.getElementById('item-count');
 
-            countEl.textContent = `Showing ${sorted.length} review${sorted.length !== 1 ? 's' : ''}`;
+            countEl.textContent = `${sorted.length} review${sorted.length !== 1 ? 's' : ''}`;
 
             if (sorted.length === 0) {
                 container.innerHTML = '<div class="loading"><p>No reviews found.</p></div>';
                 return;
             }
 
+            const columns = [
+                { key: 'title', label: 'Title' },
+                { key: 'rating', label: 'Rating' },
+                { key: 'year', label: 'Year' },
+                { key: 'director', label: 'Director' },
+                { key: 'reviewDate', label: 'Review Date' }
+            ];
+
             container.innerHTML = `
-                <div class="films-grid">
-                    ${sorted.map(film => `
-                        <div class="film-card" data-id="${film.id}">
-                            <h3 class="film-title">${escapeHtml(film.title)}</h3>
-                            <div class="film-meta">
-                                ${film.rating ? `
-                                    <div class="film-meta-item">
-                                        <span class="film-rating ${getRatingClass(film.rating)}">${film.rating.toFixed(1)}</span>
-                                    </div>
-                                ` : ''}
-                                ${film.year ? `
-                                    <div class="film-meta-item">
-                                        <span class="film-meta-label">Year</span>
-                                        <span>${escapeHtml(film.year)}</span>
-                                    </div>
-                                ` : ''}
-                                ${film.director ? `
-                                    <div class="film-meta-item">
-                                        <span class="film-meta-label">Director</span>
-                                        <span>${escapeHtml(film.director)}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `).join('')}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                ${columns.map(col => {
+                                    const isSorted = currentSort.field === col.key;
+                                    const arrow = isSorted
+                                        ? (currentSort.order === 'asc' ? '&#9650;' : '&#9660;')
+                                        : '&#9650;';
+                                    return `
+                                        <th data-sort="${col.key}" class="${isSorted ? 'sorted' : ''}">
+                                            ${col.label}<span class="sort-arrow">${arrow}</span>
+                                        </th>
+                                    `;
+                                }).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sorted.map(film => `
+                                <tr>
+                                    <td class="title-cell" data-id="${film.id}">${escapeHtml(film.title)}</td>
+                                    <td class="rating-cell ${getRatingClass(film.rating)}">${film.rating ? film.rating.toFixed(1) : '-'}</td>
+                                    <td class="year-cell">${escapeHtml(film.year) || '-'}</td>
+                                    <td>${escapeHtml(film.director) || '-'}</td>
+                                    <td>${escapeHtml(film.reviewDate) || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
                 </div>
             `;
 
-            // Add click handlers to cards
-            document.querySelectorAll('.film-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const id = parseInt(card.dataset.id);
+            // Add sort handlers to headers
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const field = th.dataset.sort;
+                    let order = 'desc';
+
+                    if (currentSort.field === field) {
+                        order = currentSort.order === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        // Default orders for each column
+                        order = (field === 'title' || field === 'director') ? 'asc' : 'desc';
+                    }
+
+                    currentSort = { field, order };
+                    renderTable();
+                });
+            });
+
+            // Add click handlers to titles
+            document.querySelectorAll('.title-cell').forEach(cell => {
+                cell.addEventListener('click', () => {
+                    const id = parseInt(cell.dataset.id);
                     const film = allFilms.find(f => f.id === id);
                     if (film) openModal(film);
                 });
             });
-        }
-
-        // Escape HTML for security
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
         }
 
         // Modal functionality
@@ -750,8 +708,7 @@
         }
 
         function closeModal() {
-            const overlay = document.getElementById('modal-overlay');
-            overlay.classList.remove('active');
+            document.getElementById('modal-overlay').classList.remove('active');
             document.body.style.overflow = '';
         }
 
@@ -764,33 +721,8 @@
             if (e.key === 'Escape') closeModal();
         });
 
-        // Sort button handlers
-        document.querySelectorAll('.sort-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const field = btn.dataset.sort;
-                let order = btn.dataset.order;
-
-                // If clicking same button, toggle order
-                if (currentSort.field === field) {
-                    order = currentSort.order === 'asc' ? 'desc' : 'asc';
-                    btn.dataset.order = order;
-                    btn.querySelector('.arrow').innerHTML = order === 'asc' ? '&#9650;' : '&#9660;';
-                }
-
-                currentSort = { field, order };
-
-                // Update active state
-                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                renderFilms();
-            });
-        });
-
         // Initialize
         fetchSheetData();
-
-        // Refresh data every 5 minutes for live updates
         setInterval(fetchSheetData, 5 * 60 * 1000);
 
         // 3D Social Icons
@@ -846,7 +778,7 @@
                 iconContainer._lastX = 0;
             });
 
-            socialScenes.push({ scene: iconScene, camera: iconCamera, renderer: iconRenderer, model: () => iconModel });
+            socialScenes.push({ scene: iconScene, camera: iconCamera, renderer: iconRenderer });
 
             const onDragStart = (clientX) => {
                 iconContainer._isDragging = true;
@@ -857,50 +789,21 @@
             const onDragMove = (clientX) => {
                 if (iconContainer._isDragging && iconContainer._pivot) {
                     const deltaX = clientX - iconContainer._lastX;
-                    if (Math.abs(deltaX) > 2) {
-                        iconContainer._hasDragged = true;
-                    }
+                    if (Math.abs(deltaX) > 2) iconContainer._hasDragged = true;
                     iconContainer._manualRotation += deltaX * 0.02;
                     iconContainer._lastX = clientX;
                 }
             };
 
-            const onDragEnd = () => {
-                iconContainer._isDragging = false;
-            };
+            const onDragEnd = () => { iconContainer._isDragging = false; };
 
-            iconContainer.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                onDragStart(e.clientX);
-            });
-
-            window.addEventListener('mousemove', (e) => {
-                onDragMove(e.clientX);
-            });
-
-            window.addEventListener('mouseup', () => {
-                onDragEnd();
-            });
-
-            iconContainer.addEventListener('touchstart', (e) => {
-                onDragStart(e.touches[0].clientX);
-            }, { passive: true });
-
-            window.addEventListener('touchmove', (e) => {
-                if (iconContainer._isDragging) {
-                    onDragMove(e.touches[0].clientX);
-                }
-            }, { passive: true });
-
-            window.addEventListener('touchend', () => {
-                onDragEnd();
-            });
-
-            iconContainer.addEventListener('click', (e) => {
-                if (!iconContainer._hasDragged) {
-                    window.open(link, '_blank');
-                }
-            });
+            iconContainer.addEventListener('mousedown', (e) => { e.preventDefault(); onDragStart(e.clientX); });
+            window.addEventListener('mousemove', (e) => { onDragMove(e.clientX); });
+            window.addEventListener('mouseup', onDragEnd);
+            iconContainer.addEventListener('touchstart', (e) => { onDragStart(e.touches[0].clientX); }, { passive: true });
+            window.addEventListener('touchmove', (e) => { if (iconContainer._isDragging) onDragMove(e.touches[0].clientX); }, { passive: true });
+            window.addEventListener('touchend', onDragEnd);
+            iconContainer.addEventListener('click', () => { if (!iconContainer._hasDragged) window.open(link, '_blank'); });
         });
 
         function animateSocialIcons() {
