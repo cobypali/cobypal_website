@@ -621,20 +621,6 @@
             isZoomedIn = true;
         }
 
-        // Detect manual zoom out and reset camera
-        controls.addEventListener('change', () => {
-            if (isZoomedIn && !isAnimating) {
-                const originalPos = getOriginalCameraPosition();
-                const distanceFromOrigin = camera.position.length();
-                const originalDistance = originalPos.length();
-
-                // If user has zoomed out past 80% of original distance, reset fully
-                if (distanceFromOrigin > originalDistance * 0.8) {
-                    resetToOriginalPosition();
-                }
-            }
-        });
-
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
         scene.add(ambientLight);
@@ -988,9 +974,24 @@
 
         window.addEventListener('mousemove', onMouseMove);
 
-        // Stop auto-rotate when user interacts
+        // Stop auto-rotate and animation when user interacts
         controls.addEventListener('start', () => {
             if (!editMode) controls.autoRotate = false;
+            isAnimating = false; // Stop camera animation so user can control
+        });
+
+        // Check if user zoomed out enough when they stop interacting
+        controls.addEventListener('end', () => {
+            if (isZoomedIn) {
+                const originalPos = getOriginalCameraPosition();
+                const distanceFromOrigin = camera.position.length();
+                const originalDistance = originalPos.length();
+
+                // If user has zoomed out past 70% of original distance, reset fully
+                if (distanceFromOrigin > originalDistance * 0.7) {
+                    resetToOriginalPosition();
+                }
+            }
         });
 
         // Load brain model
