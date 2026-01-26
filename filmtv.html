@@ -206,6 +206,23 @@
             font-variant-numeric: tabular-nums;
         }
 
+        /* Row number column */
+        .row-num-header,
+        .row-num {
+            color: rgba(230, 237, 247, 0.4);
+            text-align: center;
+            width: 50px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .row-num-header {
+            cursor: default;
+        }
+
+        .row-num-header:hover {
+            background: transparent;
+        }
+
         /* Modal */
         .modal-overlay {
             position: fixed;
@@ -603,6 +620,7 @@
                     <table>
                         <thead>
                             <tr>
+                                <th class="row-num-header">#</th>
                                 ${columns.map(col => {
                                     const isSorted = currentSort.field === col.key;
                                     const arrow = isSorted
@@ -617,8 +635,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${sorted.map(film => `
+                            ${sorted.map((film, index) => `
                                 <tr>
+                                    <td class="row-num">${index + 1}</td>
                                     <td class="title-cell" data-id="${film.id}">${escapeHtml(film.title)}</td>
                                     <td class="rating-cell ${getRatingClass(film.rating)}">${film.rating ? film.rating.toFixed(1) : '-'}</td>
                                     <td class="year-cell">${escapeHtml(film.year) || '-'}</td>
