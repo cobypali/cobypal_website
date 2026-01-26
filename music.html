@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coby's Music | CobyPal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B1220;
+            color: #E6EDF7;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(11, 18, 32, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1A2438;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #E6EDF7;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: #60A5FA;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3B82F6;
+        }
+
+        .nav-links a.active {
+            color: #3B82F6;
+        }
+
+        /* Main Content */
+        main {
+            padding-top: 100px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 20px 40px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #E6EDF7 0%, #3B82F6 50%, #60A5FA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            position: relative;
+        }
+
+        .hero h1::after {
+            content: "COBY'S MUSIC";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: transparent;
+            text-shadow: 0 0 40px rgba(59, 130, 246, 0.5), 0 0 80px rgba(59, 130, 246, 0.3);
+            z-index: -1;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #60A5FA;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* Floating Music Notes Animation */
+        .music-notes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            color: rgba(59, 130, 246, 0.15);
+            animation: float 15s infinite;
+            user-select: none;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Visualizer Background */
+        .visualizer-bg {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 4px;
+            padding: 0 20px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .bar {
+            width: 6px;
+            background: linear-gradient(to top, #3B82F6, #60A5FA);
+            border-radius: 3px 3px 0 0;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { height: 20px; }
+            50% { height: var(--max-height, 100px); }
+        }
+
+        /* Music Grid */
+        .music-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 40px 100px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Featured Playlist Section */
+        .featured-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #60A5FA;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, #1A2438, transparent);
+        }
+
+        .featured-player {
+            background: rgba(26, 36, 56, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            border: 1px solid #1A2438;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .featured-player:hover {
+            border-color: #3B82F6;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.1);
+        }
+
+        .featured-embed {
+            flex: 0 0 400px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .featured-embed iframe {
+            display: block;
+        }
+
+        .featured-info {
+            flex: 1;
+        }
+
+        .featured-info h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #E6EDF7;
+        }
+
+        .featured-info p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #60A5FA;
+            font-weight: 300;
+        }
+
+        .spotify-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #1DB954;
+            border-radius: 30px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .spotify-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(29, 185, 84, 0.4);
+        }
+
+        .spotify-badge svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Track Grid */
+        .tracks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .track-card {
+            background: rgba(26, 36, 56, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #1A2438;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .track-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3B82F6, #60A5FA, #3B82F6);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .track-card:hover {
+            transform: translateY(-5px);
+            border-color: #3B82F6;
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15);
+        }
+
+        .track-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .track-card iframe {
+            border-radius: 12px;
+            display: block;
+        }
+
+        .track-label {
+            margin-top: 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #60A5FA;
+            opacity: 0.7;
+        }
+
+        /* Playlist Showcase */
+        .playlist-showcase {
+            margin-top: 60px;
+        }
+
+        .playlist-row {
+            display: flex;
+            gap: 25px;
+            overflow-x: auto;
+            padding: 10px 0 30px;
+            scrollbar-width: thin;
+            scrollbar-color: #3B82F6 #1A2438;
+        }
+
+        .playlist-row::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .playlist-row::-webkit-scrollbar-track {
+            background: #1A2438;
+            border-radius: 3px;
+        }
+
+        .playlist-row::-webkit-scrollbar-thumb {
+            background: #3B82F6;
+            border-radius: 3px;
+        }
+
+        .playlist-item {
+            flex: 0 0 300px;
+            background: rgba(26, 36, 56, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #1A2438;
+            transition: all 0.3s ease;
+        }
+
+        .playlist-item:hover {
+            border-color: #3B82F6;
+            transform: scale(1.02);
+        }
+
+        .playlist-item iframe {
+            border-radius: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .featured-player {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .featured-embed {
+                flex: none;
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .nav-links {
+                gap: 20px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero h1::after {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+            .music-container {
+                padding: 20px 20px 80px;
+            }
+
+            .featured-player {
+                padding: 20px;
+            }
+
+            .featured-info h2 {
+                font-size: 24px;
+            }
+
+            .tracks-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .playlist-item {
+                flex: 0 0 260px;
+            }
+
+            .visualizer-bg {
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Music Notes -->
+    <div class="music-notes" id="musicNotes"></div>
+
+    <!-- Visualizer Background -->
+    <div class="visualizer-bg" id="visualizer"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo">COBYPAL</a>
+        <div class="nav-links">
+            <a href="about.html">About</a>
+            <a href="kippystudios.html">Kippy Studios</a>
+            <a href="brain.html">Coby's Brain</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="hero">
+            <h1>COBY'S MUSIC</h1>
+            <p>A curated collection of tracks that inspire, energize, and move me</p>
+        </div>
+
+        <div class="music-container">
+            <!-- Featured Playlist -->
+            <section class="featured-section">
+                <div class="section-title">Featured Playlist</div>
+                <div class="featured-player">
+                    <div class="featured-embed">
+                        <!-- Replace with your Spotify playlist ID -->
+                        <iframe
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
+                            width="100%"
+                            height="352"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                    <div class="featured-info">
+                        <h2>My Liked Songs</h2>
+                        <p>This playlist represents the soundtrack of my life - a dynamic mix of genres, moods, and memories. From late-night coding sessions to morning motivation, these are the tracks that keep me going.</p>
+                        <a href="https://open.spotify.com/user/YOUR_USERNAME" target="_blank" class="spotify-badge">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                            </svg>
+                            Follow on Spotify
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Current Favorites -->
+            <section class="tracks-section">
+                <div class="section-title">Current Favorites</div>
+                <div class="tracks-grid">
+                    <div class="track-card">
+                        <!-- Replace with your favorite track Spotify URI -->
+                        <iframe
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT?utm_source=generator&theme=0"
+                            width="100%"
+                            height="152"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                        <div class="track-label">On Repeat</div>
+                    </div>
+                    <div class="track-card">
+                        <iframe
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/track/0VjIjW4GlUZAMYd2vXMi3b?utm_source=generator&theme=0"
+                            width="100%"
+                            height="152"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                        <div class="track-label">Late Night Vibes</div>
+                    </div>
+                    <div class="track-card">
+                        <iframe
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator&theme=0"
+                            width="100%"
+                            height="152"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                        <div class="track-label">Energy Boost</div>
+                    </div>
+                    <div class="track-card">
+                        <iframe
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/track/3n3Ppam7vgaVa1iaRUc9Lp?utm_source=generator&theme=0"
+                            width="100%"
+                            height="152"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                        <div class="track-label">Classic Hit</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- More Playlists -->
+            <section class="playlist-showcase">
+                <div class="section-title">Mood Playlists</div>
+                <div class="playlist-row">
+                    <div class="playlist-item">
+                        <!-- Replace with your playlist IDs -->
+                        <iframe
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/playlist/37i9dQZF1DX5Ejj0EkURtP?utm_source=generator&theme=0"
+                            width="100%"
+                            height="352"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                    <div class="playlist-item">
+                        <iframe
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO?utm_source=generator&theme=0"
+                            width="100%"
+                            height="352"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                    <div class="playlist-item">
+                        <iframe
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ?utm_source=generator&theme=0"
+                            width="100%"
+                            height="352"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                    <div class="playlist-item">
+                        <iframe
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/playlist/37i9dQZF1DX0XUsuxWHRQd?utm_source=generator&theme=0"
+                            width="100%"
+                            height="352"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Create floating music notes
+        const notesContainer = document.getElementById('musicNotes');
+        const noteSymbols = ['♪', '♫', '♬', '♩', '♭', '♯'];
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = noteSymbols[Math.floor(Math.random() * noteSymbols.length)];
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = (10 + Math.random() * 10) + 's';
+            note.style.animationDelay = Math.random() * 5 + 's';
+            note.style.fontSize = (16 + Math.random() * 24) + 'px';
+            notesContainer.appendChild(note);
+
+            // Remove note after animation
+            setTimeout(() => {
+                note.remove();
+            }, 20000);
+        }
+
+        // Create initial notes
+        for (let i = 0; i < 15; i++) {
+            setTimeout(createNote, i * 500);
+        }
+
+        // Keep creating notes
+        setInterval(createNote, 2000);
+
+        // Create visualizer bars
+        const visualizer = document.getElementById('visualizer');
+        const barCount = 60;
+
+        for (let i = 0; i < barCount; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            bar.style.setProperty('--max-height', (30 + Math.random() * 120) + 'px');
+            bar.style.animationDelay = (Math.random() * 1) + 's';
+            bar.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+            visualizer.appendChild(bar);
+        }
+    </script>
+</body>
+</html>
