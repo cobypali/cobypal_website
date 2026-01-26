@@ -77,6 +77,7 @@
             }
             .nav-links {
                 gap: 20px;
+                margin-left: 30px;
             }
             .nav-links a {
                 font-size: 12px;
@@ -401,7 +402,7 @@
 
             #region-list {
                 top: auto;
-                bottom: 70px;
+                bottom: 120px;
                 right: 10px;
                 left: 10px;
                 max-height: 150px;
@@ -421,7 +422,7 @@
 
             #info-panel {
                 top: auto;
-                bottom: 230px;
+                bottom: 280px;
                 left: 10px;
                 right: 10px;
                 max-width: none;
@@ -472,7 +473,7 @@
         <a href="index.html" class="logo">COBYPAL</a>
         <div class="nav-links">
             <a href="about.html">About</a>
-            <a href="kippy-studios.html">Kippy Studios</a>
+            <a href="kippystudios.html">Kippy Studios</a>
             <a href="brain.html" class="active">Coby's Brain</a>
         </div>
     </nav>
@@ -557,8 +558,16 @@
         labelRenderer.domElement.style.pointerEvents = 'none';
         document.getElementById('canvas-container').appendChild(labelRenderer.domElement);
 
-        // Camera position
-        camera.position.set(0, 0, 250);
+        // Camera position - adjust for mobile
+        function updateCameraForScreenSize() {
+            const mobile = window.innerWidth <= 768;
+            if (mobile) {
+                camera.position.set(0, 20, 350);
+            } else {
+                camera.position.set(0, 0, 250);
+            }
+        }
+        updateCameraForScreenSize();
 
         // Orbit controls
         const controls = new OrbitControls(camera, renderer.domElement);
@@ -1013,6 +1022,7 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            updateCameraForScreenSize();
         });
 
         animate();
