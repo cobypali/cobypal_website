@@ -512,7 +512,7 @@
                 const data = JSON.parse(jsonString);
 
                 const rows = data.table.rows;
-                allFilms = rows.slice(1).map((row, index) => {
+                allFilms = rows.map((row, index) => {
                     const cells = row.c || [];
                     return {
                         id: index,
