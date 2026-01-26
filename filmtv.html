@@ -252,7 +252,7 @@
             border-radius: 16px;
             max-width: 700px;
             width: 100%;
-            max-height: 80vh;
+            max-height: 90vh;
             overflow-y: auto;
             padding: 40px;
             position: relative;
@@ -328,6 +328,8 @@
             line-height: 1.8;
             color: rgba(230, 237, 247, 0.9);
             white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .no-review {
@@ -594,6 +596,17 @@
             return div.innerHTML;
         }
 
+        // Format date as MM/DD/YYYY
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return escapeHtml(dateStr);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const year = date.getFullYear();
+            return `${month}/${day}/${year}`;
+        }
+
         // Render table
         function renderTable() {
             const sorted = sortFilms(currentSort.field, currentSort.order);
@@ -642,7 +655,7 @@
                                     <td class="rating-cell ${getRatingClass(film.rating)}">${film.rating ? film.rating.toFixed(1) : '-'}</td>
                                     <td class="year-cell">${escapeHtml(film.year) || '-'}</td>
                                     <td>${escapeHtml(film.director) || '-'}</td>
-                                    <td>${escapeHtml(film.reviewDate) || '-'}</td>
+                                    <td>${formatDate(film.reviewDate)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -709,7 +722,7 @@
                 ${film.reviewDate ? `
                     <div class="modal-meta-item">
                         <span class="modal-meta-label">Reviewed</span>
-                        <span class="modal-meta-value">${escapeHtml(film.reviewDate)}</span>
+                        <span class="modal-meta-value">${formatDate(film.reviewDate)}</span>
                     </div>
                 ` : ''}
             `;
