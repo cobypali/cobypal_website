@@ -558,7 +558,7 @@
         const SHEET_ID = '1g9WpJ3Si7X42lhDd_5_Ft3wWnzwy6965GApO9rwG0I8';
         const GIDS = {
             movies: '1517197804',
-            tv: '1920466216'
+            tv: '353936035'
         };
 
         let allFilms = [];
@@ -591,6 +591,15 @@
                             reviewDate = `${parseInt(month) + 1}/${day}/${year}`;
                         }
                     }
+                    // Get review - try v first, handle different formats
+                    let reviewText = '';
+                    if (cells[5]) {
+                        if (typeof cells[5].v === 'string') {
+                            reviewText = cells[5].v;
+                        } else if (cells[5].v !== null && cells[5].v !== undefined) {
+                            reviewText = String(cells[5].v);
+                        }
+                    }
                     return {
                         id: index,
                         title: cells[0]?.v || '',
@@ -598,7 +607,7 @@
                         year: cells[2]?.v ? String(cells[2].v) : '',
                         director: cells[3]?.v || '',
                         reviewDate: reviewDate,
-                        review: cells[5]?.v || ''
+                        review: reviewText
                     };
                 }).filter(film => film.title);
 
@@ -795,7 +804,7 @@
             `;
 
             if (film.review) {
-                review.innerHTML = escapeHtml(film.review);
+                review.textContent = film.review;
                 review.classList.remove('no-review');
             } else {
                 review.textContent = 'No review written yet.';
