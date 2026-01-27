@@ -185,6 +185,10 @@
             font-weight: 500;
             cursor: pointer;
             transition: color 0.2s;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .title-cell:hover {
@@ -555,9 +559,9 @@
                     return {
                         id: index,
                         title: cells[0]?.v || '',
-                        author: cells[1]?.v || '',
+                        rating: parseFloat(cells[1]?.v) || 0,
                         year: cells[2]?.v ? String(cells[2].v) : '',
-                        rating: parseFloat(cells[3]?.v) || 0,
+                        author: cells[3]?.v || '',
                         finishDate: finishDate,
                         review: reviewText
                     };
@@ -649,9 +653,9 @@
 
             const columns = [
                 { key: 'title', label: 'Title' },
-                { key: 'author', label: 'Author' },
-                { key: 'year', label: 'Year' },
                 { key: 'rating', label: 'Rating' },
+                { key: 'year', label: 'Year' },
+                { key: 'author', label: 'Author' },
                 { key: 'finishDate', label: 'Date Finished' }
             ];
 
@@ -679,9 +683,9 @@
                                 <tr>
                                     <td class="row-num">${index + 1}</td>
                                     <td class="title-cell" data-id="${book.id}">${escapeHtml(book.title)}</td>
-                                    <td>${escapeHtml(book.author) || '-'}</td>
-                                    <td class="year-cell">${escapeHtml(book.year) || '-'}</td>
                                     <td class="rating-cell ${getRatingClass(book.rating)}">${book.rating ? book.rating.toFixed(1) : '-'}</td>
+                                    <td class="year-cell">${escapeHtml(book.year) || '-'}</td>
+                                    <td>${escapeHtml(book.author) || '-'}</td>
                                     <td>${formatDate(book.finishDate)}</td>
                                 </tr>
                             `).join('')}
