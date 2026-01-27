@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coby's Thought Blog | Coby Palivathukal</title>
+    <title>Coby's Thoughts | Coby Palivathukal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -73,12 +73,18 @@
         /* Main Content */
         main {
             flex: 1;
-            padding: 120px 50px 80px;
+            padding: 100px 50px 40px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .blog-section {
-            max-width: 900px;
+        .content-section {
+            max-width: 1200px;
+            width: 100%;
             margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .page-title {
@@ -87,200 +93,48 @@
             font-weight: 600;
             color: #E6EDF7;
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 32px;
         }
 
-        .page-subtitle {
-            text-align: center;
-            color: rgba(230, 237, 247, 0.6);
-            font-size: 16px;
-            margin-bottom: 40px;
-        }
-
-        /* Loading State */
-        .loading {
-            text-align: center;
-            padding: 60px;
-            color: #60A5FA;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #1A2438;
-            border-top-color: #3B82F6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Item count */
-        .item-count {
-            text-align: right;
-            font-size: 13px;
-            color: rgba(230, 237, 247, 0.5);
-            margin-bottom: 16px;
-        }
-
-        /* Thought Cards */
-        .thoughts-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .thought-card {
-            background: rgba(18, 26, 43, 0.5);
+        /* Document Container */
+        .doc-container {
+            flex: 1;
             border: 1px solid #1A2438;
             border-radius: 12px;
-            padding: 20px 24px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .thought-card:hover {
-            border-color: #3B82F6;
-            background: rgba(59, 130, 246, 0.05);
-            transform: translateX(4px);
-        }
-
-        .thought-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #E6EDF7;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .thought-card h3::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: #00d4ff;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .thought-card .preview {
-            margin-top: 8px;
-            margin-left: 20px;
-            color: rgba(230, 237, 247, 0.6);
-            font-size: 14px;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
             overflow: hidden;
+            background: #fff;
+            min-height: 600px;
         }
 
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(11, 18, 32, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 200;
-            display: none;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 40px 20px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            overflow-y: auto;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        .modal {
-            background: #121A2B;
-            border: 1px solid #1A2438;
-            border-radius: 16px;
-            max-width: 700px;
+        .doc-container iframe {
             width: 100%;
-            padding: 40px;
-            position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s;
-            margin: auto 0;
+            height: 100%;
+            min-height: 600px;
+            border: none;
         }
 
-        .modal-overlay.active .modal {
-            transform: scale(1);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(26, 36, 56, 0.8);
-            border: 1px solid #1A2438;
-            color: #E6EDF7;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .modal-close:hover {
-            background: rgba(239, 68, 68, 0.3);
-            border-color: #EF4444;
-        }
-
-        .modal-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: #E6EDF7;
-            margin-bottom: 24px;
-            padding-right: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #1A2438;
-        }
-
-        .modal-content {
-            font-size: 16px;
-            line-height: 1.8;
-            color: rgba(230, 237, 247, 0.9);
-        }
-
-        .modal-content p {
-            margin-bottom: 16px;
-        }
-
-        .modal-content ul, .modal-content ol {
-            margin-bottom: 16px;
-            padding-left: 24px;
-        }
-
-        .modal-content li {
-            margin-bottom: 8px;
-        }
-
-        .no-content {
-            color: rgba(230, 237, 247, 0.5);
-            font-style: italic;
-        }
-
-        /* Error State */
-        .error {
+        /* Open in new tab link */
+        .external-link {
             text-align: center;
-            padding: 60px;
-            color: #EF4444;
+            margin-bottom: 20px;
+        }
+
+        .external-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #60A5FA;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .external-link a:hover {
+            color: #3B82F6;
+        }
+
+        .external-link svg {
+            width: 16px;
+            height: 16px;
         }
 
         /* Footer */
@@ -339,35 +193,20 @@
             }
 
             main {
-                padding: 100px 15px 60px;
+                padding: 100px 15px 30px;
             }
 
             .page-title {
                 font-size: 28px;
+                margin-bottom: 20px;
             }
 
-            .page-subtitle {
-                font-size: 14px;
+            .doc-container {
+                min-height: 500px;
             }
 
-            .thought-card {
-                padding: 16px 18px;
-            }
-
-            .thought-card h3 {
-                font-size: 16px;
-            }
-
-            .thought-card .preview {
-                font-size: 13px;
-            }
-
-            .modal {
-                padding: 24px;
-            }
-
-            .modal-title {
-                font-size: 22px;
+            .doc-container iframe {
+                min-height: 500px;
             }
 
             footer {
@@ -397,27 +236,23 @@
     </nav>
 
     <main>
-        <div class="blog-section">
-            <h1 class="page-title">Coby's Thought Blog</h1>
-            <p class="page-subtitle">Random thoughts and ideas from Coby's brain</p>
-            <p class="item-count" id="item-count"></p>
-            <div id="content">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Loading thoughts...</p>
-                </div>
+        <div class="content-section">
+            <h1 class="page-title">Coby's Thoughts</h1>
+            <div class="external-link">
+                <a href="https://docs.google.com/document/d/e/2PACX-1vTxeOdboeodIO157WT66cRZWb9MYGzCrqD6XlXs4e2-6YDvp3JgjRAsc-1GfUxbpAkTk-AyrOL_ctzN/pub" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Open in Google Docs
+                </a>
+            </div>
+            <div class="doc-container">
+                <iframe src="https://docs.google.com/document/d/e/2PACX-1vTxeOdboeodIO157WT66cRZWb9MYGzCrqD6XlXs4e2-6YDvp3JgjRAsc-1GfUxbpAkTk-AyrOL_ctzN/pub?embedded=true"></iframe>
             </div>
         </div>
     </main>
-
-    <!-- Modal -->
-    <div class="modal-overlay" id="modal-overlay">
-        <div class="modal">
-            <button class="modal-close" id="modal-close">&times;</button>
-            <h2 class="modal-title" id="modal-title"></h2>
-            <div class="modal-content" id="modal-content"></div>
-        </div>
-    </div>
 
     <footer>
         <div class="social-links-3d" id="social-links-3d">
@@ -445,202 +280,7 @@
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-        // Google Doc configuration - using published URL
-        const PUBLISHED_URL = 'https://docs.google.com/document/d/e/2PACX-1vTxeOdboeodIO157WT66cRZWb9MYGzCrqD6XlXs4e2-6YDvp3JgjRAsc-1GfUxbpAkTk-AyrOL_ctzN/pub';
-
-        let allThoughts = [];
-
-        // Fetch and parse the published Google Doc
-        async function fetchDocData() {
-            try {
-                // Use cors-anywhere or allorigins proxy for CORS
-                const proxyUrl = 'https://api.allorigins.win/raw?url=';
-                const response = await fetch(proxyUrl + encodeURIComponent(PUBLISHED_URL));
-
-                if (!response.ok) throw new Error('Failed to fetch');
-
-                const html = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
-                // Parse the document structure
-                allThoughts = parseDocContent(doc);
-
-                if (allThoughts.length === 0) {
-                    throw new Error('No content found');
-                }
-
-                renderThoughts();
-            } catch (error) {
-                console.error('Error fetching doc:', error);
-                document.getElementById('content').innerHTML = `
-                    <div class="error">
-                        <p>Unable to load thoughts. Please try again later.</p>
-                        <p style="margin-top: 16px; color: rgba(230, 237, 247, 0.5);">
-                            <a href="https://docs.google.com/document/d/1-dkdApHnbanprAGmZI6psG-07ufG-crWUr1kvfLBqac/edit" target="_blank" style="color: #60A5FA;">
-                                Open in Google Docs
-                            </a>
-                        </p>
-                    </div>
-                `;
-            }
-        }
-
-        // Parse the Google Doc HTML content
-        function parseDocContent(doc) {
-            const thoughts = [];
-            const content = doc.body;
-
-            // Get only paragraph elements - Google Docs wraps content in <p> tags
-            const paragraphs = content.querySelectorAll('p');
-
-            let currentHeading = null;
-            let currentContent = [];
-            let seenContent = new Set();
-
-            paragraphs.forEach(p => {
-                const text = p.textContent.trim();
-                if (!text) return;
-
-                // Check if this paragraph looks like a heading
-                // Google Docs uses spans with specific styles for headings
-                const spans = p.querySelectorAll('span');
-                let isHeading = false;
-
-                spans.forEach(span => {
-                    const style = span.getAttribute('style') || '';
-                    const isBold = style.includes('font-weight:700') || style.includes('font-weight: 700');
-                    const fontSize = style.match(/font-size:(\d+)/);
-                    const isLargeText = fontSize && parseInt(fontSize[1]) >= 14;
-
-                    if (isBold && isLargeText) {
-                        isHeading = true;
-                    }
-                });
-
-                if (isHeading) {
-                    // Save previous thought
-                    if (currentHeading) {
-                        thoughts.push({
-                            title: currentHeading,
-                            content: currentContent.join('')
-                        });
-                    }
-                    currentHeading = text;
-                    currentContent = [];
-                    seenContent = new Set();
-                } else if (currentHeading) {
-                    // Add as content if not already added
-                    if (!seenContent.has(text) && text !== currentHeading) {
-                        seenContent.add(text);
-                        currentContent.push(`<p>${escapeHtml(text)}</p>`);
-                    }
-                }
-            });
-
-            // Don't forget the last thought
-            if (currentHeading) {
-                thoughts.push({
-                    title: currentHeading,
-                    content: currentContent.join('')
-                });
-            }
-
-            // Filter out duplicates and empty entries
-            const seen = new Set();
-            return thoughts.filter(t => {
-                if (seen.has(t.title) || !t.title) return false;
-                seen.add(t.title);
-                return true;
-            });
-        }
-
-        // Escape HTML
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Render the thoughts list
-        function renderThoughts() {
-            const container = document.getElementById('content');
-            const countEl = document.getElementById('item-count');
-
-            countEl.textContent = `${allThoughts.length} thought${allThoughts.length !== 1 ? 's' : ''}`;
-
-            if (allThoughts.length === 0) {
-                container.innerHTML = '<div class="loading"><p>No thoughts found.</p></div>';
-                return;
-            }
-
-            container.innerHTML = `
-                <div class="thoughts-container">
-                    ${allThoughts.map((thought, index) => {
-                        // Create preview from content
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = thought.content;
-                        const preview = tempDiv.textContent.substring(0, 120);
-
-                        return `
-                            <div class="thought-card" data-index="${index}">
-                                <h3>${escapeHtml(thought.title)}</h3>
-                                ${preview ? `<p class="preview">${escapeHtml(preview)}${preview.length >= 120 ? '...' : ''}</p>` : ''}
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-
-            // Add click handlers
-            document.querySelectorAll('.thought-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const index = parseInt(card.dataset.index);
-                    openModal(allThoughts[index]);
-                });
-            });
-        }
-
-        // Modal functionality
-        function openModal(thought) {
-            const overlay = document.getElementById('modal-overlay');
-            const title = document.getElementById('modal-title');
-            const content = document.getElementById('modal-content');
-
-            title.textContent = thought.title;
-
-            if (thought.content) {
-                content.innerHTML = thought.content;
-                content.classList.remove('no-content');
-            } else {
-                content.textContent = 'No additional content for this thought.';
-                content.classList.add('no-content');
-            }
-
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // Event listeners
-        document.getElementById('modal-close').addEventListener('click', closeModal);
-        document.getElementById('modal-overlay').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeModal();
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        // Initialize
-        fetchDocData();
-        // Refresh every 5 minutes like filmtv.html
-        setInterval(fetchDocData, 5 * 60 * 1000);
-
-        // 3D Social Icons (same as filmtv.html)
+        // 3D Social Icons
         const socialIcons = document.querySelectorAll('.social-icon-container');
         const socialScenes = [];
 
