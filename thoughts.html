@@ -491,34 +491,36 @@
             const thoughts = [];
             const content = doc.body;
 
-            // Find all elements
-            const elements = content.querySelectorAll('*');
+            // Get only paragraph elements - Google Docs wraps content in <p> tags
+            const paragraphs = content.querySelectorAll('p');
 
             let currentHeading = null;
             let currentContent = [];
+            let seenContent = new Set();
 
-            elements.forEach(el => {
-                const tagName = el.tagName.toLowerCase();
-                const text = el.textContent.trim();
+            paragraphs.forEach(p => {
+                const text = p.textContent.trim();
+                if (!text) return;
 
-                // Skip empty or container elements
-                if (!text || el.children.length > 3) return;
-
-                // Check if this looks like a heading
+                // Check if this paragraph looks like a heading
                 // Google Docs uses spans with specific styles for headings
-                const style = el.getAttribute('style') || '';
-                const isBold = style.includes('font-weight:700') || style.includes('font-weight: 700');
-                const fontSize = style.match(/font-size:(\d+)/);
-                const isLargeText = fontSize && parseInt(fontSize[1]) >= 14;
-                const isHeadingTag = /^h[1-6]$/.test(tagName);
+                const spans = p.querySelectorAll('span');
+                let isHeading = false;
 
-                // Also check for Google's heading class patterns
-                const classList = el.className || '';
-                const isHeadingClass = classList.includes('title') || classList.includes('subtitle');
+                spans.forEach(span => {
+                    const style = span.getAttribute('style') || '';
+                    const isBold = style.includes('font-weight:700') || style.includes('font-weight: 700');
+                    const fontSize = style.match(/font-size:(\d+)/);
+                    const isLargeText = fontSize && parseInt(fontSize[1]) >= 14;
 
-                if ((isBold && isLargeText) || isHeadingTag || isHeadingClass) {
+                    if (isBold && isLargeText) {
+                        isHeading = true;
+                    }
+                });
+
+                if (isHeading) {
                     // Save previous thought
-                    if (currentHeading && currentHeading !== text) {
+                    if (currentHeading) {
                         thoughts.push({
                             title: currentHeading,
                             content: currentContent.join('')
@@ -526,23 +528,12 @@
                     }
                     currentHeading = text;
                     currentContent = [];
-                } else if (currentHeading && tagName === 'span' && el.closest('p')) {
-                    // This is paragraph content
-                    const parentP = el.closest('p');
-                    if (parentP && !currentContent.includes(parentP.innerHTML)) {
-                        const pText = parentP.textContent.trim();
-                        if (pText && pText !== currentHeading) {
-                            currentContent.push(`<p>${escapeHtml(pText)}</p>`);
-                        }
-                    }
-                } else if (currentHeading && (tagName === 'p' || tagName === 'li')) {
-                    const pText = el.textContent.trim();
-                    if (pText && pText !== currentHeading && !currentContent.some(c => c.includes(pText))) {
-                        if (tagName === 'li') {
-                            currentContent.push(`<li>${escapeHtml(pText)}</li>`);
-                        } else {
-                            currentContent.push(`<p>${escapeHtml(pText)}</p>`);
-                        }
+                    seenContent = new Set();
+                } else if (currentHeading) {
+                    // Add as content if not already added
+                    if (!seenContent.has(text) && text !== currentHeading) {
+                        seenContent.add(text);
+                        currentContent.push(`<p>${escapeHtml(text)}</p>`);
                     }
                 }
             });
