@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games &amp; Interactive Media Blog | Coby Palivathukal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B1220;
+            color: #E6EDF7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(11, 18, 32, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1A2438;
+        }
+
+        .logo {
+            font-family: 'Inter', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #E6EDF7;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #3B82F6;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 120px 50px 80px;
+        }
+
+        .blog-section {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 48px;
+            font-weight: 600;
+            color: #E6EDF7;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #60A5FA;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #1A2438;
+            border-top-color: #3B82F6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #1A2438;
+            border-radius: 12px;
+            background: rgba(18, 26, 43, 0.5);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: rgba(26, 36, 56, 0.8);
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #60A5FA;
+            border-bottom: 1px solid #1A2438;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        th.sorted {
+            color: #3B82F6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        th .sort-arrow {
+            margin-left: 6px;
+            opacity: 0.5;
+            font-size: 10px;
+        }
+
+        th.sorted .sort-arrow {
+            opacity: 1;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(26, 36, 56, 0.5);
+            color: rgba(230, 237, 247, 0.9);
+        }
+
+        tr:hover td {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Title column - clickable */
+        .title-cell {
+            color: #E6EDF7;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .title-cell:hover {
+            color: #60A5FA;
+        }
+
+        /* Rating styling */
+        .rating-cell {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .rating-cell.high { color: #34D399; }
+        .rating-cell.medium { color: #FBBF24; }
+        .rating-cell.low { color: #F87171; }
+
+        /* Row number column */
+        .row-num-header,
+        .row-num {
+            color: rgba(230, 237, 247, 0.4);
+            text-align: center;
+            width: 50px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .row-num-header {
+            cursor: default;
+        }
+
+        .row-num-header:hover {
+            background: transparent;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(11, 18, 32, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: #121A2B;
+            border: 1px solid #1A2438;
+            border-radius: 16px;
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+            margin: auto 0;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(26, 36, 56, 0.8);
+            border: 1px solid #1A2438;
+            color: #E6EDF7;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: #EF4444;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #E6EDF7;
+            margin-bottom: 16px;
+            padding-right: 40px;
+        }
+
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #1A2438;
+        }
+
+        .modal-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .modal-meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(230, 237, 247, 0.5);
+        }
+
+        .modal-meta-value {
+            font-size: 16px;
+            color: #E6EDF7;
+            font-weight: 500;
+        }
+
+        .modal-review {
+            font-size: 16px;
+            line-height: 1.8;
+            color: rgba(230, 237, 247, 0.9);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .no-review {
+            color: rgba(230, 237, 247, 0.5);
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            padding: 20px 50px 40px;
+            text-align: center;
+            border-top: 1px solid #1A2438;
+        }
+
+        .social-links-3d {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-icon-container {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .social-icon-container:hover {
+            transform: scale(1.15);
+        }
+
+        .social-icon-container canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .copyright {
+            font-size: 12px;
+            color: rgba(230, 237, 247, 0.5);
+        }
+
+        /* Item count */
+        .item-count {
+            text-align: right;
+            font-size: 13px;
+            color: rgba(230, 237, 247, 0.5);
+            margin-bottom: 16px;
+        }
+
+        /* Error State */
+        .error {
+            text-align: center;
+            padding: 60px;
+            color: #EF4444;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .nav-links {
+                gap: 20px;
+                margin-left: 30px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+
+            main {
+                padding: 100px 15px 60px;
+            }
+
+            .page-title {
+                font-size: 24px;
+                margin-bottom: 24px;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 12px 14px;
+            }
+
+            th {
+                font-size: 11px;
+            }
+
+            .modal {
+                padding: 24px;
+            }
+
+            .modal-title {
+                font-size: 22px;
+            }
+
+            footer {
+                padding: 20px;
+            }
+
+            .social-links-3d {
+                gap: 20px;
+                margin-left: -25px;
+            }
+
+            .social-icon-container {
+                width: 70px;
+                height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">COBYPAL</a>
+        <div class="nav-links">
+            <a href="about.html">About</a>
+            <a href="kippystudios.html">Kippy Studios</a>
+            <a href="brain.html">Coby's Brain</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="blog-section">
+            <h1 class="page-title">Coby's Games and Interactive Media Blog</h1>
+            <p class="item-count" id="item-count"></p>
+            <div id="content">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading games...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Review Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <h2 class="modal-title" id="modal-title"></h2>
+            <div class="modal-meta" id="modal-meta"></div>
+            <div class="modal-review" id="modal-review"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="social-links-3d" id="social-links-3d">
+            <div class="social-icon-container" data-link="https://www.youtube.com/user/cobypalivathukal" data-model="socials/youtube_icon/scene.gltf" title="YouTube"></div>
+            <div class="social-icon-container" data-link="https://www.instagram.com/cobypal" data-model="socials/instagram_icon/scene.gltf" title="Instagram"></div>
+            <div class="social-icon-container" data-link="https://www.tiktok.com/@cobypal?lang=en" data-model="socials/tiktok_icon/scene.gltf" title="TikTok"></div>
+            <div class="social-icon-container" data-link="https://www.twitter.com/cobypal" data-model="socials/x_icon/scene.gltf" title="X"></div>
+            <div class="social-icon-container" data-link="http://threads.net/@cobypal" data-model="socials/threads_icon/scene.gltf" title="Threads"></div>
+            <div class="social-icon-container" data-link="https://www.linkedin.com/in/cobypalivathukal/" data-model="socials/linkedin_icon/scene.gltf" title="LinkedIn"></div>
+            <div class="social-icon-container" data-link="https://www.facebook.com/coby.palivathukal" data-model="socials/facebook_icon/scene.gltf" title="Facebook"></div>
+        </div>
+        <p class="copyright">&copy; 2026 Coby Palivathukal. All rights reserved.</p>
+    </footer>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // Google Sheet configuration
+        const SHEET_ID = '14hDSpeKBUCyqkJB1-6WTRhX0ugMLtbGKy_c5UTXP70w';
+        const GID = '1604154728';
+
+        let allGames = [];
+        let currentSort = { field: 'rating', order: 'desc' };
+
+        // Fetch data from Google Sheet
+        async function fetchSheetData() {
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+                const response = await fetch(url);
+                const text = await response.text();
+
+                const jsonStart = text.indexOf('{');
+                const jsonEnd = text.lastIndexOf('}') + 1;
+                const jsonString = text.substring(jsonStart, jsonEnd);
+                const data = JSON.parse(jsonString);
+
+                const rows = data.table.rows;
+                allGames = rows.map((row, index) => {
+                    const cells = row.c || [];
+                    // Handle date - prefer formatted value, fallback to raw value
+                    let reviewDate = cells[2]?.f || cells[2]?.v || '';
+                    // If it's a Date object string like "Date(2024,10,28)", parse it
+                    if (typeof cells[2]?.v === 'string' && cells[2]?.v.startsWith('Date(')) {
+                        const match = cells[2].v.match(/Date\((\d+),(\d+),(\d+)\)/);
+                        if (match) {
+                            const [, year, month, day] = match;
+                            reviewDate = `${parseInt(month) + 1}/${day}/${year}`;
+                        }
+                    }
+                    // Get review - try v first, handle different formats
+                    let reviewText = '';
+                    if (cells[3]) {
+                        if (typeof cells[3].v === 'string') {
+                            reviewText = cells[3].v;
+                        } else if (cells[3].v !== null && cells[3].v !== undefined) {
+                            reviewText = String(cells[3].v);
+                        }
+                    }
+                    return {
+                        id: index,
+                        title: cells[0]?.v || '',
+                        rating: parseFloat(cells[1]?.v) || 0,
+                        reviewDate: reviewDate,
+                        review: reviewText
+                    };
+                }).filter(game => game.title);
+
+                renderTable();
+            } catch (error) {
+                console.error('Error fetching sheet data:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="error">
+                        <p>Unable to load games. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Sort games
+        function sortGames(field, order) {
+            return [...allGames].sort((a, b) => {
+                let valA = a[field];
+                let valB = b[field];
+
+                if (field === 'rating') {
+                    valA = parseFloat(valA) || 0;
+                    valB = parseFloat(valB) || 0;
+                } else if (field === 'reviewDate') {
+                    valA = new Date(valA) || new Date(0);
+                    valB = new Date(valB) || new Date(0);
+                } else {
+                    valA = String(valA).toLowerCase();
+                    valB = String(valB).toLowerCase();
+                }
+
+                if (order === 'asc') {
+                    return valA > valB ? 1 : valA < valB ? -1 : 0;
+                } else {
+                    return valA < valB ? 1 : valA > valB ? -1 : 0;
+                }
+            });
+        }
+
+        // Get rating class
+        function getRatingClass(rating) {
+            if (rating >= 8) return 'high';
+            if (rating >= 6) return 'medium';
+            if (rating > 0) return 'low';
+            return '';
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Format date as MM/DD/YYYY
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            // If already in MM/DD/YYYY format, return as is
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+                return escapeHtml(dateStr);
+            }
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return escapeHtml(dateStr);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const year = date.getFullYear();
+            return `${month}/${day}/${year}`;
+        }
+
+        // Render table
+        function renderTable() {
+            const sorted = sortGames(currentSort.field, currentSort.order);
+            const displayed = sorted.slice(0, 250);
+            const container = document.getElementById('content');
+            const countEl = document.getElementById('item-count');
+
+            const totalCount = sorted.length;
+            const showingCount = displayed.length;
+            countEl.textContent = totalCount > 250
+                ? `Showing ${showingCount} of ${totalCount} entries`
+                : `${totalCount} entr${totalCount !== 1 ? 'ies' : 'y'}`;
+
+            if (displayed.length === 0) {
+                container.innerHTML = '<div class="loading"><p>No games found.</p></div>';
+                return;
+            }
+
+            const columns = [
+                { key: 'title', label: 'Title' },
+                { key: 'rating', label: 'Rating' },
+                { key: 'reviewDate', label: 'Review Date' }
+            ];
+
+            container.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="row-num-header">#</th>
+                                ${columns.map(col => {
+                                    const isSorted = currentSort.field === col.key;
+                                    const arrow = isSorted
+                                        ? (currentSort.order === 'asc' ? '&#9650;' : '&#9660;')
+                                        : '&#9650;';
+                                    return `
+                                        <th data-sort="${col.key}" class="${isSorted ? 'sorted' : ''}">
+                                            ${col.label}<span class="sort-arrow">${arrow}</span>
+                                        </th>
+                                    `;
+                                }).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${displayed.map((game, index) => `
+                                <tr>
+                                    <td class="row-num">${index + 1}</td>
+                                    <td class="title-cell" data-id="${game.id}">${escapeHtml(game.title)}</td>
+                                    <td class="rating-cell ${getRatingClass(game.rating)}">${game.rating ? game.rating.toFixed(1) : '-'}</td>
+                                    <td>${formatDate(game.reviewDate)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Add sort handlers to headers
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const field = th.dataset.sort;
+                    let order = 'desc';
+
+                    if (currentSort.field === field) {
+                        order = currentSort.order === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        // Default orders for each column
+                        order = field === 'title' ? 'asc' : 'desc';
+                    }
+
+                    currentSort = { field, order };
+                    renderTable();
+                });
+            });
+
+            // Add click handlers to titles
+            document.querySelectorAll('.title-cell').forEach(cell => {
+                cell.addEventListener('click', () => {
+                    const id = parseInt(cell.dataset.id);
+                    const game = allGames.find(g => g.id === id);
+                    if (game) openModal(game);
+                });
+            });
+        }
+
+        // Modal functionality
+        function openModal(game) {
+            const overlay = document.getElementById('modal-overlay');
+            const title = document.getElementById('modal-title');
+            const meta = document.getElementById('modal-meta');
+            const review = document.getElementById('modal-review');
+
+            title.textContent = game.title;
+
+            meta.innerHTML = `
+                ${game.rating ? `
+                    <div class="modal-meta-item">
+                        <span class="modal-meta-label">Rating</span>
+                        <span class="modal-meta-value">${game.rating.toFixed(1)} / 10</span>
+                    </div>
+                ` : ''}
+                ${game.reviewDate ? `
+                    <div class="modal-meta-item">
+                        <span class="modal-meta-label">Reviewed</span>
+                        <span class="modal-meta-value">${formatDate(game.reviewDate)}</span>
+                    </div>
+                ` : ''}
+            `;
+
+            if (game.review) {
+                review.textContent = game.review;
+                review.classList.remove('no-review');
+            } else {
+                review.textContent = 'No review written yet.';
+                review.classList.add('no-review');
+            }
+
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Event listeners
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Initialize
+        fetchSheetData();
+        setInterval(fetchSheetData, 5 * 60 * 1000);
+
+        // 3D Social Icons
+        const socialIcons = document.querySelectorAll('.social-icon-container');
+        const socialScenes = [];
+
+        socialIcons.forEach((iconContainer, index) => {
+            const modelPath = iconContainer.dataset.model;
+            const link = iconContainer.dataset.link;
+
+            const iconScene = new THREE.Scene();
+            const iconCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+            const iconRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+            iconRenderer.setSize(100, 100);
+            iconRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            iconContainer.appendChild(iconRenderer.domElement);
+
+            iconCamera.position.set(0, 0, 3);
+
+            const iconAmbient = new THREE.AmbientLight(0xffffff, 0.8);
+            iconScene.add(iconAmbient);
+
+            const iconKey = new THREE.DirectionalLight(0xffffff, 1.2);
+            iconKey.position.set(2, 2, 2);
+            iconScene.add(iconKey);
+
+            const iconLoader = new GLTFLoader();
+            let iconModel = null;
+
+            iconLoader.load(modelPath, (gltf) => {
+                iconModel = gltf.scene;
+
+                const box = new THREE.Box3().setFromObject(iconModel);
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 1.8 / maxDim;
+                iconModel.scale.setScalar(scale);
+
+                const scaledBox = new THREE.Box3().setFromObject(iconModel);
+                const center = scaledBox.getCenter(new THREE.Vector3());
+
+                iconModel.position.set(-center.x, -center.y, -center.z);
+
+                const pivot = new THREE.Group();
+                pivot.add(iconModel);
+                iconScene.add(pivot);
+
+                iconContainer._pivot = pivot;
+                iconContainer._manualRotation = 0;
+                iconContainer._isDragging = false;
+                iconContainer._hasDragged = false;
+                iconContainer._lastX = 0;
+            });
+
+            socialScenes.push({ scene: iconScene, camera: iconCamera, renderer: iconRenderer });
+
+            const onDragStart = (clientX) => {
+                iconContainer._isDragging = true;
+                iconContainer._hasDragged = false;
+                iconContainer._lastX = clientX;
+            };
+
+            const onDragMove = (clientX) => {
+                if (iconContainer._isDragging && iconContainer._pivot) {
+                    const deltaX = clientX - iconContainer._lastX;
+                    if (Math.abs(deltaX) > 2) iconContainer._hasDragged = true;
+                    iconContainer._manualRotation += deltaX * 0.02;
+                    iconContainer._lastX = clientX;
+                }
+            };
+
+            const onDragEnd = () => { iconContainer._isDragging = false; };
+
+            iconContainer.addEventListener('mousedown', (e) => { e.preventDefault(); onDragStart(e.clientX); });
+            window.addEventListener('mousemove', (e) => { onDragMove(e.clientX); });
+            window.addEventListener('mouseup', onDragEnd);
+            iconContainer.addEventListener('touchstart', (e) => { onDragStart(e.touches[0].clientX); }, { passive: true });
+            window.addEventListener('touchmove', (e) => { if (iconContainer._isDragging) onDragMove(e.touches[0].clientX); }, { passive: true });
+            window.addEventListener('touchend', onDragEnd);
+            iconContainer.addEventListener('click', () => { if (!iconContainer._hasDragged) window.open(link, '_blank'); });
+        });
+
+        function animateSocialIcons() {
+            requestAnimationFrame(animateSocialIcons);
+            const time = Date.now() * 0.001;
+
+            socialIcons.forEach((iconContainer, i) => {
+                const pivot = iconContainer._pivot;
+                if (pivot) {
+                    if (iconContainer._isDragging) {
+                        pivot.rotation.y = iconContainer._manualRotation;
+                    } else {
+                        const autoRotation = time + i * 0.5;
+                        iconContainer._manualRotation = autoRotation;
+                        pivot.rotation.y = autoRotation;
+                    }
+                }
+            });
+
+            socialScenes.forEach((item) => {
+                item.renderer.render(item.scene, item.camera);
+            });
+        }
+
+        animateSocialIcons();
+    </script>
+</body>
+</html>
