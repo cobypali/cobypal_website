@@ -74,17 +74,12 @@
         main {
             flex: 1;
             padding: 100px 50px 40px;
-            display: flex;
-            flex-direction: column;
         }
 
         .content-section {
             max-width: 1200px;
             width: 100%;
             margin: 0 auto;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
         }
 
         .page-title {
@@ -93,13 +88,20 @@
             font-weight: 600;
             color: #E6EDF7;
             text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: rgba(230, 237, 247, 0.6);
+            font-size: 16px;
             margin-bottom: 32px;
         }
 
         /* Instagram Link */
         .instagram-link {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .instagram-link a {
@@ -109,15 +111,16 @@
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             color: white;
             padding: 14px 28px;
-            border-radius: 10px;
+            border-radius: 50px;
             font-size: 16px;
             font-weight: 600;
             transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);
         }
 
         .instagram-link a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(225, 48, 108, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(225, 48, 108, 0.4);
         }
 
         .instagram-link svg {
@@ -125,81 +128,63 @@
             height: 24px;
         }
 
-        /* Embed Container */
-        .embed-container {
-            flex: 1;
+        /* Instagram Feed Container */
+        .instagram-feed-container {
+            background: rgba(18, 26, 43, 0.5);
             border: 1px solid #1A2438;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #fafafa;
-            min-height: 600px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
         }
 
-        .embed-container iframe {
+        .feed-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #1A2438;
+        }
+
+        .feed-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            padding: 3px;
+        }
+
+        .feed-avatar img {
             width: 100%;
             height: 100%;
-            min-height: 600px;
-            border: none;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #0B1220;
         }
 
-        /* Fallback message */
-        .embed-fallback {
-            text-align: center;
-            padding: 60px 20px;
-            color: #262626;
-        }
-
-        .embed-fallback .instagram-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 24px;
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .embed-fallback .instagram-icon svg {
-            width: 48px;
-            height: 48px;
-            color: white;
-        }
-
-        .embed-fallback h2 {
-            font-size: 24px;
+        .feed-info h3 {
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 12px;
-            color: #262626;
+            color: #E6EDF7;
+            margin-bottom: 4px;
         }
 
-        .embed-fallback p {
-            font-size: 16px;
-            color: #8e8e8e;
-            margin-bottom: 24px;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .embed-fallback .follow-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #0095f6;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
+        .feed-info p {
             font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
+            color: rgba(230, 237, 247, 0.6);
         }
 
-        .embed-fallback .follow-btn:hover {
-            background: #1877f2;
+        /* LightWidget Container */
+        .lightwidget-container {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .lightwidget-widget {
+            width: 100%;
+            border: 0;
+            overflow: hidden;
         }
 
         /* Footer */
@@ -262,40 +247,22 @@
             }
 
             .page-title {
-                font-size: 28px;
-                margin-bottom: 20px;
+                font-size: 32px;
             }
 
-            .instagram-link a {
-                padding: 12px 20px;
-                font-size: 14px;
-            }
-
-            .embed-container {
-                min-height: 500px;
-            }
-
-            .embed-fallback {
-                padding: 40px 20px;
-            }
-
-            .embed-fallback .instagram-icon {
-                width: 60px;
-                height: 60px;
+            .instagram-feed-container {
+                padding: 20px;
                 border-radius: 16px;
             }
 
-            .embed-fallback .instagram-icon svg {
-                width: 36px;
-                height: 36px;
+            .feed-header {
+                flex-direction: column;
+                text-align: center;
             }
 
-            .embed-fallback h2 {
-                font-size: 20px;
-            }
-
-            .embed-fallback p {
-                font-size: 14px;
+            .feed-avatar {
+                width: 80px;
+                height: 80px;
             }
 
             footer {
@@ -327,31 +294,36 @@
     <main>
         <div class="content-section">
             <h1 class="page-title">Coby's Food Blog</h1>
+            <p class="page-subtitle">Culinary adventures, restaurant reviews, and delicious discoveries</p>
+
             <div class="instagram-link">
                 <a href="https://www.instagram.com/cobysfoodblog/" target="_blank">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
-                    Follow on Instagram
+                    Follow @cobysfoodblog
                 </a>
             </div>
-            <div class="embed-container">
-                <div class="embed-fallback">
-                    <div class="instagram-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                        </svg>
+
+            <div class="instagram-feed-container">
+                <div class="feed-header">
+                    <div class="feed-avatar">
+                        <img src="https://via.placeholder.com/60" alt="@cobysfoodblog" id="profile-pic">
                     </div>
-                    <h2>@cobysfoodblog</h2>
-                    <p>Follow Coby's culinary adventures, food reviews, and restaurant recommendations on Instagram.</p>
-                    <a href="https://www.instagram.com/cobysfoodblog/" target="_blank" class="follow-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <line x1="10" y1="14" x2="21" y2="3"></line>
-                        </svg>
-                        View on Instagram
-                    </a>
+                    <div class="feed-info">
+                        <h3>@cobysfoodblog</h3>
+                        <p>Latest posts from Coby's culinary journey</p>
+                    </div>
+                </div>
+
+                <div class="lightwidget-container">
+                    <!-- LightWidget WIDGET -->
+                    <script src="https://cdn.lightwidget.com/widgets/lightwidget.js"></script>
+                    <iframe src="https://cdn.lightwidget.com/widgets/5765fc9498e55e6893fc13af51e46caa.html"
+                            scrolling="no"
+                            allowtransparency="true"
+                            class="lightwidget-widget"
+                            style="width:100%;border:0;overflow:hidden;"></iframe>
                 </div>
             </div>
         </div>
