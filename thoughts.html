@@ -497,10 +497,11 @@
                 const data = JSON.parse(jsonString);
 
                 const rows = data.table.rows;
-                allThoughts = rows.map((row, index) => {
+                // Skip first row (header row)
+                allThoughts = rows.slice(1).map((row, index) => {
                     const cells = row.c || [];
 
-                    // Get thought text
+                    // Get thought title from column A
                     let thoughtText = '';
                     if (cells[0]) {
                         if (typeof cells[0].v === 'string') {
@@ -510,7 +511,7 @@
                         }
                     }
 
-                    // Handle date - prefer formatted value, fallback to raw value
+                    // Handle date from column B - prefer formatted value, fallback to raw value
                     let dateStr = cells[1]?.f || cells[1]?.v || '';
                     // If it's a Date object string like "Date(2024,10,28)", parse it
                     if (typeof cells[1]?.v === 'string' && cells[1]?.v.startsWith('Date(')) {
@@ -521,10 +522,21 @@
                         }
                     }
 
+                    // Get full contents from column C for the popup
+                    let fullContents = '';
+                    if (cells[2]) {
+                        if (typeof cells[2].v === 'string') {
+                            fullContents = cells[2].v;
+                        } else if (cells[2].v !== null && cells[2].v !== undefined) {
+                            fullContents = String(cells[2].v);
+                        }
+                    }
+
                     return {
                         id: index,
                         thought: thoughtText,
-                        date: dateStr
+                        date: dateStr,
+                        fullContents: fullContents
                     };
                 }).filter(item => item.thought);
 
@@ -593,15 +605,12 @@
         // Render table
         function renderTable() {
             const sorted = sortThoughts(currentSort.field, currentSort.order);
-            const displayed = sorted.slice(0, 250);
+            const displayed = sorted;
             const container = document.getElementById('content');
             const countEl = document.getElementById('item-count');
 
             const totalCount = sorted.length;
-            const showingCount = displayed.length;
-            countEl.textContent = totalCount > 250
-                ? `Showing ${showingCount} of ${totalCount} thoughts`
-                : `${totalCount} thought${totalCount !== 1 ? 's' : ''}`;
+            countEl.textContent = `${totalCount} thought${totalCount !== 1 ? 's' : ''}`;
 
             if (displayed.length === 0) {
                 container.innerHTML = '<div class="loading"><p>No thoughts found.</p></div>';
@@ -680,7 +689,7 @@
             const contentEl = document.getElementById('modal-content');
 
             dateEl.textContent = item.date ? formatDate(item.date) : '';
-            contentEl.textContent = item.thought;
+            contentEl.textContent = item.fullContents || item.thought;
 
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
