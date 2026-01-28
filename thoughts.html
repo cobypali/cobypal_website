@@ -14,11 +14,6 @@
             box-sizing: border-box;
         }
 
-        html, body {
-            overflow-x: hidden;
-            width: 100%;
-        }
-
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0B1220;
@@ -78,18 +73,12 @@
         /* Main Content */
         main {
             flex: 1;
-            padding: 100px 50px 40px;
-            display: flex;
-            flex-direction: column;
+            padding: 120px 50px 80px;
         }
 
-        .content-section {
-            max-width: 1200px;
-            width: 100%;
+        .blog-section {
+            max-width: 1000px;
             margin: 0 auto;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
         }
 
         .page-title {
@@ -101,48 +90,229 @@
             margin-bottom: 32px;
         }
 
-        /* Document Container */
-        .doc-container {
-            flex: 1;
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #60A5FA;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #1A2438;
+            border-top-color: #3B82F6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
             border: 1px solid #1A2438;
             border-radius: 12px;
-            overflow: hidden;
-            background: #FFFFFF;
-            position: relative;
-            min-height: 700px;
+            background: rgba(18, 26, 43, 0.5);
         }
 
-        .doc-container iframe {
-            position: absolute;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: rgba(26, 36, 56, 0.8);
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #60A5FA;
+            border-bottom: 1px solid #1A2438;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        th.sorted {
+            color: #3B82F6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        th .sort-arrow {
+            margin-left: 6px;
+            opacity: 0.5;
+            font-size: 10px;
+        }
+
+        th.sorted .sort-arrow {
+            opacity: 1;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(26, 36, 56, 0.5);
+            color: rgba(230, 237, 247, 0.9);
+        }
+
+        tr:hover td {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Thought column - clickable */
+        .thought-cell {
+            color: #E6EDF7;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+            max-width: 600px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .thought-cell:hover {
+            color: #60A5FA;
+        }
+
+        /* Date column */
+        .date-cell {
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            width: 140px;
+        }
+
+        /* Row number column */
+        .row-num-header,
+        .row-num {
+            color: rgba(230, 237, 247, 0.4);
+            text-align: center;
+            width: 50px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .row-num-header {
+            cursor: default;
+        }
+
+        .row-num-header:hover {
+            background: transparent;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(11, 18, 32, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: #121A2B;
+            border: 1px solid #1A2438;
+            border-radius: 16px;
+            max-width: 700px;
             width: 100%;
-            height: 100%;
-            border: none;
+            padding: 40px;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+            margin: auto 0;
         }
 
-        /* Open in new tab link */
-        .external-link {
-            text-align: center;
-            margin-bottom: 20px;
+        .modal-overlay.active .modal {
+            transform: scale(1);
         }
 
-        .external-link a {
-            display: inline-flex;
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(26, 36, 56, 0.8);
+            border: 1px solid #1A2438;
+            color: #E6EDF7;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: #EF4444;
+        }
+
+        .modal-date {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             color: #60A5FA;
-            font-size: 14px;
-            transition: color 0.3s;
+            margin-bottom: 16px;
         }
 
-        .external-link a:hover {
-            color: #3B82F6;
+        .modal-content {
+            font-size: 18px;
+            line-height: 1.8;
+            color: rgba(230, 237, 247, 0.95);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        .external-link svg {
-            width: 16px;
-            height: 16px;
+        /* Item count */
+        .item-count {
+            text-align: right;
+            font-size: 13px;
+            color: rgba(230, 237, 247, 0.5);
+            margin-bottom: 16px;
+        }
+
+        /* Error State */
+        .error {
+            text-align: center;
+            padding: 60px;
+            color: #EF4444;
         }
 
         /* Footer */
@@ -201,16 +371,36 @@
             }
 
             main {
-                padding: 100px 15px 30px;
+                padding: 100px 15px 60px;
             }
 
             .page-title {
                 font-size: 28px;
-                margin-bottom: 20px;
+                margin-bottom: 24px;
             }
 
-            .doc-container {
-                min-height: 500px;
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 12px 14px;
+            }
+
+            th {
+                font-size: 11px;
+            }
+
+            .thought-cell {
+                max-width: 200px;
+            }
+
+            .modal {
+                padding: 24px;
+            }
+
+            .modal-content {
+                font-size: 16px;
             }
 
             footer {
@@ -240,23 +430,26 @@
     </nav>
 
     <main>
-        <div class="content-section">
+        <div class="blog-section">
             <h1 class="page-title">Coby's Thoughts</h1>
-            <div class="external-link">
-                <a href="https://docs.google.com/document/d/e/2PACX-1vTxeOdboeodIO157WT66cRZWb9MYGzCrqD6XlXs4e2-6YDvp3JgjRAsc-1GfUxbpAkTk-AyrOL_ctzN/pub" target="_blank">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                    Open in Google Docs
-                </a>
-            </div>
-            <div class="doc-container">
-                <iframe src="https://docs.google.com/document/d/e/2PACX-1vTxeOdboeodIO157WT66cRZWb9MYGzCrqD6XlXs4e2-6YDvp3JgjRAsc-1GfUxbpAkTk-AyrOL_ctzN/pub?embedded=true"></iframe>
+            <p class="item-count" id="item-count"></p>
+            <div id="content">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading thoughts...</p>
+                </div>
             </div>
         </div>
     </main>
+
+    <!-- Thought Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <p class="modal-date" id="modal-date"></p>
+            <div class="modal-content" id="modal-content"></div>
+        </div>
+    </div>
 
     <footer>
         <div class="social-links-3d" id="social-links-3d">
@@ -283,6 +476,233 @@
     <script type="module">
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // Google Sheet configuration
+        const SHEET_ID = '1pTF-S2WAXQ-t-_GgpI9YZ6ZfHxMw6fG1GnFoF6hEMTI';
+        const GID = '1593910464';
+
+        let allThoughts = [];
+        let currentSort = { field: 'date', order: 'desc' };
+
+        // Fetch data from Google Sheet
+        async function fetchSheetData() {
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+                const response = await fetch(url);
+                const text = await response.text();
+
+                const jsonStart = text.indexOf('{');
+                const jsonEnd = text.lastIndexOf('}') + 1;
+                const jsonString = text.substring(jsonStart, jsonEnd);
+                const data = JSON.parse(jsonString);
+
+                const rows = data.table.rows;
+                allThoughts = rows.map((row, index) => {
+                    const cells = row.c || [];
+
+                    // Get thought text
+                    let thoughtText = '';
+                    if (cells[0]) {
+                        if (typeof cells[0].v === 'string') {
+                            thoughtText = cells[0].v;
+                        } else if (cells[0].v !== null && cells[0].v !== undefined) {
+                            thoughtText = String(cells[0].v);
+                        }
+                    }
+
+                    // Handle date - prefer formatted value, fallback to raw value
+                    let dateStr = cells[1]?.f || cells[1]?.v || '';
+                    // If it's a Date object string like "Date(2024,10,28)", parse it
+                    if (typeof cells[1]?.v === 'string' && cells[1]?.v.startsWith('Date(')) {
+                        const match = cells[1].v.match(/Date\((\d+),(\d+),(\d+)\)/);
+                        if (match) {
+                            const [, year, month, day] = match;
+                            dateStr = `${parseInt(month) + 1}/${day}/${year}`;
+                        }
+                    }
+
+                    return {
+                        id: index,
+                        thought: thoughtText,
+                        date: dateStr
+                    };
+                }).filter(item => item.thought);
+
+                renderTable();
+            } catch (error) {
+                console.error('Error fetching sheet data:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="error">
+                        <p>Unable to load thoughts. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Sort thoughts
+        function sortThoughts(field, order) {
+            return [...allThoughts].sort((a, b) => {
+                let valA = a[field];
+                let valB = b[field];
+
+                if (field === 'date') {
+                    valA = new Date(valA) || new Date(0);
+                    valB = new Date(valB) || new Date(0);
+                } else {
+                    valA = String(valA).toLowerCase();
+                    valB = String(valB).toLowerCase();
+                }
+
+                if (order === 'asc') {
+                    return valA > valB ? 1 : valA < valB ? -1 : 0;
+                } else {
+                    return valA < valB ? 1 : valA > valB ? -1 : 0;
+                }
+            });
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Format date as MM/DD/YYYY
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            // If already in MM/DD/YYYY format, return as is
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+                return escapeHtml(dateStr);
+            }
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return escapeHtml(dateStr);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const year = date.getFullYear();
+            return `${month}/${day}/${year}`;
+        }
+
+        // Truncate text for table display
+        function truncateText(text, maxLength = 80) {
+            if (!text) return '-';
+            if (text.length <= maxLength) return escapeHtml(text);
+            return escapeHtml(text.substring(0, maxLength)) + '...';
+        }
+
+        // Render table
+        function renderTable() {
+            const sorted = sortThoughts(currentSort.field, currentSort.order);
+            const displayed = sorted.slice(0, 250);
+            const container = document.getElementById('content');
+            const countEl = document.getElementById('item-count');
+
+            const totalCount = sorted.length;
+            const showingCount = displayed.length;
+            countEl.textContent = totalCount > 250
+                ? `Showing ${showingCount} of ${totalCount} thoughts`
+                : `${totalCount} thought${totalCount !== 1 ? 's' : ''}`;
+
+            if (displayed.length === 0) {
+                container.innerHTML = '<div class="loading"><p>No thoughts found.</p></div>';
+                return;
+            }
+
+            const columns = [
+                { key: 'thought', label: 'Thought' },
+                { key: 'date', label: 'Date' }
+            ];
+
+            container.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="row-num-header">#</th>
+                                ${columns.map(col => {
+                                    const isSorted = currentSort.field === col.key;
+                                    const arrow = isSorted
+                                        ? (currentSort.order === 'asc' ? '&#9650;' : '&#9660;')
+                                        : '&#9650;';
+                                    return `
+                                        <th data-sort="${col.key}" class="${isSorted ? 'sorted' : ''}">
+                                            ${col.label}<span class="sort-arrow">${arrow}</span>
+                                        </th>
+                                    `;
+                                }).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${displayed.map((item, index) => `
+                                <tr>
+                                    <td class="row-num">${index + 1}</td>
+                                    <td class="thought-cell" data-id="${item.id}">${truncateText(item.thought)}</td>
+                                    <td class="date-cell">${formatDate(item.date)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Add sort handlers to headers
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const field = th.dataset.sort;
+                    let order = 'desc';
+
+                    if (currentSort.field === field) {
+                        order = currentSort.order === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        // Default orders for each column
+                        order = field === 'thought' ? 'asc' : 'desc';
+                    }
+
+                    currentSort = { field, order };
+                    renderTable();
+                });
+            });
+
+            // Add click handlers to thoughts
+            document.querySelectorAll('.thought-cell').forEach(cell => {
+                cell.addEventListener('click', () => {
+                    const id = parseInt(cell.dataset.id);
+                    const item = allThoughts.find(t => t.id === id);
+                    if (item) openModal(item);
+                });
+            });
+        }
+
+        // Modal functionality
+        function openModal(item) {
+            const overlay = document.getElementById('modal-overlay');
+            const dateEl = document.getElementById('modal-date');
+            const contentEl = document.getElementById('modal-content');
+
+            dateEl.textContent = item.date ? formatDate(item.date) : '';
+            contentEl.textContent = item.thought;
+
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Event listeners
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Initialize
+        fetchSheetData();
+        setInterval(fetchSheetData, 5 * 60 * 1000);
 
         // 3D Social Icons
         const socialIcons = document.querySelectorAll('.social-icon-container');
