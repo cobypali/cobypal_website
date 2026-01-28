@@ -537,7 +537,7 @@
                         date: dateStr,
                         fullContents: fullContents
                     };
-                }).filter(item => item.thought);
+                }).filter(item => item.thought || item.fullContents);
 
                 renderTable();
             } catch (error) {
@@ -644,7 +644,7 @@
                             ${displayed.map((item, index) => `
                                 <tr>
                                     <td class="row-num">${index + 1}</td>
-                                    <td class="thought-cell" data-id="${item.id}">${truncateText(item.thought)}</td>
+                                    <td class="thought-cell" data-id="${item.id}">${truncateText(item.thought || item.fullContents)}</td>
                                     <td class="date-cell">${formatDate(item.date)}</td>
                                 </tr>
                             `).join('')}
