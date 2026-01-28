@@ -487,7 +487,8 @@
         // Fetch data from Google Sheet
         async function fetchSheetData() {
             try {
-                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+                // Use tqx=out:json and request all rows
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}&headers=1`;
                 const response = await fetch(url);
                 const text = await response.text();
 
@@ -496,49 +497,51 @@
                 const jsonString = text.substring(jsonStart, jsonEnd);
                 const data = JSON.parse(jsonString);
 
-                const rows = data.table.rows;
-                allThoughts = rows.map((row, index) => {
+                const rows = data.table.rows || [];
+                console.log('Total rows from API:', rows.length);
+
+                allThoughts = [];
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
                     const cells = row.c || [];
 
-                    // Get thought title from column A
-                    let thoughtText = '';
-                    if (cells[0]) {
-                        if (typeof cells[0].v === 'string') {
-                            thoughtText = cells[0].v;
-                        } else if (cells[0].v !== null && cells[0].v !== undefined) {
-                            thoughtText = String(cells[0].v);
-                        }
-                    }
-
-                    // Handle date from column B - prefer formatted value, fallback to raw value
-                    let dateStr = cells[1]?.f || cells[1]?.v || '';
-                    // If it's a Date object string like "Date(2024,10,28)", parse it
-                    if (typeof cells[1]?.v === 'string' && cells[1]?.v.startsWith('Date(')) {
-                        const match = cells[1].v.match(/Date\((\d+),(\d+),(\d+)\)/);
-                        if (match) {
-                            const [, year, month, day] = match;
-                            dateStr = `${parseInt(month) + 1}/${day}/${year}`;
-                        }
-                    }
-
-                    // Get full contents from column C for the popup
-                    let fullContents = '';
-                    if (cells[2]) {
-                        if (typeof cells[2].v === 'string') {
-                            fullContents = cells[2].v;
-                        } else if (cells[2].v !== null && cells[2].v !== undefined) {
-                            fullContents = String(cells[2].v);
-                        }
-                    }
-
-                    return {
-                        id: index,
-                        thought: thoughtText,
-                        date: dateStr,
-                        fullContents: fullContents
+                    // Get value from cell, handling null cells
+                    const getValue = (cell) => {
+                        if (!cell) return '';
+                        if (cell.v === null || cell.v === undefined) return '';
+                        return String(cell.v);
                     };
-                }).filter(item => item.thought || item.fullContents);
 
+                    // Get formatted value or fall back to raw value
+                    const getDateValue = (cell) => {
+                        if (!cell) return '';
+                        if (cell.f) return cell.f;
+                        if (cell.v === null || cell.v === undefined) return '';
+                        // Handle Date() format
+                        if (typeof cell.v === 'string' && cell.v.startsWith('Date(')) {
+                            const match = cell.v.match(/Date\((\d+),(\d+),(\d+)\)/);
+                            if (match) {
+                                const [, year, month, day] = match;
+                                return `${parseInt(month) + 1}/${day}/${year}`;
+                            }
+                        }
+                        return String(cell.v);
+                    };
+
+                    const thought = getValue(cells[0]);
+                    const date = getDateValue(cells[1]);
+                    const fullContents = getValue(cells[2]);
+
+                    // Include ALL rows - no filtering
+                    allThoughts.push({
+                        id: i,
+                        thought: thought,
+                        date: date,
+                        fullContents: fullContents
+                    });
+                }
+
+                console.log('Total thoughts loaded:', allThoughts.length);
                 renderTable();
             } catch (error) {
                 console.error('Error fetching sheet data:', error);
@@ -644,7 +647,7 @@
                             ${displayed.map((item, index) => `
                                 <tr>
                                     <td class="row-num">${index + 1}</td>
-                                    <td class="thought-cell" data-id="${item.id}">${truncateText(item.thought || item.fullContents)}</td>
+                                    <td class="thought-cell" data-id="${item.id}">${truncateText(item.thought || item.fullContents || '(empty)')}</td>
                                     <td class="date-cell">${formatDate(item.date)}</td>
                                 </tr>
                             `).join('')}
