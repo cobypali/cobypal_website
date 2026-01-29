@@ -595,6 +595,25 @@
             flex-shrink: 0;
         }
 
+
+        #brain-regions-nav .back-to-brain {
+            display: block;
+            text-align: center;
+            background: #3B82F6;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 14px;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        #brain-regions-nav .back-to-brain:hover {
+            background: #2563EB;
+            transform: translateY(-1px);
+        }
         @media (max-width: 768px) {
             #brain-regions-nav {
                 display: none;
@@ -614,16 +633,17 @@
     <div id="brain-regions-nav">
         <h3>Brain Regions</h3>
         <ul>
-            <li><a href="filmtv.html"><span class="dot" style="background: #ff4444"></span>Film and TV</a></li>
-            <li><a href="thoughts.html"><span class="dot" style="background: #00d4ff"></span>Thoughts</a></li>
-            <li><a href="reading.html"><span class="dot" style="background: #44ff44"></span>Books</a></li>
-            <li><a href="music.html"><span class="dot" style="background: #ff44ff"></span>Music</a></li>
-            <li><a href="games.html"><span class="dot" style="background: #ffaa00"></span>Games and Interactive Media</a></li>
-            <li><a href="protocols.html"><span class="dot" style="background: #00ffaa"></span>Protocols</a></li>
-            <li><a href="principles.html"><span class="dot" style="background: #aa00ff"></span>Principles</a></li>
-            <li><a href="food.html"><span class="dot" style="background: #ff8844"></span>Food</a></li>
             <li><a href="adventures.html" class="active"><span class="dot" style="background: #44aaff"></span>Adventures</a></li>
+            <li><a href="reading.html"><span class="dot" style="background: #44ff44"></span>Books</a></li>
+            <li><a href="filmtv.html"><span class="dot" style="background: #ff4444"></span>Film and TV</a></li>
+            <li><a href="food.html"><span class="dot" style="background: #ff8844"></span>Food</a></li>
+            <li><a href="games.html"><span class="dot" style="background: #ffaa00"></span>Games and Interactive Media</a></li>
+            <li><a href="music.html"><span class="dot" style="background: #ff44ff"></span>Music</a></li>
+            <li><a href="principles.html"><span class="dot" style="background: #aa00ff"></span>Principles</a></li>
+            <li><a href="protocols.html"><span class="dot" style="background: #00ffaa"></span>Protocols</a></li>
+            <li><a href="thoughts.html"><span class="dot" style="background: #00d4ff"></span>Thoughts</a></li>
         </ul>
+        <a href="brain.html" class="back-to-brain">Back to Coby's Brain</a>
     </div>
 
     <main>
