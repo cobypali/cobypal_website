@@ -101,24 +101,78 @@
             margin-bottom: 32px;
         }
 
-        /* Document Container */
-        .doc-container {
-            flex: 1;
-            border: 1px solid #1A2438;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #FFFFFF;
-            position: relative;
-            min-height: 700px;
+        /* External link */
+        .external-link {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
-        .doc-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
+        .external-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #60A5FA;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .external-link a:hover {
+            color: #3B82F6;
+        }
+
+        .external-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Protocol Grid */
+        .protocol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 10px 0;
+        }
+
+        .protocol-item {
+            background: #121A2B;
+            border: 1px solid #1A2438;
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.3s, box-shadow 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .protocol-item:hover {
+            transform: translateY(-3px);
+            border-color: #3B82F6;
+            box-shadow: 0 6px 24px rgba(59, 130, 246, 0.15);
+        }
+
+        .protocol-item .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(59, 130, 246, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .protocol-item .icon svg {
+            width: 20px;
+            height: 20px;
+            color: #60A5FA;
+        }
+
+        .protocol-item .label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #E6EDF7;
+            line-height: 1.4;
         }
 
         /* Loading State */
@@ -142,28 +196,104 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Open in new tab link */
-        .external-link {
+        .error-message {
             text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .external-link a {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #60A5FA;
+            padding: 40px;
+            color: #ff6666;
             font-size: 14px;
-            transition: color 0.3s;
         }
 
-        .external-link a:hover {
-            color: #3B82F6;
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
-        .external-link svg {
-            width: 16px;
-            height: 16px;
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #121A2B;
+            border: 1px solid #1A2438;
+            border-radius: 16px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 28px 16px;
+            border-bottom: 1px solid #1A2438;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #E6EDF7;
+        }
+
+        .modal-close {
+            background: rgba(59, 130, 246, 0.2);
+            border: none;
+            color: #E6EDF7;
+            font-size: 18px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .modal-close:hover {
+            background: rgba(59, 130, 246, 0.4);
+        }
+
+        .modal-body {
+            padding: 24px 28px 28px;
+            overflow-y: auto;
+            line-height: 1.8;
+            color: rgba(230, 237, 247, 0.9);
+            font-size: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #1A2438;
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #2A3448;
         }
 
         /* Footer */
@@ -230,8 +360,34 @@
                 margin-bottom: 20px;
             }
 
-            .doc-container {
-                min-height: 500px;
+            .protocol-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .protocol-item {
+                padding: 18px;
+            }
+
+            .protocol-item .label {
+                font-size: 15px;
+            }
+
+            .modal {
+                max-height: 85vh;
+            }
+
+            .modal-header {
+                padding: 18px 20px 14px;
+            }
+
+            .modal-title {
+                font-size: 18px;
+            }
+
+            .modal-body {
+                padding: 18px 20px 22px;
+                font-size: 14px;
             }
 
             footer {
@@ -264,20 +420,34 @@
         <div class="content-section">
             <h1 class="page-title">Coby's Protocols for an Optimal Body and Mind</h1>
             <div class="external-link">
-                <a href="https://docs.google.com/document/d/1rgd9WmvAimxZ0yawJdr1DtKwOHNAeW0BcH8tPxhNmSk/edit?tab=t.0" target="_blank">
+                <a href="https://docs.google.com/spreadsheets/d/1AcVJFt12DyAIpuYivkbGnQDg7I3XzRx7Mlwo2f2VSoc/edit?gid=0#gid=0" target="_blank">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                         <polyline points="15 3 21 3 21 9"></polyline>
                         <line x1="10" y1="14" x2="21" y2="3"></line>
                     </svg>
-                    Open in Google Docs
+                    Open in Google Sheets
                 </a>
             </div>
-            <div class="doc-container">
-                <iframe src="https://docs.google.com/document/d/1rgd9WmvAimxZ0yawJdr1DtKwOHNAeW0BcH8tPxhNmSk/preview"></iframe>
+            <div id="protocol-list">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Loading protocols...</div>
+                </div>
             </div>
         </div>
     </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title"></h2>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
 
     <footer>
         <div class="social-links-3d" id="social-links-3d">
@@ -299,6 +469,125 @@
             "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
         }
     }
+    </script>
+
+    <script>
+        const SHEET_ID = '1AcVJFt12DyAIpuYivkbGnQDg7I3XzRx7Mlwo2f2VSoc';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+        const protocolList = document.getElementById('protocol-list');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const modalClose = document.getElementById('modal-close');
+
+        // Close modal handlers
+        modalClose.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                modalOverlay.classList.remove('active');
+            }
+        });
+
+        function openModal(title, content) {
+            modalTitle.textContent = title;
+            modalBody.textContent = content;
+            modalOverlay.classList.add('active');
+        }
+
+        async function loadProtocols() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const text = await response.text();
+
+                // Strip the JSONP wrapper: google.visualization.Query.setResponse({...})
+                const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
+                if (!jsonStr) throw new Error('Could not parse response');
+
+                const data = JSON.parse(jsonStr[1]);
+                const rows = data.table.rows;
+
+                if (!rows || rows.length <= 1) {
+                    protocolList.innerHTML = '<div class="error-message">No protocols found.</div>';
+                    return;
+                }
+
+                const grid = document.createElement('div');
+                grid.className = 'protocol-grid';
+
+                // Skip row 0 (header), iterate remaining rows
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    const cells = row.c;
+                    if (!cells || !cells[0] || !cells[0].v) continue;
+
+                    const name = String(cells[0].v).trim();
+                    if (!name) continue;
+
+                    // Find the closest column with text (B, C, D, ...)
+                    let content = '';
+                    for (let j = 1; j < cells.length; j++) {
+                        if (cells[j] && cells[j].v !== null && cells[j].v !== undefined) {
+                            const val = String(cells[j].v).trim();
+                            if (val) {
+                                content = val;
+                                break;
+                            }
+                        }
+                    }
+
+                    const item = document.createElement('div');
+                    item.className = 'protocol-item';
+                    item.innerHTML = `
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </div>
+                        <span class="label">${escapeHtml(name)}</span>
+                    `;
+
+                    item.addEventListener('click', () => {
+                        openModal(name, content || 'No details available.');
+                    });
+
+                    grid.appendChild(item);
+                }
+
+                protocolList.innerHTML = '';
+                protocolList.appendChild(grid);
+
+            } catch (err) {
+                console.error('Failed to load protocols:', err);
+                protocolList.innerHTML = `
+                    <div class="error-message">
+                        Failed to load protocols. The spreadsheet may not be publicly accessible.<br>
+                        <a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit?gid=0#gid=0" target="_blank" style="color: #60A5FA; margin-top: 10px; display: inline-block;">Open spreadsheet directly</a>
+                    </div>
+                `;
+            }
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        loadProtocols();
     </script>
 
     <script type="module">
