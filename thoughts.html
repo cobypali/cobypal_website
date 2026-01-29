@@ -417,6 +417,66 @@
                 height: 70px;
             }
         }
+
+        /* Brain Regions Sidebar - Desktop Only */
+        #brain-regions-nav {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #121A2B;
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 16px;
+            color: #E6EDF7;
+            border: 1px solid #1A2438;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 50;
+        }
+
+        #brain-regions-nav h3 {
+            margin-bottom: 12px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(230, 237, 247, 0.5);
+        }
+
+        #brain-regions-nav ul {
+            list-style: none;
+        }
+
+        #brain-regions-nav li a {
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #E6EDF7;
+            text-decoration: none;
+        }
+
+        #brain-regions-nav li a:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        #brain-regions-nav li a.active {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        #brain-regions-nav .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            #brain-regions-nav {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -428,6 +488,20 @@
             <a href="brain.html">Coby's Brain</a>
         </div>
     </nav>
+    <div id="brain-regions-nav">
+        <h3>Brain Regions</h3>
+        <ul>
+            <li><a href="filmtv.html"><span class="dot" style="background: #ff4444"></span>Film and TV</a></li>
+            <li><a href="thoughts.html" class="active"><span class="dot" style="background: #00d4ff"></span>Thoughts</a></li>
+            <li><a href="reading.html"><span class="dot" style="background: #44ff44"></span>Books</a></li>
+            <li><a href="music.html"><span class="dot" style="background: #ff44ff"></span>Music</a></li>
+            <li><a href="games.html"><span class="dot" style="background: #ffaa00"></span>Games and Interactive Media</a></li>
+            <li><a href="protocols.html"><span class="dot" style="background: #00ffaa"></span>Protocols</a></li>
+            <li><a href="principles.html"><span class="dot" style="background: #aa00ff"></span>Principles</a></li>
+            <li><a href="food.html"><span class="dot" style="background: #ff8844"></span>Food</a></li>
+            <li><a href="adventures.html"><span class="dot" style="background: #44aaff"></span>Adventures</a></li>
+        </ul>
+    </div>
 
     <main>
         <div class="blog-section">
