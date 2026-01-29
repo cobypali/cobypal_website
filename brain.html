@@ -244,21 +244,13 @@
             background: rgba(59, 130, 246, 0.2);
         }
 
-        #region-list li.active {
-            background: rgba(59, 130, 246, 0.3);
-        }
-
         #region-list li .dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
         }
 
-        #region-list li .status {
-            margin-left: auto;
-            font-size: 11px;
-            opacity: 0.5;
-        }
+
 
         #page-header {
             position: fixed;
@@ -284,28 +276,6 @@
             font-weight: 300;
         }
 
-        #edit-mode-btn {
-            width: 100%;
-            background: #3B82F6;
-            border: none;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: background 0.2s;
-            margin-top: 12px;
-        }
-
-        #edit-mode-btn:hover {
-            background: #2563EB;
-        }
-
-        #edit-mode-btn.active {
-            background: #60A5FA;
-        }
-
         .hotspot-label {
             color: #E6EDF7;
             font-size: 12px;
@@ -313,20 +283,6 @@
             text-shadow: 0 0 8px rgba(0,0,0,0.8), 0 0 3px rgba(0,0,0,1);
             white-space: nowrap;
             pointer-events: none;
-        }
-
-        #edit-instructions {
-            position: fixed;
-            top: 180px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #60A5FA;
-            color: #0B1220;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 13px;
-            display: none;
-            z-index: 100;
         }
 
         /* Footer */
@@ -392,11 +348,6 @@
 
             #page-subtitle {
                 font-size: 13px;
-            }
-
-            #edit-mode-btn,
-            #edit-instructions {
-                display: none !important;
             }
 
             #region-list {
@@ -489,8 +440,6 @@
         <h1 id="page-title">COBY'S BRAIN</h1>
         <p id="page-subtitle">Explore a digitized map of Coby's brain</p>
     </div>
-    <div id="edit-instructions">Click on a region in the list, then click on the brain to place it</div>
-
     <div id="info-panel">
         <button id="close-btn">&times;</button>
         <h2 id="panel-title">Region Name</h2>
@@ -502,7 +451,6 @@
     <div id="region-list">
         <h3>Brain Regions</h3>
         <ul id="regions"></ul>
-        <button id="edit-mode-btn">Enable Edit Mode</button>
     </div>
 
     <div id="instructions">
@@ -727,13 +675,7 @@
         // Hotspot meshes
         const hotspotMeshes = [];
 
-        // Edit mode state
-        let editMode = false;
-        let selectedRegionIndex = null;
-
         // UI elements
-        const editModeBtn = document.getElementById('edit-mode-btn');
-        const editInstructions = document.getElementById('edit-instructions');
         const regionsList = document.getElementById('regions');
         const infoPanel = document.getElementById('info-panel');
         const panelTitle = document.getElementById('panel-title');
@@ -749,17 +691,12 @@
                 li.innerHTML = `
                     <span class="dot" style="background: #${def.color.toString(16).padStart(6, '0')}"></span>
                     ${def.name}
-                    <span class="status">${def.position ? 'placed' : 'not placed'}</span>
                 `;
                 li.addEventListener('click', () => {
-                    if (editMode) {
-                        selectRegion(index);
-                    } else if (def.position) {
+                    if (def.position) {
                         if (currentShownRegion === index) {
-                            // Second click - open the link
                             window.open(def.link, '_blank');
                         } else {
-                            // First click - zoom and show info
                             zoomToHotspot(index);
                             showInfo(index);
                             currentShownRegion = index;
@@ -767,16 +704,6 @@
                     }
                 });
                 regionsList.appendChild(li);
-            });
-        }
-
-        // Select region for placement
-        function selectRegion(index) {
-            selectedRegionIndex = index;
-            // Update UI
-            const items = regionsList.querySelectorAll('li');
-            items.forEach((item, i) => {
-                item.classList.toggle('active', i === index);
             });
         }
 
@@ -839,11 +766,6 @@
             brainGroup.add(label);
 
             hotspotMeshes[index] = { ring, sphere, glow, label };
-
-            // Update region list status
-            const items = regionsList.querySelectorAll('li');
-            const statusSpan = items[index].querySelector('.status');
-            statusSpan.textContent = 'placed';
         }
 
         // Show info panel
@@ -856,30 +778,6 @@
             panelLink.href = def.link;
             infoPanel.style.display = 'block';
         }
-
-        // Toggle edit mode
-        editModeBtn.addEventListener('click', () => {
-            editMode = !editMode;
-            editModeBtn.textContent = editMode ? 'Exit Edit Mode' : 'Enable Edit Mode';
-            editModeBtn.classList.toggle('active', editMode);
-            editInstructions.style.display = editMode ? 'block' : 'none';
-            controls.autoRotate = !editMode;
-
-            if (!editMode) {
-                selectedRegionIndex = null;
-                const items = regionsList.querySelectorAll('li');
-                items.forEach(item => item.classList.remove('active'));
-
-                // Log all positions for saving
-                console.log('--- HOTSPOT POSITIONS ---');
-                hotspotDefinitions.forEach((def, i) => {
-                    if (def.position) {
-                        console.log(`${def.name}: new THREE.Vector3(${def.position.x.toFixed(2)}, ${def.position.y.toFixed(2)}, ${def.position.z.toFixed(2)})`);
-                    }
-                });
-                console.log('-------------------------');
-            }
-        });
 
         closeBtn.addEventListener('click', () => {
             infoPanel.style.display = 'none';
@@ -897,30 +795,12 @@
 
             raycaster.setFromCamera(mouse, camera);
 
-            if (editMode && selectedRegionIndex !== null) {
-                // Place hotspot on brain surface
-                const intersects = raycaster.intersectObjects(brainMeshes, true);
-                if (intersects.length > 0) {
-                    const point = intersects[0].point.clone();
-                    // Offset slightly along normal so marker sits on surface
-                    const normal = intersects[0].face.normal.clone();
-                    normal.transformDirection(intersects[0].object.matrixWorld);
-                    point.add(normal.multiplyScalar(4));
-
-                    hotspotDefinitions[selectedRegionIndex].position = point;
-                    createHotspotMarker(selectedRegionIndex);
-
-                    console.log(`Placed ${hotspotDefinitions[selectedRegionIndex].name} at:`, point);
-                }
-            } else {
-                // Check if clicking on hotspot - go directly to link
-                const spheres = hotspotMeshes.filter(h => h).map(h => h.sphere);
-                const intersects = raycaster.intersectObjects(spheres);
-                if (intersects.length > 0) {
-                    const index = intersects[0].object.userData.hotspotIndex;
-                    const def = hotspotDefinitions[index];
-                    window.open(def.link, '_blank');
-                }
+            const spheres = hotspotMeshes.filter(h => h).map(h => h.sphere);
+            const intersects = raycaster.intersectObjects(spheres);
+            if (intersects.length > 0) {
+                const index = intersects[0].object.userData.hotspotIndex;
+                const def = hotspotDefinitions[index];
+                window.open(def.link, '_blank');
             }
         }
 
@@ -974,31 +854,25 @@
 
             raycaster.setFromCamera(mouse, camera);
 
-            if (editMode) {
-                // Show pointer when hovering over brain
-                const intersects = raycaster.intersectObjects(brainMeshes, true);
-                document.body.style.cursor = intersects.length > 0 ? 'crosshair' : 'grab';
-            } else {
-                const spheres = hotspotMeshes.filter(h => h).map(h => h.sphere);
-                const intersects = raycaster.intersectObjects(spheres);
-                document.body.style.cursor = intersects.length > 0 ? 'pointer' : 'grab';
+            const spheres = hotspotMeshes.filter(h => h).map(h => h.sphere);
+            const intersects = raycaster.intersectObjects(spheres);
+            document.body.style.cursor = intersects.length > 0 ? 'pointer' : 'grab';
 
-                hotspotMeshes.forEach((hotspot, i) => {
-                    if (!hotspot) return;
-                    const isHovered = intersects.length > 0 && intersects[0].object.userData.hotspotIndex === i;
-                    hotspot.sphere.scale.setScalar(isHovered ? 1.5 : 1);
-                    hotspot.ring.scale.setScalar(isHovered ? 1.4 : 1);
-                    hotspot.glow.scale.setScalar(isHovered ? 1.5 : 1);
-                    hotspot.glow.material.opacity = isHovered ? 0.3 : 0.15;
-                });
-            }
+            hotspotMeshes.forEach((hotspot, i) => {
+                if (!hotspot) return;
+                const isHovered = intersects.length > 0 && intersects[0].object.userData.hotspotIndex === i;
+                hotspot.sphere.scale.setScalar(isHovered ? 1.5 : 1);
+                hotspot.ring.scale.setScalar(isHovered ? 1.4 : 1);
+                hotspot.glow.scale.setScalar(isHovered ? 1.5 : 1);
+                hotspot.glow.material.opacity = isHovered ? 0.3 : 0.15;
+            });
         }
 
         window.addEventListener('mousemove', onMouseMove);
 
         // Stop auto-rotate and animation when user interacts
         controls.addEventListener('start', () => {
-            if (!editMode) controls.autoRotate = false;
+            controls.autoRotate = false;
             isAnimating = false; // Stop camera animation so user can control
         });
 
