@@ -61,6 +61,14 @@
             backdrop-filter: blur(8px); transform: translate(-50%, -130%);
         }
         #city-tooltip .video-count { color: rgba(230,237,247,0.5); font-size: 11px; margin-left: 6px; }
+        .city-label {
+            position: absolute; pointer-events: none; white-space: nowrap;
+            color: #E6EDF7; font-size: 10px; font-weight: 500; letter-spacing: 0.3px;
+            transform: translate(-50%, -100%); padding: 1px 4px;
+            text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
+            opacity: 0; transition: opacity 0.15s;
+        }
+        .city-label.visible { opacity: 1; }
         /* Video Panel */
         #video-panel {
             position: fixed; top: 0; right: 0; width: 420px; height: 100vh;
@@ -209,6 +217,7 @@
             </div>
             <div class="globe-wrapper">
                 <div id="globe-container"></div>
+                <div id="city-labels"></div>
                 <div id="city-tooltip"></div>
             </div>
             <p class="globe-hint">Drag to rotate &middot; Scroll to zoom &middot; Click a pin to explore videos</p>
@@ -744,10 +753,11 @@ function makeRingTexture() {
 const glowTex = makeRingTexture();
 
 const pinMat = new THREE.MeshBasicMaterial({ color: 0xff4444 });
-const pinGeom = new THREE.SphereGeometry(0.06, 12, 12);
+const pinGeom = new THREE.SphereGeometry(0.04, 10, 10);
+const labelsContainer = document.getElementById('city-labels');
 
 Object.entries(CITIES).forEach(([city, data]) => {
-    const pos = latLngToVec3(data.lat, data.lng, GLOBE_RADIUS + 0.03);
+    const pos = latLngToVec3(data.lat, data.lng, GLOBE_RADIUS + 0.02);
     // Pin dot
     const pin = new THREE.Mesh(pinGeom, pinMat.clone());
     pin.position.copy(pos);
@@ -759,10 +769,16 @@ Object.entries(CITIES).forEach(([city, data]) => {
         map: glowTex, transparent: true, opacity: 0.6, depthWrite: false
     }));
     sprite.position.copy(pos);
-    sprite.scale.set(0.5, 0.5, 1);
+    sprite.scale.set(0.35, 0.35, 1);
     pinGroup.add(sprite);
 
-    pinObjs.push({ mesh: pin, sprite, city, pos });
+    // HTML label
+    const label = document.createElement('div');
+    label.className = 'city-label';
+    label.textContent = city;
+    labelsContainer.appendChild(label);
+
+    pinObjs.push({ mesh: pin, sprite, city, pos, label });
 });
 
 // ── Raycasting & Interaction ───────────────────────────────────────
@@ -895,15 +911,31 @@ function animate() {
     const camDist = camera.position.length();
     controls.autoRotate = camDist >= AUTO_ROTATE_THRESHOLD;
     controls.update();
-    // Scale pins based on zoom distance
-    pinScale = Math.pow(camDist / 18, 2);
+    // Scale pins based on zoom distance (cubic for aggressive shrink)
+    pinScale = Math.pow(camDist / 18, 3);
     const t = Date.now() * 0.003;
+    const camDir = camera.position.clone().normalize();
+    const rect = renderer.domElement.getBoundingClientRect();
+    // Label font scales inversely with distance so text is readable when close
+    const labelFontSize = Math.max(7, Math.min(13, 70 / camDist));
     pinObjs.forEach((p, i) => {
-        const base = p.city === hoveredPin ? 2.2 * pinScale : pinScale;
+        const base = p.city === hoveredPin ? 1.8 * pinScale : pinScale;
         p.mesh.scale.setScalar(base);
-        const s = (0.4 + Math.sin(t + i * 0.3) * 0.1) * pinScale;
+        const s = (0.3 + Math.sin(t + i * 0.3) * 0.08) * pinScale;
         if (p.city !== hoveredPin) p.sprite.scale.set(s, s, 1);
-        else p.sprite.scale.set(0.5 * pinScale, 0.5 * pinScale, 1);
+        else p.sprite.scale.set(0.35 * pinScale, 0.35 * pinScale, 1);
+        // Update label position & visibility
+        const pinDir = p.pos.clone().normalize();
+        const facing = camDir.dot(pinDir) > 0.05;
+        const projected = p.pos.clone().project(camera);
+        if (facing && projected.z < 1) {
+            p.label.style.left = ((projected.x + 1) / 2 * rect.width) + 'px';
+            p.label.style.top = ((-projected.y + 1) / 2 * rect.height - 10 * pinScale - 6) + 'px';
+            p.label.style.fontSize = labelFontSize + 'px';
+            p.label.classList.add('visible');
+        } else {
+            p.label.classList.remove('visible');
+        }
     });
     updateTooltip();
     renderer.render(scene, camera);
