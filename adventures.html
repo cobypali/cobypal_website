@@ -62,13 +62,15 @@
         }
         #city-tooltip .video-count { color: rgba(230,237,247,0.5); font-size: 11px; margin-left: 6px; }
         .city-label {
-            position: absolute; pointer-events: none; white-space: nowrap;
+            position: absolute; white-space: nowrap; cursor: pointer;
             color: #E6EDF7; font-size: 10px; font-weight: 500; letter-spacing: 0.3px;
-            transform: translate(-50%, -100%); padding: 1px 4px;
+            transform: translate(-50%, -100%); padding: 2px 6px; border-radius: 4px;
             text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
-            opacity: 0; transition: opacity 0.15s;
+            opacity: 0; transition: opacity 0.15s, background 0.15s;
+            pointer-events: none;
         }
-        .city-label.visible { opacity: 1; }
+        .city-label.visible { opacity: 1; pointer-events: auto; }
+        .city-label:hover { background: rgba(255,68,68,0.25); }
         /* Video Panel */
         #video-panel {
             position: fixed; top: 0; right: 0; width: 420px; height: 100vh;
@@ -776,6 +778,7 @@ Object.entries(CITIES).forEach(([city, data]) => {
     const label = document.createElement('div');
     label.className = 'city-label';
     label.textContent = city;
+    label.addEventListener('click', (e) => { e.stopPropagation(); openPanel(city); });
     labelsContainer.appendChild(label);
 
     pinObjs.push({ mesh: pin, sprite, city, pos, label });
