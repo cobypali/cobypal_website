@@ -610,6 +610,16 @@
                 `;
                 grid.appendChild(happyBodyItem);
 
+                // Add Stretches link
+                const stretchesItem = document.createElement('a');
+                stretchesItem.href = 'stretches.html';
+                stretchesItem.className = 'protocol-item';
+                stretchesItem.innerHTML = `
+                    <span class="emoji">🧘</span>
+                    <span class="label">Stretches</span>
+                `;
+                grid.appendChild(stretchesItem);
+
                 protocolList.innerHTML = '';
                 protocolList.appendChild(grid);
 
