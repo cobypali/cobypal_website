@@ -396,6 +396,9 @@ function renderLandTexture(landGeom) {
         else if (g.type === 'GeometryCollection') g.geometries.forEach(draw);
     }
     draw(landGeom);
+    // Solid polar caps — eliminates sphere UV convergence artifacts
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, 32);      // North pole: ocean
+    ctx.fillStyle = '#000'; ctx.fillRect(0, H - 32, W, 32); // South pole: Antarctica
     const tex = new THREE.CanvasTexture(c);
     tex.minFilter = THREE.LinearMipmapLinearFilter;
     tex.magFilter = THREE.LinearFilter;
@@ -439,7 +442,7 @@ const GLOBE_RADIUS = 5;
 // Placeholder 1x1 white texture (all water) until vector map loads
 const defaultWaterTex = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1);
 defaultWaterTex.needsUpdate = true;
-const globeGeom = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
+const globeGeom = new THREE.SphereGeometry(GLOBE_RADIUS, 128, 128);
 const globeMat = new THREE.ShaderMaterial({
     uniforms: {
         waterMap: { value: defaultWaterTex },
@@ -474,7 +477,7 @@ const globe = new THREE.Mesh(globeGeom, globeMat);
 scene.add(globe);
 
 // Atmosphere glow
-const atmosGeom = new THREE.SphereGeometry(GLOBE_RADIUS * 1.015, 64, 64);
+const atmosGeom = new THREE.SphereGeometry(GLOBE_RADIUS * 1.015, 128, 128);
 const atmosMat = new THREE.ShaderMaterial({
     vertexShader: `
         varying vec3 vNormal;
