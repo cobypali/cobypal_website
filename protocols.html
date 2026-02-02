@@ -582,22 +582,9 @@
                     const name = String(cells[0].v).trim();
                     if (!name) continue;
 
-                    // Get emoji from column R (index 17)
-                    const emojiCol = 17;
-                    const emoji = (cells[emojiCol] && cells[emojiCol].v) ? String(cells[emojiCol].v).trim() : '';
-
-                    // Find the closest column with text (B through Q, skipping R/emoji)
-                    let content = '';
-                    for (let j = 1; j < cells.length; j++) {
-                        if (j === emojiCol) continue;
-                        if (cells[j] && cells[j].v !== null && cells[j].v !== undefined) {
-                            const val = String(cells[j].v).trim();
-                            if (val) {
-                                content = val;
-                                break;
-                            }
-                        }
-                    }
+                    // Column B (index 1) = emoji, Column C (index 2) = content
+                    const emoji = (cells[1] && cells[1].v) ? String(cells[1].v).trim() : '';
+                    const content = (cells[2] && cells[2].v) ? String(cells[2].v).trim() : '';
 
                     const item = document.createElement('div');
                     item.className = 'protocol-item';
