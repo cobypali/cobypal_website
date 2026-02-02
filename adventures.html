@@ -910,6 +910,7 @@ function animate() {
     // Auto-rotate only when fully zoomed out
     const camDist = camera.position.length();
     controls.autoRotate = camDist >= AUTO_ROTATE_THRESHOLD;
+    controls.rotateSpeed = 0.5 * Math.pow(camDist / 18, 2);
     controls.update();
     // Scale pins based on zoom distance (cubic for aggressive shrink)
     pinScale = Math.pow(camDist / 18, 3);
