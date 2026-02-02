@@ -652,8 +652,9 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.06;
 controls.rotateSpeed = 0.5;
-controls.minDistance = 8;
+controls.minDistance = 5.5;
 controls.maxDistance = 30;
+const AUTO_ROTATE_THRESHOLD = 17; // only auto-rotate when zoomed out past this distance
 controls.enablePan = false;
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.4;
@@ -789,8 +790,7 @@ function onPointerDown(e) {
         // Rotate globe to face this city
         const data = CITIES[city];
         const target = latLngToVec3(data.lat, data.lng, GLOBE_RADIUS + 5);
-        controls.autoRotate = false;
-        // Smooth camera transition not needed - just stop auto-rotation
+        // autoRotate is handled by zoom distance in the animate loop
     }
 }
 renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -864,7 +864,6 @@ function openPanel(city) {
 function closePanel() {
     panel.classList.remove('active');
     overlay.classList.remove('active');
-    controls.autoRotate = true;
 }
 
 document.getElementById('panel-close').addEventListener('click', closePanel);
@@ -894,6 +893,9 @@ document.addEventListener('keydown', (e) => {
 // ── Animate ────────────────────────────────────────────────────────
 function animate() {
     requestAnimationFrame(animate);
+    // Auto-rotate only when fully zoomed out
+    const camDist = camera.position.length();
+    controls.autoRotate = camDist >= AUTO_ROTATE_THRESHOLD;
     controls.update();
     // Pulse pins
     const t = Date.now() * 0.003;
