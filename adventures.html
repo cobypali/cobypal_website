@@ -384,9 +384,17 @@ function renderLandTexture(landGeom) {
             for (let i = 0; i < r.length; i++) {
                 const x = (r[i][0] + 180) / 360 * W;
                 const y = (90 - r[i][1]) / 180 * H;
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                // Skip edges that cross the antimeridian (±180° lng jump)
+                if (i === 0 || Math.abs(r[i][0] - r[i - 1][0]) > 180) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
             }
-            ctx.closePath();
+            // Only close if the ring doesn't wrap across the antimeridian
+            if (r.length > 1 && Math.abs(r[r.length - 1][0] - r[0][0]) <= 180) {
+                ctx.closePath();
+            }
         }
         ctx.fill('evenodd');
     }
