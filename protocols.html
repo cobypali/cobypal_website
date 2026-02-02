@@ -600,6 +600,16 @@
                     grid.appendChild(item);
                 }
 
+                // Add The Happy Body Workout link
+                const happyBodyItem = document.createElement('a');
+                happyBodyItem.href = 'happy-body.html';
+                happyBodyItem.className = 'protocol-item';
+                happyBodyItem.innerHTML = `
+                    <span class="emoji">🏋️</span>
+                    <span class="label">The Happy Body Workout</span>
+                `;
+                grid.appendChild(happyBodyItem);
+
                 protocolList.innerHTML = '';
                 protocolList.appendChild(grid);
 
