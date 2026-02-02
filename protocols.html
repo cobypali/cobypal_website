@@ -620,6 +620,16 @@
                 `;
                 grid.appendChild(stretchesItem);
 
+                // Add Lifting link
+                const liftingItem = document.createElement('a');
+                liftingItem.href = 'lifting.html';
+                liftingItem.className = 'protocol-item';
+                liftingItem.innerHTML = `
+                    <span class="emoji">💪</span>
+                    <span class="label">Lifting</span>
+                `;
+                grid.appendChild(liftingItem);
+
                 protocolList.innerHTML = '';
                 protocolList.appendChild(grid);
 
