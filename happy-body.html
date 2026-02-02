@@ -329,6 +329,47 @@
             word-wrap: break-word;
         }
 
+        /* Modal Navigation Arrows */
+        .modal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #1A2438;
+        }
+
+        .modal-nav-label {
+            font-size: 13px;
+            color: rgba(230, 237, 247, 0.4);
+            font-weight: 500;
+        }
+
+        .modal-arrow {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60A5FA;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .modal-arrow:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .modal-arrow:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+
         /* Workout Overlay */
         .workout-overlay {
             display: none;
@@ -489,11 +530,11 @@
         }
 
         /* Workout Navigation */
-        .workout-nav {
+        .workout-nav-inline {
             display: flex;
             gap: 16px;
-            flex-shrink: 0;
-            padding-bottom: 40px;
+            justify-content: center;
+            margin-bottom: 24px;
         }
 
         .btn-nav {
@@ -697,11 +738,6 @@
             <div class="workout-progress-fill" id="workout-progress-fill"></div>
         </div>
         <div class="workout-content" id="workout-content"></div>
-        <div class="workout-nav" id="workout-nav">
-            <button class="btn-nav" id="btn-prev">Previous</button>
-            <button class="btn-nav" id="btn-pause">Pause</button>
-            <button class="btn-nav primary" id="btn-next">Next</button>
-        </div>
     </div>
 
     <footer>
@@ -716,6 +752,7 @@
 
         let exercises = [];
         let currentExerciseIndex = 0;
+        let currentModalIndex = -1;
         let timerInterval = null;
         let timeRemaining = EXERCISE_TIME;
         let isPaused = false;
@@ -731,11 +768,7 @@
         const workoutContent = document.getElementById('workout-content');
         const workoutProgressText = document.getElementById('workout-progress-text');
         const workoutProgressFill = document.getElementById('workout-progress-fill');
-        const workoutNav = document.getElementById('workout-nav');
         const btnStop = document.getElementById('btn-stop');
-        const btnPrev = document.getElementById('btn-prev');
-        const btnPause = document.getElementById('btn-pause');
-        const btnNext = document.getElementById('btn-next');
 
         // Close modal
         modalClose.addEventListener('click', () => modalOverlay.classList.remove('active'));
@@ -747,6 +780,13 @@
                 modalOverlay.classList.remove('active');
                 if (workoutOverlay.classList.contains('active')) stopWorkout();
             }
+            if (modalOverlay.classList.contains('active') && !workoutOverlay.classList.contains('active')) {
+                if (e.key === 'ArrowLeft' && currentModalIndex > 0) {
+                    openExerciseModal(currentModalIndex - 1);
+                } else if (e.key === 'ArrowRight' && currentModalIndex < exercises.length - 1) {
+                    openExerciseModal(currentModalIndex + 1);
+                }
+            }
         });
 
         function escapeHtml(str) {
@@ -755,9 +795,36 @@
             return div.innerHTML;
         }
 
-        function openExerciseModal(exercise) {
+        function openExerciseModal(index) {
+            currentModalIndex = index;
+            const exercise = exercises[index];
             modalTitle.textContent = exercise.name;
             modalBody.innerHTML = '';
+
+            // Navigation arrows
+            const nav = document.createElement('div');
+            nav.className = 'modal-nav';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'modal-arrow';
+            prevBtn.innerHTML = '&#8249;';
+            prevBtn.disabled = index === 0;
+            prevBtn.addEventListener('click', () => openExerciseModal(index - 1));
+
+            const label = document.createElement('span');
+            label.className = 'modal-nav-label';
+            label.textContent = `${index + 1} / ${exercises.length}`;
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'modal-arrow';
+            nextBtn.innerHTML = '&#8250;';
+            nextBtn.disabled = index === exercises.length - 1;
+            nextBtn.addEventListener('click', () => openExerciseModal(index + 1));
+
+            nav.appendChild(prevBtn);
+            nav.appendChild(label);
+            nav.appendChild(nextBtn);
+            modalBody.appendChild(nav);
 
             if (exercise.image) {
                 const img = document.createElement('img');
@@ -834,7 +901,7 @@
                     <span class="exercise-number">${exercise.number}</span>
                     <span class="exercise-name">${escapeHtml(exercise.name)}</span>
                 `;
-                card.addEventListener('click', () => openExerciseModal(exercise));
+                card.addEventListener('click', () => openExerciseModal(i));
                 grid.appendChild(card);
             });
 
@@ -845,9 +912,6 @@
         // Workout mode
         btnBegin.addEventListener('click', startWorkout);
         btnStop.addEventListener('click', stopWorkout);
-        btnPrev.addEventListener('click', prevExercise);
-        btnNext.addEventListener('click', nextExercise);
-        btnPause.addEventListener('click', togglePause);
 
         function startWorkout() {
             if (exercises.length === 0) return;
@@ -869,7 +933,6 @@
             clearInterval(timerInterval);
             timeRemaining = EXERCISE_TIME;
             isPaused = false;
-            btnPause.textContent = 'Pause';
 
             const exercise = exercises[currentExerciseIndex];
             const total = exercises.length;
@@ -877,9 +940,8 @@
             workoutProgressText.textContent = `Exercise ${currentExerciseIndex + 1} of ${total}`;
             workoutProgressFill.style.width = `${((currentExerciseIndex) / total) * 100}%`;
 
-            btnPrev.disabled = currentExerciseIndex === 0;
-
             const circumference = 2 * Math.PI * 60;
+            const prevDisabled = currentExerciseIndex === 0 ? 'disabled' : '';
 
             let html = `
                 <h2 class="workout-exercise-name">${escapeHtml(exercise.name)}</h2>
@@ -901,11 +963,15 @@
                         <span class="timer-text" id="timer-text">${formatTime(EXERCISE_TIME)}</span>
                     </div>
                 </div>
+                <div class="workout-nav-inline">
+                    <button class="btn-nav" onclick="prevExercise()" ${prevDisabled}>Previous</button>
+                    <button class="btn-nav" id="btn-pause" onclick="togglePause()">Pause</button>
+                    <button class="btn-nav primary" onclick="nextExercise()">Next</button>
+                </div>
                 <div class="workout-description">${escapeHtml(exercise.description || 'No description available.')}</div>
             `;
 
             workoutContent.innerHTML = html;
-            workoutNav.style.display = 'flex';
 
             startTimer();
         }
@@ -953,7 +1019,8 @@
 
         function togglePause() {
             isPaused = !isPaused;
-            btnPause.textContent = isPaused ? 'Resume' : 'Pause';
+            const pauseBtn = document.getElementById('btn-pause');
+            if (pauseBtn) pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
         }
 
         function prevExercise() {
@@ -986,8 +1053,6 @@
                     <button class="btn-begin" onclick="stopWorkout()">Done</button>
                 </div>
             `;
-
-            workoutNav.style.display = 'none';
         }
 
         loadExercises();
