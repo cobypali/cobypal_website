@@ -769,6 +769,7 @@ Object.entries(CITIES).forEach(([city, data]) => {
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let hoveredPin = null;
+let pinScale = 1; // updated each frame based on camera distance
 
 function onPointerMove(e) {
     const rect = renderer.domElement.getBoundingClientRect();
@@ -808,9 +809,7 @@ function updateTooltip() {
             hoveredPin = city;
             tooltip.innerHTML = city + '<span class="video-count">' + data.v.length + ' video' + (data.v.length !== 1 ? 's' : '') + '</span>';
             tooltip.style.display = 'block';
-            // Scale up hovered pin
             pinObjs.forEach(p => {
-                p.mesh.scale.setScalar(p.city === city ? 2.2 : 1);
                 p.sprite.material.opacity = p.city === city ? 1.0 : 0.6;
             });
         }
@@ -825,7 +824,6 @@ function updateTooltip() {
             hoveredPin = null;
             tooltip.style.display = 'none';
             pinObjs.forEach(p => {
-                p.mesh.scale.setScalar(1);
                 p.sprite.material.opacity = 0.6;
             });
             renderer.domElement.style.cursor = 'grab';
@@ -897,11 +895,15 @@ function animate() {
     const camDist = camera.position.length();
     controls.autoRotate = camDist >= AUTO_ROTATE_THRESHOLD;
     controls.update();
-    // Pulse pins
+    // Scale pins based on zoom distance
+    pinScale = camDist / 18;
     const t = Date.now() * 0.003;
     pinObjs.forEach((p, i) => {
-        const s = 0.4 + Math.sin(t + i * 0.3) * 0.1;
+        const base = p.city === hoveredPin ? 2.2 * pinScale : pinScale;
+        p.mesh.scale.setScalar(base);
+        const s = (0.4 + Math.sin(t + i * 0.3) * 0.1) * pinScale;
         if (p.city !== hoveredPin) p.sprite.scale.set(s, s, 1);
+        else p.sprite.scale.set(0.5 * pinScale, 0.5 * pinScale, 1);
     });
     updateTooltip();
     renderer.render(scene, camera);
