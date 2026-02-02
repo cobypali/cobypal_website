@@ -652,7 +652,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.06;
 controls.rotateSpeed = 0.5;
-controls.minDistance = 5.5;
+controls.minDistance = 5.15;
 controls.maxDistance = 30;
 const AUTO_ROTATE_THRESHOLD = 17; // only auto-rotate when zoomed out past this distance
 controls.enablePan = false;
@@ -896,7 +896,7 @@ function animate() {
     controls.autoRotate = camDist >= AUTO_ROTATE_THRESHOLD;
     controls.update();
     // Scale pins based on zoom distance
-    pinScale = camDist / 18;
+    pinScale = Math.pow(camDist / 18, 2);
     const t = Date.now() * 0.003;
     pinObjs.forEach((p, i) => {
         const base = p.city === hoveredPin ? 2.2 * pinScale : pinScale;
