@@ -71,6 +71,24 @@
         }
         .city-label.visible { opacity: 1; pointer-events: auto; }
         .city-label:hover { background: rgba(255,68,68,0.25); }
+        /* Loading overlay */
+        .globe-loading {
+            position: absolute; inset: 0; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(11,18,32,0.85); z-index: 5;
+            transition: opacity 0.5s;
+        }
+        .globe-loading.hidden { opacity: 0; pointer-events: none; }
+        .globe-loading .spinner {
+            width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.15);
+            border-top-color: #3B82F6; border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .globe-loading span {
+            margin-top: 12px; font-size: 13px; color: rgba(230,237,247,0.5);
+            letter-spacing: 0.5px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         /* Video Panel */
         #video-panel {
             position: fixed; top: 0; right: 0; width: 420px; height: 100vh;
@@ -221,6 +239,10 @@
                 <div id="globe-container"></div>
                 <div id="city-labels"></div>
                 <div id="city-tooltip"></div>
+                <div class="globe-loading" id="globe-loading">
+                    <div class="spinner"></div>
+                    <span>Loading adventures&hellip;</span>
+                </div>
             </div>
             <p class="globe-hint">Drag to rotate &middot; Scroll to zoom &middot; Click a pin to explore videos</p>
         </div>
@@ -267,384 +289,120 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-// ── City + Video Data ──────────────────────────────────────────────
-const CITIES = {
-"Oakland":{lat:37.80,lng:-122.27,v:[
-["Travis Scott - Sicko Mode (360 Video) (Live at Rolling Loud 2018)","1DEFftIjXDU"],
-["Travis Scott - Goosebumps (360 Video) (Live at Rolling Loud 2018)","FGaSJs4pZBw"],
-["Travis Scott - Stargazing (360 Video) (Live at Rolling Loud 2018)","A2Xz1zJj3X8"],
-["Sheck Wes - Mo Bamba w Travis Scott (360 Video) (Live at Rolling Loud 2018)","JHkai_fTEko"],
-["Travis Scott - Butterfly Effect (360 Video) (Live at Rolling Loud 2018)","rNc-fmp5oPc"],
-["Travis Scott and Gunna - Yosemite (360 Video) (Live at Rolling Loud 2018)","FXz0UFY8sBY"],
-["Travis Scott and Young Thug - Pick up the Phone (360 Video) (Live at Rolling Loud 2018)","B8cZ_ADD-Ow"],
-["Travis Scott & Don Toliver - Can't Say (360 Video) (Live at Rolling Loud 2018)","P5WMU1EHpSw"]]},
-"New York City":{lat:40.71,lng:-74.01,v:[
-["Ordering a Pastrami Sandwich from Katz's Deli in NYC (360 Video)","h-iEo31Zg84"],
-["Top of the World Trade Center (360 Video)","D7j0_cwC4bo"],
-["Times Square NYC (360 Video)","8oLVvB-c3TI"],
-["Approaching the World Trade Center (360 Video)","OEgRmwrhTWc"],
-["Going to the Top of the World Trade Center NYC (360 Video)","O4VOeEOMrGI"],
-["Manhattan Bridge NYC (360 Video)","Y1R1SBSl0mU"],
-["Coby in NYC 2023 (360 Video)","ytPooPqclsY"],
-["West Village Tour in NYC (360 Video)","nwBJdzJxgz4"]]},
-"South Lake Tahoe":{lat:38.93,lng:-119.98,v:[
-["VR Water Skiing (360 Video)","kAUkQ4O4g2k"],
-["VR Cliff Jumping at Fallen Leaf Lake (360 Video)","TZqEns89UkU"],
-["Baby Beach at Stanford Sierra Camp (360 Video)","2TD0OC5D1hM"],
-["Paddleboarding at Fallen Leaf Lake (360 Video)","R5dDbNKpWJc"],
-["Sky Express at Heavenly (Mounted) (360 Video)","P1IFF6HWjvw"],
-["Roque Takes an L","ZUZsBTqKvfM"],
-["Sky Express at Heavenly (Handheld) (360 Video)","WH96J7hUHSA"],
-["Day 1 at Heavenly (360 Video)","_ZEvAmEkgDQ"],
-["Gondola Ride at Heavenly (360 Video)","IstCxJcqVb8"],
-["Jacuzziing at Heavenly (360 Video)","lKAn4GObVZU"],
-["Roque Takes an L at Heavenly (360 Video)","AiWHWpinvLc"],
-["Angora Lake (360 Video)","Od6i_UyCZLA"],
-["Pyramid Peak Summit (360 Video)","S0D8hAo7iyo"]]},
-"Venice Beach":{lat:33.985,lng:-118.47,v:[
-["Volleyball Game at Venice Beach (360 Video)","HqQvmpBSfGk"],
-["Sarah's August 2021 Box Party (360 video)","msYfpMe-VVE"],
-["LED Wall Shoot Time Lapse (360 Video)","WsezqckPdiw"],
-["Cute Pug in Venice Beach (360 Video)","DKF4D8vUF7I"],
-["Caleb's Mocap Performance (1/28/21) (360 Video)","6A_ADNJFU0Q"],
-["Mocap Shoot (12/2/2020) (360 Video)","IztgWFu5H_k"],
-["Real Time Compositing Test @Elektrashock (360 Video)","UHqdQAewoMk"],
-["Venice Beach Volleyball (360 Video)","lEHukPkhfa8"],
-["665 Rose Ave","uC3Lzx22Y3s"],
-["Mocap Shoot (1/17/2021) (360 Video)","BQl7HjpUGn4"]]},
-"Los Angeles":{lat:34.05,lng:-118.24,v:[
-["Shrine Auditorium Interior (360 Video)","YBbLh87qLXE"],
-["David Geffen Theater at the Academy Museum in LA, CA (360 Video)","lI1TLih3_NY"],
-["Bike Ride in Skid Row, Los Angeles (360 Video)","K2JD8S134xQ"],
-["Kobe Bryant Memorial Murals in DTLA (360 Video)","jIQhqJQOMQ0"],
-["UCLA (360 Video)","2a2k6ookkWw"],
-["Matt Reeves Speech at USC School of Cinematic Arts Graduation 2022 (360 Video)","NiaOzgBncxU"],
-["Elektrashock LED Wall Test Shoot","DrZaMIQ2lRk"],
-["Walt Disney Concert Hall in DTLA (360 video)","qiSIJymgz_I"],
-["LAX Terminal 1 (360 Video)","QZp8Qth_Abc"],
-["LED Wall Test (360 Video)","SVjpmD44GrQ"],
-["Hollywood Sign Hike (360 Video)","l2qZhxihB2g"],
-["Vignesh's Motion Capture Shoot (360 video)","Rvhmp9ba0-8"],
-["Brenda's VJ Set Epic Moments (360 Video)","2_z2yBRo8EA"],
-["Tommy Trojan Statue at USC (360 Video)","7T6etHGPBRo"],
-["The Lab 2.0 (360 Video)","rNzayXhsw1A"],
-["LED Wall Test Shoot (Timelapse) (4k)","4BcdWL1qFc4"],
-["USC Graduation 2022 (360 Video)","ou9OQr5Twdw"],
-["Sunset in Elysian Park (360 Video)","IFnPycWTZpA"],
-["Griffith Observatory Golden Hour (360 Video)","MiIWPntiG6o"],
-["The Lab (360 Video)","yy9kL1UBKrA"],
-["Beverly Glenn Bike Ride in LA, CA (360 Video)","Pre0YU_jVZI"],
-["Kenter Trailhead in Brentwood, CA (360 Video)","aGCoDEIygV4"],
-["The Getty (360 Video)","vQoC8ctqLTo"],
-["USC School of Cinematic Arts Courtyard (360 Video)","1XcNCUiiiAU"],
-["Trent Peltz - Going To Hell (Live at Molly Malone's) (360 Video)","TTqsjg2kfI0"],
-["Trent Peltz - Empty Bottles (Live at Molly Malone's) (360 Video)","Hc4x3pfNxJo"],
-["Trent Peltz - Wish I Knew (Live at Molly Malone's) (360 Video)","M9ytKGVAX8g"],
-["Trent Peltz - Don't Pull Your Love (Live at Molly Malone's) (360 Video)","Y7E1wy2pFJk"],
-["Trent Peltz - Crossing Bridges (Live at Molly Malone's) (360 Video)","2YgumI53dV4"],
-["Trent Peltz - Fade Into Nothing (Live at Molly Malone's) (360 Video)","Jin5zaabxW8"],
-["Trent Peltz - Why Am I So Different? (Live at Molly Malone's) (360 Video)","2wZieCDd_BU"],
-["Trent Peltz - Going to Hell (Live at El Cid 8/16/2023)","mee5oIo-cVk"],
-["Trent Peltz - Empty Bottles (Live at El Cid 8/16/2023)","aCVsEkvob3I"],
-["The Hackathon (360 Video)","X7Q2lP0TS3I"],
-["Luh Kee B - Live at El Cid (8/16/2023)","sCe5o62eo14"],
-["Self Transcendence Podcast (Episode 1)","64bz8ptsA58"],
-["Fusion Spaces Testimonial","J9268jfwyc8"]]},
-"Blythe":{lat:33.62,lng:-114.59,v:[
-["Arizona California Border in Blythe, CA (360 Video)","71_Ld65g8tk"]]},
-"Compton":{lat:33.90,lng:-118.22,v:[
-["Compton City Hall (360 Video)","Y08n5868ke8"]]},
-"San Francisco":{lat:37.77,lng:-122.42,v:[
-["Childish Gambino - The Worst Guys (Outside Lands 2019) (180 video)","jDCeCWEKJXo"],
-["Fort Point in San Francisco (360 Video)","qxkM7KH7Ags"],
-["Chinatown San Francisco (360 Video)","qwDcFNBi170"],
-["SF Museum of Ice Cream (360 Video)","Af96mQciDXg"],
-["Walt Disney Family Museum in SF (360 Video)","CeqFSRdz6zY"],
-["Aquatic Park Cove in San Francisco (360 Video)","X0IKCsE3mEw"],
-["Saturday in the Bay (360 Video)","25Q4TsPt-JI"],
-["Haight-Ashbury San Francisco (360 Video)","teNzMx-K9Ss"],
-["Mission Dolores Park San Francisco (360 Video)","DQsCxdxT3AU"],
-["The Dogs of San Fransisco - Dolores Park 4/20 (360 Video)","nkZGkwRABgs"],
-["Alamo Square Park, San Francisco (360 Video)","J75ZQ0THzZM"],
-["Ghirardelli Square in San Francisco (360 Video)","se_xPLCbO3I"],
-["Buena Vista Park Summit in SF (360 Video)","OhbulCFPzco"],
-["SF Revel Ride with the Strobe (360 Video)","waatRmwmOBQ"],
-["View from Twin Peaks in San Francisco (180 Video)","Nf62WxHSLIA"],
-["SF Womp Convention (360 Video)","hJd6J4eWGE4"],
-["Painted Ladies Womp","qm9uV3uezHY"],
-["Meta SF Office 250 Howard (360 Video)","yUlbMYVLCqc"],
-["Meta SF Office Views (360 Video)","dK2AS3CMuvQ"]]},
-"Kfar Kama":{lat:32.72,lng:35.43,v:[
-["Kfar Kama - Circassian Town in Israel (360 Video)","JWq8cb7PJnY"]]},
-"Honolulu":{lat:21.31,lng:-157.86,v:[
-["Coby in Hawaii (360 Video)","5kxA-SY7cKo"],
-["Skating in Waikiki (360 Video)","k11kXAsVQYo"]]},
-"Stanford":{lat:37.43,lng:-122.17,v:[
-["Stanford University Drone Footage (4k)","hQDEm9wBTG4"],
-["Matoma at Stanford KSig (360 Video)","bQCdaPs1BmA"],
-["2 Chainz - 4 AM Live at Stanford Blackfest (360 Video)","E5DH9SKqqhc"],
-["Oy/Yo Sculpture, Stanford (360 Video)","8jq3HupR_HQ"],
-["Stanford University Walk (360 Video)","NKErCz4b_10"],
-["Stanford Engineering Quad (360 Video)","uBN8nsCYZCM"],
-["Stanford University Quad (360 Video)","Ry79fCAKvwo"],
-["Pre-Luau Party Walk Through (360 Video)","GvHeyBLL-3U"]]},
-"Palm Springs":{lat:33.83,lng:-116.55,v:[
-["Giant Marilyn Monroe Statue in Palm Springs (360 Video)","44MGxjlrC-4"],
-["VR Waterslide in Palm Springs (360 Video)","McV_DTwMyeY"],
-["Palm Springs Art Museum (360 Video)","FySmghPBGAs"],
-["Palm Springs Aerial Tramway Ride Time-lapse (360 Video)","g5CCCtsGW44"],
-["Palm Springs Aerial Tramway Summit (360 Video)","icgdeQ27r8w"],
-["VR Sledding near Mount San Jacinto (360 Video)","Ss5h5HweKVw"],
-["Big Horned Sheep at Lykken Trail Summit Palm Springs (360 Video)","WVFRBdtiFC8"],
-["Victor Trail at Indian Canyons in Palm Springs (360 Video)","zKf_ZbW9izs"],
-["Andreas Loop Hike at Indian Canyons in Palm Springs (360 Video)","LFFjr8KPk30"]]},
-"Century City":{lat:34.06,lng:-118.42,v:[
-["Exploring Fox Studios in Century City, CA (360 Video)","CbiwPyejRE4"]]},
-"Cordes Lakes":{lat:34.31,lng:-112.10,v:[
-["Jim's Weed Farm (360 video)","rYjYwWWbC_E"],
-["Cordes Lakes Trip (360 video)","tlXlu4j65b0"],
-["Junior the Bird Ribbits like a Frog in Cordes Lakes, AZ (360 Video)","fv8H7lq0yBY"],
-["Smoke Sesh with Uncle Marty (360 video)","FTrBVxRZiy0"]]},
-"Beaverton":{lat:45.49,lng:-122.80,v:[
-["Nike Company Store in Beaverton, OR (360 Video)","TqrNTT8bdBo"],
-["Nike Campus Drive Through in Beaverton, OR (360 Video)","4qFQ75uatmk"]]},
-"Santa Cruz":{lat:36.97,lng:-122.03,v:[
-["Cowell's Beach in Santa Cruz (360 Video)","IVAD9BIkHvI"],
-["Hopping in at Steamer Lane Santa Cruz, CA (360 Video)","_yD8Y_6kN5s"]]},
-"Scottsdale":{lat:33.49,lng:-111.93,v:[
-["Justin Gets MAErried - Kevin and Max's Best Men Speech (360 Video)","ZYmIgtKoYA8"],
-["Pinnacle Peak Hike in Scottsdale, AZ (360 Video)","d14wfQHF2_4"]]},
-"Redondo Beach":{lat:33.85,lng:-118.39,v:[
-["Redondo Beach Volleyball (360 Video)","n_09XSd8UrA"],
-["Subterranean Sconch","Tefl8qr54ds"]]},
-"Catalina Island":{lat:33.34,lng:-118.33,v:[
-["Buena Vista Scenic Overlook on Catalina Island (360 Video)","wGZl_iUjrqk"],
-["Catalina Island Airport in the Sky (360 Video)","E0zEtjUxMoI"],
-["Catalina Island Snorkeling (360 Video)","7z-z7RQrcl4"],
-["Three Palms Scenic Overlook on Catalina Island (360 Video)","fLwbpbUaxO0"],
-["Catalina Island Hummer Tour (360 Video)","J20zwAAgFQc"],
-["Catalina Express Ride (360 Video)","6UjkzXglLPU"],
-["Catalina Island Sightseeing (360 Video)","OEvAh-DR2as"],
-["Catalina Island Trip (360 Video)","yBHZHZhPhB0"]]},
-"Haifa":{lat:32.79,lng:34.99,v:[
-["Bahai Temple in Haifa, Israel (360 Video)","Y2qrPui3NU0"],
-["Last Crusader Forts in Israel (360 Video)","JmowhHxoZh0"]]},
-"Truckee":{lat:39.33,lng:-120.18,v:[
-["Truckee River Rafting Adventure (360 Video)","SsAKFtdXMRI"],
-["Truckee River Rapids (360 Video)","LGjCGbHSKWE"]]},
-"Coloma":{lat:38.80,lng:-120.89,v:[
-["American River White Water Rafting - Satan's Cesspool (360 video)","rADNmSj_4vE"],
-["American River White Water Rafting - Scissors (360 video)","8gGeK_aWvwA"],
-["American River White Water Rafting - Hospital Bar (360 video)","QLiLSjuMJEE"],
-["American River White Water Rafting - Fowler's Rock (360 video)","ZRqOqnIbGGA"],
-["American River White Water Rafting - Lower Haystack Rapids (360 video)","naqJTh7O17Q"]]},
-"Beverly Hills":{lat:34.07,lng:-118.40,v:[
-["Rodeo Drive Walk (360 Video)","hGDml5Sgrj8"],
-["Ranch Trail in Beverly Hills (360 Video)","i8RRRRwIadA"]]},
-"Anaheim":{lat:33.84,lng:-117.91,v:[
-["Cars Land - California Adventure (360 Video)","ESxM1R2qqsc"],
-["Rise of the Resistance - Disneyland (360 Video)","WPcynYkldpw"],
-["Guardians of the Galaxy Tower of Terror - California Adventure (360 Video)","F6-5f0HR8-g"],
-["Incredicoaster - California Adventure (360 Video)","3knXwIcsUCw"],
-["Disneyland, CA (360 Video)","Yl6hdjpxPU8"]]},
-"Cochi":{lat:9.93,lng:76.27,v:[
-["Visiting the Jewish Synagogues of Kerala","UzfAocycsVY"]]},
-"Red Rock Canyon":{lat:35.37,lng:-117.99,v:[
-["Red Rock Canyon State Park 'Cave' Exploration (360 Video)","bJGt_T3q9GI"],
-["Red Rock Canyon State Park, CA (360 Video)","rKbSARsxsDo"]]},
-"Dana Point":{lat:33.47,lng:-117.70,v:[
-["Jacuzzi Cannonball in Dana Point (360 Video)","hDP4I5J-uEY"]]},
-"Bodie":{lat:38.21,lng:-119.01,v:[
-["Bodie, CA: A Ghost Town (360 Video)","gjXmnqJkhWE"],
-["Bodie, CA (360 Video)","oNsbzwfST6Y"]]},
-"Pacifica":{lat:37.61,lng:-122.49,v:[
-["Surfing Pacifica (360 Video)","4DPnO9segr4"],
-["Womping and Surfing (360 Video)","jFLbep-CfKA"]]},
-"Hollywood":{lat:34.09,lng:-118.33,v:[
-["El Capitan Theater in Hollywood, CA (360 Video)","gqPpjYSetdw"],
-["TCL Chinese Theater in Hollywood, CA (360 Video)","RRgA88T47MQ"]]},
-"Venice":{lat:34.00,lng:-118.46,v:[
-["Hotel Erwin Rooftop in Venice, CA (360 Video)","lKz4Ep3fSD8"],
-["Mocap Capture Day in Venice (360 Video)","comTWxVQbxM"],
-["Abbot Kinney Blvd in Venice (360 Video)","9TEMGYzpEnU"],
-["Rosh Hashana in Venice","Hmvg8H__n18"]]},
-"Phoenix":{lat:33.45,lng:-112.07,v:[
-["My Childhood Home (360 Video)","0ku_Bs785ng"],
-["Just Gets MAErried - Justin's Entrance (360 Video)","5BwwkbVdA6k"],
-["Electro-Symbio Phonics for Phoenix by Nam June Paik (360 Video)","okUZHEKmSXE"],
-["Justin Gets MAErried - Justin and Mae's First Dance","tnKxaXhqt4o"],
-["Sky Train in Phoenix, AZ (360 Video)","uZUA8awnvcI"],
-["Glassmaking Lesson from Spencer (360 Video)","OEC830NnzJI"],
-["Spencer Makes a Glass Heart (360 Video)","vs-hht09AeY"],
-["Wrigley Mansion View in Phoenix, AZ (360 Video)","tbJBHnhrY6U"],
-["Tanner and Lexi's Wedding in Phoenix, AZ (360 Video)","As5zFVCWqow"]]},
-"Encino":{lat:34.15,lng:-118.52,v:[
-["Mercedes Benz of Encino AMG Showroom (360 Video)","KRwQp2O7u5E"]]},
-"Palo Alto":{lat:37.44,lng:-122.14,v:[
-["500 Waves (360 Video)","xw5rN3_URlI"]]},
-"Tel Aviv":{lat:31.77,lng:34.79,v:[
-["Azareli Sarona Tower in Tel Aviv, Israel (360 Video)","sFX4cDOTuDY"],
-["Rothschild Avenue in Israel (360 Video)","a5JE-agiyT8"],
-["Meta Rothschild Office in Israel (360 Video)","7tq5ysgvRaI"]]},
-"Las Catalinas":{lat:10.58,lng:-85.79,v:[
-["Scuba Diving at Las Catalinas Islands, Costa Rica (360 Video)","yLrnmHXeqBY"],
-["Exploring Las Catalinas, Costa Rica (360 Video)","w_U-rxT_Ir0"]]},
-"Portland":{lat:45.52,lng:-122.68,v:[
-["VR Zen Garden Meditation Experience","l_cgTqovxBo"],
-["Portland Japanese Garden Koi Pond (360 Video)","MYa17R0yfMk"],
-["Portland Japanese Garden (360 Video)","Qt6iETCnm00"],
-["Burnside Bridge Scooter Ride in Portland, OR (360 Video)","551UpxhRcNA"],
-["Broadway Bridge Scooter Ride in Portland, OR (360 Video)","1Du-xgl_eMM"],
-["Battleship Oregon Memorial Marine Park Scooter Ride in Portland, OR (360 Video)","9fYFhEEbFdU"],
-["Washington Park Rose Garden (360 Video)","ZefC7pSFkfE"]]},
-"Pacific Palisades":{lat:34.04,lng:-118.52,v:[
-["Palisades Fire Aftermath (360 Video)","PiG9ZOX8KRg"],
-["Inspiration Point at Will Rogers State Park (360 Video)","aFPUUyOvO68"],
-["Temescal Canyon Trail Summit - Pacific Palisades (360 Video)","rP4-2OJ2jH8"]]},
-"La Jolla":{lat:32.83,lng:-117.27,v:[
-["La Jolla Night Swimming (360 Video)","yPZNap75I0w"]]},
-"Lee Vining":{lat:37.96,lng:-119.12,v:[
-["Mono Lake (360 Video)","C-QatHxx8tk"]]},
-"Marina Del Rey":{lat:33.98,lng:-118.45,v:[
-["Ballona Creek in Marina Del Rey, CA (360 video)","Cr2597o6uQY"]]},
-"Culver City":{lat:33.99,lng:-118.40,v:[
-["July 4th Fireworks (360 video)","V_cmfZko3NE"],
-["Culver Steps in Culver City, CA (360 Video)","nEWvh-2WlQw"]]},
-"Cabazon":{lat:33.92,lng:-116.79,v:[
-["Mt. San Jacinto view from Cabazon, CA (360 Video)","WeH1jOVgRM0"]]},
-"Joshua Tree":{lat:34.13,lng:-116.31,v:[
-["Sunset at Joshua Tree National Park (360 Video)","8MNwqH3xXBE"],
-["Arch Rock Nature Trail in Joshua Tree (360 Video)","76PLUMURPHI"],
-["Cholla Fields at Joshua Tree (360 Video)","209p-U0rvHM"],
-["Joshua Tree South Entrance (360 Video)","f8G_f-b1tx4"],
-["Big Joshua Tree LOOK UP (360 Video)","MHpCZfrcfck"],
-["Keys View at Joshua Tree National Park (360 Video)","d78WGvcRq8E"],
-["Skull Rock Nature Trail in Joshua Tree (360 Video)","1iKk7oBq1zE"],
-["Joshua Tree Trip (Part 1) (360 Video)","eG3Mr5G2Zo0"],
-["Joshua Tree Trip (Part 2) (360 Video)","ERsxpJyZIsk"]]},
-"Government Camp":{lat:45.30,lng:-121.75,v:[
-["Coby and Eric go to Timberline Hotel, Talk Quantum (360 Video)","qfyJDjh8UuA"],
-["VR Mountain Biking #4 (360 Video)","uymeDoS2gqM"],
-["Downhill Bike Ride at Timberline Lodge (360 Video)","WQ9dQbxzZhw"],
-["Timberline Lodge Hotel in Government Camp, OR (360 Video)","7RPmG6oCp2E"],
-["VR Mountain Biking #1 (360 Video)","7OAfjHboYeQ"],
-["VR Mountain Biking #2 (360 Video)","HIFwKgsQNFo"],
-["VR Mountain Biking #3 (360 Video)","ZisFZfnjm7U"],
-["Timberline Lodge Ski Lift (360 Video)","ijCSgMZOA_8"]]},
-"Re'im":{lat:31.38,lng:34.46,v:[
-["Nova Music Festival Aftermath in Israel (360 Video)","GwAi5TUOVrU"],
-["October 7th Aftermath in Israel (360 Video)","kbe3LPYOo5g"]]},
-"Menlo Park":{lat:37.45,lng:-122.18,v:[
-["Skateboarding at Menlo Skatepark (360 Video)","u24FG8W2Kh8"]]},
-"Jerusalem":{lat:31.77,lng:35.21,v:[
-["Jerusalem (360 Video)","uBB3H7MxCkw"]]},
-"San Jose":{lat:37.34,lng:-121.89,v:[
-["Cinequest Film and VR Festival (360 Video)","166liIG19lA"]]},
-"Bombay Beach":{lat:33.35,lng:-115.73,v:[
-["Salton Sea and Bombay Beach (360 Video)","T7AzGytx75E"]]},
-"Independence":{lat:36.81,lng:-118.20,v:[
-["Manzanar National Historic Site (360 Video)","uiTIAh-WFrc"]]},
-"Milwaukee":{lat:43.04,lng:-87.91,v:[
-["McKinley Park in Milwaukee (360 Video)","V1lpJQ7MWGw"],
-["Milwaukee Art Museum (360 Video)","GuDPyiB5iGc"],
-["Veteran's Park in Milwaukee (360 Video)","OcqOvWxaap0"],
-["Milwaukee River (360 Video)","WOEnmz1EKMI"],
-["Milwaukee Scooter Ride (360 Video)","0pZbfkceKkI"],
-["POG and Jenn Get Married (360 Video)","zbNMnTdoUj8"]]},
-"La Fortuna":{lat:10.47,lng:-84.64,v:[
-["La Fortuna Waterfall in Costa Rica (360 Video)","qhz4nLR4RcE"]]},
-"Tiberias":{lat:32.79,lng:35.53,v:[
-["Sea of Galilee in Israel (360 Video)","CYbN_mtyNME"]]},
-"Paradise Valley":{lat:33.53,lng:-111.94,v:[
-["Casita Teeta Hang in Paradise Valley, AZ (360 Video)","7UySYuxVmyw"]]},
-"Palm Desert":{lat:33.72,lng:-116.37,v:[
-["Ladder Canyon in the Palm Desert (360 Video)","6EX12891cU4"]]},
-"San Marino":{lat:34.12,lng:-118.11,v:[
-["The Huntington Library and Museum (360 Video)","maSlcDd2sRw"],
-["The Huntington Gardens (360 Video)","e2_nu8JKegg"]]},
-"Woodside":{lat:37.43,lng:-122.25,v:[
-["Thornewood Open Space Preserve (360 Video)","-wry3t7mUcw"]]},
-"Herzliya":{lat:32.16,lng:34.79,v:[
-["Downtown Herzliya, Israel (360 Video)","oEG_KFMnFSk"]]},
-"Fallen Leaf Lake":{lat:38.91,lng:-120.06,v:[
-["Danica Shreds (360 Video)","XGl4Esyc5nY"]]},
-"Sacramento":{lat:38.58,lng:-121.49,v:[
-["Sacramento Capital and Old Town Sac (360 Video)","ZvK3FLYeP98"]]},
-"Caesarea":{lat:32.50,lng:34.89,v:[
-["Caesarea Tour in Israel (360 Video)","il9-xYbsnL8"]]},
-"Tamarindo":{lat:10.30,lng:-85.84,v:[
-["Storm Surfing in Tamarindo, Costa Rica (360 Video)","OB8daFgteds"],
-["Bali Go Boat Ride in Costa Rica (360 Video)","bm6eb7utqOc"],
-["Sunset Surf Sesh in Tamarindo, Costa Rica (360 Video)","YmuqW56GE1I"]]},
-"Pasadena":{lat:34.15,lng:-118.14,v:[
-["The Original Trader Joe's (360 Video)","nlCoThD9jrc"]]},
-"Sedona":{lat:34.87,lng:-111.76,v:[
-["Family Trip to Sedona, AZ (360 Video)","KSKcr5gs8y8"],
-["Bell Rock Summit - Sedona, AZ (360 Video)","Sfqf1F8emKo"]]},
-"Indio":{lat:33.72,lng:-116.22,v:[
-["Coachella (360 Video)","82EXv8fob2A"]]},
-"Touws River":{lat:-33.35,lng:20.02,v:[
-["Aquila Private Game Reserve, South Africa (360 Video)","adD0ExISbjU"]]},
-"Cape Town":{lat:-33.92,lng:18.42,v:[
-["Cape of Good Hope, South Africa (360 Video)","pNszrqCxKr4"],
-["Table Mountain - Cape Town, South Africa (360 Video)","0AeXH40NZqo"],
-["Lion's Head - Cape Town, South Africa (360 Video)","6n2dk4mMZB4"]]},
-"Boston":{lat:42.36,lng:-71.06,v:[
-["Boston, MA (360 Video)","HM67RqEw-rI"]]},
-"Santa Barbara":{lat:34.42,lng:-119.70,v:[
-["Santa Barbara County Wine Tour for Jack (360 Video)","Luh1vO1VGyU"]]},
-"North Shore":{lat:42.52,lng:-70.89,v:[
-["North Shore, MA (360 Video)","aifoFbCmmEk"]]},
-"Verde Valley":{lat:34.57,lng:-111.86,v:[
-["Verde Valley River - Arizona (360 Video)","tPhECh8cdS8"]]},
-"False Bay":{lat:-34.18,lng:18.48,v:[
-["Shark Diving in False Bay, South Africa (360 Video)","6DKab2RKxcg"]]},
-"Simon's Town":{lat:-34.19,lng:18.43,v:[
-["Boulders Beach Penguins, South Africa (360 Video)","F5Aj3IUbB_8"]]},
-"Mount Tabor":{lat:32.69,lng:35.39,v:[
-["Mount Tabor in Israel (360 Video)","43ajHCW28YI"]]},
-"San Diego":{lat:32.72,lng:-117.16,v:[
-["Blacks and Torey Pines State Beach (360 Video)","J5w9kJIB_Q0"]]},
-"St. Francis Bay":{lat:-34.17,lng:24.84,v:[
-["Bruce's Beauties - St. Francis Bay, South Africa (360 Video)","KvBkJ2DG2Z8"]]},
-"Salem":{lat:42.52,lng:-70.90,v:[
-["Salem, MA (360 Video)","jzxKTft-VUs"]]},
-"Prescott":{lat:34.54,lng:-112.47,v:[
-["Embry Riddle Aeronautical University in Prescott, AZ (360 Video)","Ux9n3N4W54E"],
-["Watson Lake in Prescott, AZ (360 Video)","wdjG7TThxdg"]]},
-"Lake Tahoe":{lat:39.10,lng:-120.03,v:[
-["Lake Tahoe, CA - Nov 2025 (360 Video)","G6gCbplktW4"]]},
-"Arenal":{lat:10.46,lng:-84.68,v:[
-["Tabacon Hot Springs in Arenal, Costa Rica (360 Video)","U5w9sagUXMA"],
-["Jet Skiing at Lake Arenal in Costa Rica (360 Video)","gDAbguHlSZY"],
-["Wild Sloth in Arenal, Costa Rica (360 Video)","6sM6nMVPXmM"],
-["Arenal 1968 Park in Costa Rica (360 Video)","LSVEfE_bjFw"]]},
-"Monteverde":{lat:10.31,lng:-84.83,v:[
-["Tarzan Swing at Selvatura Park in Monteverde, Costa Rica (360 Video)","3ia_WPL6My8"],
-["Finca Camino Nuevo in Monteverde, Costa Rica (360 Video)","_CGMCaBXM7g"],
-["Hanging Bridges at Selvatura Park in Monteverde, Costa Rica (360 Video)","Atkfys_YiEg"],
-["Ziplining at Selvetura Park in Monteverde, Costa Rica (360 Video)","l9ugpPmYRRs"],
-["Monteverde Cloud Forest in Costa Rica (360 Video)","SZrupLUjEJs"]]},
-"Playa Grande":{lat:10.33,lng:-85.85,v:[
-["Surfing in Playa Grande, Costa Rica (360 Video)","4RDoGOFkc44"]]},
-"Austin":{lat:30.27,lng:-97.74,v:[
-["Austin, TX - Nov 2025 (360 Video)","dS1DiZoklBc"]]},
-"Miami":{lat:25.76,lng:-80.19,v:[
-["Miami, FL - Nov 2025 (360 Video)","P_JY8UzIY2s"]]},
-"Malibu":{lat:34.03,lng:-118.78,v:[
-["PCH Fire Aftermath (360 Video)","C8Wt4BcZ-BE"],
-["Point Dume in Malibu (360 Video)","_wMxkIVlTwM"],
-["Malibu Frisbee Sesh (360 Video)","A4heqhkd4F0"],
-["Throwing a Rock at a Dead Seal in Malibu (360 Video)","PpQ-fzbuzX8"]]},
-"Mount San Jacinto":{lat:33.81,lng:-116.68,v:[
-["Mount San Jacinto (360 Video)","Vq0wdzGrZLM"]]},
-"Cape St Francis":{lat:-34.20,lng:24.83,v:[
-["Cape St Francis, South Africa (360 Video)","F9vVfNGkYM4"]]},
-"Burlingame":{lat:37.58,lng:-122.35,v:[
-["Meta Burlingame Office Views (360 Video)","Xjp4Qc55vfk"]]},
-"Las Gaviotas":{lat:32.25,lng:-116.98,v:[
-["Las Gaviotas, Mexico (360 Video)","zVLRIPWa_pM"]]},
-};
+// ── City + Video Data (fetched from Google Sheet) ─────────────────
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1RUCWiT3EF89AuM0xCQvCGW44PJk7YlK7cZfmOXkJRTA/gviz/tq?tqx=out:csv';
+let cityData = {};
+
+function parseCSV(text) {
+    const rows = [];
+    let current = '';
+    let inQuotes = false;
+    let row = [];
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inQuotes) {
+            if (ch === '"' && text[i + 1] === '"') { current += '"'; i++; }
+            else if (ch === '"') { inQuotes = false; }
+            else { current += ch; }
+        } else {
+            if (ch === '"') { inQuotes = true; }
+            else if (ch === ',') { row.push(current.trim()); current = ''; }
+            else if (ch === '\n' || (ch === '\r' && text[i + 1] === '\n')) {
+                row.push(current.trim()); current = '';
+                if (row.length > 1) rows.push(row);
+                row = [];
+                if (ch === '\r') i++;
+            } else { current += ch; }
+        }
+    }
+    if (current || row.length) { row.push(current.trim()); if (row.length > 1) rows.push(row); }
+    return rows;
+}
+
+function extractVideoId(url) {
+    if (!url) return null;
+    const m = url.match(/(?:youtu\.be\/|[?&]v=)([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : null;
+}
+
+function processCSVData(rows) {
+    // Skip header row (index 0); columns: A=Title, B=Link, C=City, D=State, E=Country, F=Longitude, G=Latitude
+    const cities = {};
+    for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        const title = r[0], link = r[1], city = r[2];
+        const lng = parseFloat(r[5]), lat = parseFloat(r[6]);
+        const id = extractVideoId(link);
+        if (!city || !id || isNaN(lat) || isNaN(lng)) continue;
+        if (!cities[city]) cities[city] = { lat, lng, v: [] };
+        cities[city].v.push([title, id]);
+    }
+    return cities;
+}
+
+// ── Vector globe texture ──────────────────────────────────────────
+const LAND_TOPO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/land-50m.json';
+
+function topoFeature(topology, obj) {
+    const {scale, translate} = topology.transform;
+    const arcs = topology.arcs.map(arc => {
+        let x = 0, y = 0;
+        return arc.map(([dx, dy]) => {
+            x += dx; y += dy;
+            return [x * scale[0] + translate[0], y * scale[1] + translate[1]];
+        });
+    });
+    function ring(indices) {
+        const coords = [];
+        for (const i of indices) {
+            const arc = i < 0 ? arcs[~i].slice().reverse() : arcs[i];
+            for (let j = coords.length ? 1 : 0; j < arc.length; j++) coords.push(arc[j]);
+        }
+        return coords;
+    }
+    function geometry(o) {
+        const t = o.type;
+        if (t === 'Polygon') return { type: t, coordinates: o.arcs.map(ring) };
+        if (t === 'MultiPolygon') return { type: t, coordinates: o.arcs.map(p => p.map(ring)) };
+        if (t === 'GeometryCollection') return { type: t, geometries: o.geometries.map(geometry) };
+        return o;
+    }
+    return geometry(obj);
+}
+
+function renderLandTexture(landGeom) {
+    const W = 4096, H = 2048;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#000';
+    function drawPoly(coords) {
+        ctx.beginPath();
+        for (const r of coords) {
+            for (let i = 0; i < r.length; i++) {
+                const x = (r[i][0] + 180) / 360 * W;
+                const y = (90 - r[i][1]) / 180 * H;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+        }
+        ctx.fill('evenodd');
+    }
+    function draw(g) {
+        if (g.type === 'Polygon') drawPoly(g.coordinates);
+        else if (g.type === 'MultiPolygon') g.coordinates.forEach(drawPoly);
+        else if (g.type === 'GeometryCollection') g.geometries.forEach(draw);
+    }
+    draw(landGeom);
+    const tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.anisotropy = 16;
+    tex.wrapS = THREE.RepeatWrapping;
+    return tex;
+}
 
 // ── Three.js Globe Setup ───────────────────────────────────────────
 const container = document.getElementById('globe-container');
@@ -678,12 +436,13 @@ scene.add(sunLight);
 
 // Globe sphere
 const GLOBE_RADIUS = 5;
-const textureLoader = new THREE.TextureLoader();
-const waterMask = textureLoader.load('https://unpkg.com/three-globe@2.31.0/example/img/earth-water.png');
+// Placeholder 1x1 white texture (all water) until vector map loads
+const defaultWaterTex = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1);
+defaultWaterTex.needsUpdate = true;
 const globeGeom = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
 const globeMat = new THREE.ShaderMaterial({
     uniforms: {
-        waterMap: { value: waterMask },
+        waterMap: { value: defaultWaterTex },
         lightDir: { value: new THREE.Vector3(0.5, 0.3, 0.5).normalize() }
     },
     vertexShader: `
@@ -783,31 +542,33 @@ const pinMat = new THREE.MeshBasicMaterial({ color: 0xff4444 });
 const pinGeom = new THREE.SphereGeometry(0.04, 10, 10);
 const labelsContainer = document.getElementById('city-labels');
 
-Object.entries(CITIES).forEach(([city, data]) => {
-    const pos = latLngToVec3(data.lat, data.lng, GLOBE_RADIUS + 0.02);
-    // Pin dot
-    const pin = new THREE.Mesh(pinGeom, pinMat.clone());
-    pin.position.copy(pos);
-    pin.userData = { city };
-    pinGroup.add(pin);
+function createPins(cities) {
+    Object.entries(cities).forEach(([city, data]) => {
+        const pos = latLngToVec3(data.lat, data.lng, GLOBE_RADIUS + 0.02);
+        // Pin dot
+        const pin = new THREE.Mesh(pinGeom, pinMat.clone());
+        pin.position.copy(pos);
+        pin.userData = { city };
+        pinGroup.add(pin);
 
-    // Glow ring (sprite)
-    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: glowTex, transparent: true, opacity: 0.6, depthWrite: false
-    }));
-    sprite.position.copy(pos);
-    sprite.scale.set(0.35, 0.35, 1);
-    pinGroup.add(sprite);
+        // Glow ring (sprite)
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: glowTex, transparent: true, opacity: 0.6, depthWrite: false
+        }));
+        sprite.position.copy(pos);
+        sprite.scale.set(0.35, 0.35, 1);
+        pinGroup.add(sprite);
 
-    // HTML label
-    const label = document.createElement('div');
-    label.className = 'city-label';
-    label.textContent = city;
-    label.addEventListener('click', (e) => { e.stopPropagation(); openPanel(city); });
-    labelsContainer.appendChild(label);
+        // HTML label
+        const label = document.createElement('div');
+        label.className = 'city-label';
+        label.textContent = city;
+        label.addEventListener('click', (e) => { e.stopPropagation(); openPanel(city); });
+        labelsContainer.appendChild(label);
 
-    pinObjs.push({ mesh: pin, sprite, city, pos, label });
-});
+        pinObjs.push({ mesh: pin, sprite, city, pos, label });
+    });
+}
 
 // ── Raycasting & Interaction ───────────────────────────────────────
 const raycaster = new THREE.Raycaster();
@@ -833,7 +594,7 @@ function onPointerDown(e) {
         const city = hits[0].object.userData.city;
         openPanel(city);
         // Rotate globe to face this city
-        const data = CITIES[city];
+        const data = cityData[city];
         const target = latLngToVec3(data.lat, data.lng, GLOBE_RADIUS + 5);
         // autoRotate is handled by zoom distance in the animate loop
     }
@@ -848,7 +609,7 @@ function updateTooltip() {
 
     if (hits.length > 0) {
         const city = hits[0].object.userData.city;
-        const data = CITIES[city];
+        const data = cityData[city];
         if (hoveredPin !== city) {
             hoveredPin = city;
             tooltip.innerHTML = city + '<span class="video-count">' + data.v.length + ' video' + (data.v.length !== 1 ? 's' : '') + '</span>';
@@ -880,7 +641,7 @@ const panel = document.getElementById('video-panel');
 const overlay = document.getElementById('panel-overlay');
 
 function openPanel(city) {
-    const data = CITIES[city];
+    const data = cityData[city];
     document.getElementById('panel-city-name').textContent = city;
     document.getElementById('panel-city-count').textContent = data.v.length + ' video' + (data.v.length !== 1 ? 's' : '');
     const list = document.getElementById('panel-video-list');
@@ -970,6 +731,30 @@ function animate() {
     renderer.render(scene, camera);
 }
 animate();
+
+// ── Fetch vector map + spreadsheet data ───────────────────────────
+(async () => {
+    try {
+        const [csvRes, topoRes] = await Promise.all([
+            fetch(SHEET_CSV_URL),
+            fetch(LAND_TOPO_URL)
+        ]);
+        // Build vector globe texture
+        const topo = await topoRes.json();
+        const landGeom = topoFeature(topo, topo.objects.land);
+        globeMat.uniforms.waterMap.value = renderLandTexture(landGeom);
+        // Process city data
+        const csvText = await csvRes.text();
+        const rows = parseCSV(csvText);
+        cityData = processCSVData(rows);
+        createPins(cityData);
+    } catch (err) {
+        console.error('Failed to load adventure data:', err);
+    } finally {
+        const loader = document.getElementById('globe-loading');
+        if (loader) loader.classList.add('hidden');
+    }
+})();
 
 // Resize
 window.addEventListener('resize', () => {
