@@ -374,19 +374,55 @@ controls.enablePan = false;
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.4;
 
-// Lights (for social icons and pins)
-scene.add(new THREE.AmbientLight(0xffffff, 1.5));
-const sunLight = new THREE.DirectionalLight(0xffffff, 1.0);
+// Lights
+scene.add(new THREE.AmbientLight(0xffffff, 2.0));
+const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
 sunLight.position.set(5, 3, 5);
 scene.add(sunLight);
 
-// Globe (textured sphere — satellite photo has lighting baked in)
+// Globe — starts as a lit blue sphere so it's never dark even if textures fail
 const GLOBE_RADIUS = 5;
-const earthTexture = new THREE.TextureLoader().load('3d_models/8k_earth_daymap.webp');
-earthTexture.colorSpace = THREE.SRGBColorSpace;
 const globeGeom = new THREE.SphereGeometry(GLOBE_RADIUS, 128, 128);
-const globeMat = new THREE.MeshBasicMaterial({ map: earthTexture });
-scene.add(new THREE.Mesh(globeGeom, globeMat));
+const globeMat = new THREE.MeshStandardMaterial({
+    color: 0x2266bb,
+    roughness: 0.7,
+    metalness: 0.1,
+    emissive: 0x112244,
+    emissiveIntensity: 0.4,
+});
+const globeMesh = new THREE.Mesh(globeGeom, globeMat);
+scene.add(globeMesh);
+
+// Load earth texture with fallbacks (2K JPG → 8K WebP → CDN)
+const _texLoader = new THREE.TextureLoader();
+(async () => {
+    const urls = [
+        '3d_models/2k_earth_daymap.jpg',
+        '3d_models/8k_earth_daymap.webp',
+        'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
+    ];
+    for (const url of urls) {
+        try {
+            const tex = await new Promise((ok, fail) => _texLoader.load(url, ok, undefined, fail));
+            tex.colorSpace = THREE.SRGBColorSpace;
+            globeMesh.material = new THREE.MeshBasicMaterial({ map: tex });
+            console.log('Globe texture loaded:', url);
+            return;
+        } catch (_) { console.warn('Globe texture failed:', url); }
+    }
+    // All textures failed — add lat/lng grid so the blue globe has features
+    const gridMat = new THREE.LineBasicMaterial({ color: 0x4488cc, transparent: true, opacity: 0.25 });
+    for (let lat = -80; lat <= 80; lat += 20) {
+        const pts = [];
+        for (let lng = 0; lng <= 360; lng += 2) pts.push(latLngToVec3(lat, lng - 180, GLOBE_RADIUS + 0.01));
+        globeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
+    }
+    for (let lng = -180; lng < 180; lng += 30) {
+        const pts = [];
+        for (let lat = -90; lat <= 90; lat += 2) pts.push(latLngToVec3(lat, lng, GLOBE_RADIUS + 0.01));
+        globeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
+    }
+})();
 
 // Atmosphere glow
 const atmosGeom = new THREE.SphereGeometry(GLOBE_RADIUS * 1.015, 128, 128);
