@@ -360,8 +360,6 @@ camera.position.set(0, 2, 18);
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.2;
 container.appendChild(renderer.domElement);
 
 // Controls
@@ -376,26 +374,18 @@ controls.enablePan = false;
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.4;
 
-// Lights — ambient + sun + fill + hemisphere for even visibility
-scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-
-const sunLight = new THREE.DirectionalLight(0xfff0dd, 1.8);
+// Lights (for social icons and pins)
+scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+const sunLight = new THREE.DirectionalLight(0xffffff, 1.0);
 sunLight.position.set(5, 3, 5);
 scene.add(sunLight);
 
-const fillLight = new THREE.DirectionalLight(0x8090b0, 0.8);
-fillLight.position.set(-5, -2, -4);
-scene.add(fillLight);
-
-const hemiLight = new THREE.HemisphereLight(0xc8d8f0, 0x303850, 0.7);
-scene.add(hemiLight);
-
-// Globe (textured sphere)
+// Globe (textured sphere — satellite photo has lighting baked in)
 const GLOBE_RADIUS = 5;
 const earthTexture = new THREE.TextureLoader().load('3d_models/8k_earth_daymap.webp');
 earthTexture.colorSpace = THREE.SRGBColorSpace;
 const globeGeom = new THREE.SphereGeometry(GLOBE_RADIUS, 128, 128);
-const globeMat = new THREE.MeshStandardMaterial({ map: earthTexture, roughness: 1.0, metalness: 0.0 });
+const globeMat = new THREE.MeshBasicMaterial({ map: earthTexture });
 scene.add(new THREE.Mesh(globeGeom, globeMat));
 
 // Atmosphere glow
