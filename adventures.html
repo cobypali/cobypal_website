@@ -451,6 +451,10 @@ const glowTex = makeRingTexture();
 const pinMat = new THREE.MeshBasicMaterial({ color: 0xff4444 });
 const pinGeom = new THREE.SphereGeometry(0.04, 10, 10);
 const labelsContainer = document.getElementById('city-labels');
+labelsContainer.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    renderer.domElement.dispatchEvent(new WheelEvent('wheel', e));
+}, { passive: false });
 
 function createPins(cities) {
     Object.entries(cities).forEach(([city, data]) => {
