@@ -288,7 +288,7 @@
     <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; // kept for social icons
 
 // ── City + Video Data (fetched from Google Sheet) ─────────────────
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1RUCWiT3EF89AuM0xCQvCGW44PJk7YlK7cZfmOXkJRTA/gviz/tq?tqx=out:csv';
@@ -380,8 +380,13 @@ const sunLight = new THREE.DirectionalLight(0xfff0dd, 1.0);
 sunLight.position.set(5, 3, 5);
 scene.add(sunLight);
 
-// Globe (loaded from GLB model)
+// Globe (textured sphere)
 const GLOBE_RADIUS = 5;
+const earthTexture = new THREE.TextureLoader().load('3d_models/8k_earth_daymap.webp');
+earthTexture.colorSpace = THREE.SRGBColorSpace;
+const globeGeom = new THREE.SphereGeometry(GLOBE_RADIUS, 128, 128);
+const globeMat = new THREE.MeshPhongMaterial({ map: earthTexture });
+scene.add(new THREE.Mesh(globeGeom, globeMat));
 
 // Atmosphere glow
 const atmosGeom = new THREE.SphereGeometry(GLOBE_RADIUS * 1.015, 128, 128);
@@ -693,26 +698,10 @@ function animate() {
 }
 animate();
 
-// ── Load globe model + spreadsheet data ───────────────────────────
+// ── Load spreadsheet data ─────────────────────────────────────────
 (async () => {
     try {
-        const [csvRes, gltf] = await Promise.all([
-            fetch(SHEET_CSV_URL),
-            new Promise((resolve, reject) => {
-                new GLTFLoader().load('3d_models/earth.glb', resolve, undefined, reject);
-            })
-        ]);
-        // Add globe model, scaled to GLOBE_RADIUS
-        const model = gltf.scene;
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const scale = (GLOBE_RADIUS * 2) / Math.max(size.x, size.y, size.z);
-        model.scale.setScalar(scale);
-        model.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
-        scene.add(model);
-        // Process city data
-        const csvText = await csvRes.text();
+        const csvText = await (await fetch(SHEET_CSV_URL)).text();
         const rows = parseCSV(csvText);
         cityData = processCSVData(rows);
         createPins(cityData);
