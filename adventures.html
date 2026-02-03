@@ -132,6 +132,7 @@
         .play-icon svg { width: 14px; height: 14px; fill: white; margin-left: 2px; }
         .video-item-info { display: flex; flex-direction: column; justify-content: center; }
         .video-item-title { font-size: 13px; font-weight: 500; line-height: 1.4; color: #E6EDF7; }
+        .video-item-date { font-size: 11px; color: rgba(230,237,247,0.45); margin-top: 4px; }
         /* Video Modal */
         .video-modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -326,16 +327,25 @@ function extractVideoId(url) {
 }
 
 function processCSVData(rows) {
-    // Skip header row (index 0); columns: A=Title, B=Link, C=City, D=State, E=Country, F=Longitude, G=Latitude
+    // Skip header row (index 0); columns: A=Title, B=Link, C=City, D=State, E=Country, F=Longitude, G=Latitude, H=Publish time
     const cities = {};
     for (let i = 1; i < rows.length; i++) {
         const r = rows[i];
         const title = r[0], link = r[1], city = r[2];
         const lng = parseFloat(r[5]), lat = parseFloat(r[6]);
+        const publishTime = r[7] || '';
         const id = extractVideoId(link);
         if (!city || !id || isNaN(lat) || isNaN(lng)) continue;
+        if (!publishTime || isNaN(new Date(publishTime))) continue;
         if (!cities[city]) cities[city] = { lat, lng, v: [] };
-        cities[city].v.push([title, id]);
+        cities[city].v.push([title, id, publishTime]);
+    }
+    // Sort each city's videos newest to oldest
+    for (const city in cities) {
+        cities[city].v.sort((a, b) => {
+            const da = new Date(a[2]), db = new Date(b[2]);
+            return (isNaN(db) ? 0 : db) - (isNaN(da) ? 0 : da);
+        });
     }
     return cities;
 }
@@ -545,7 +555,13 @@ function openPanel(city) {
     document.getElementById('panel-city-name').textContent = city;
     document.getElementById('panel-city-count').textContent = data.v.length + ' video' + (data.v.length !== 1 ? 's' : '');
     const list = document.getElementById('panel-video-list');
-    list.innerHTML = data.v.map(([title, id]) => `
+    list.innerHTML = data.v.map(([title, id, publishTime]) => {
+        let dateStr = '';
+        if (publishTime) {
+            const d = new Date(publishTime);
+            if (!isNaN(d)) dateStr = d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+        return `
         <div class="video-item" data-id="${id}">
             <div class="video-thumb">
                 <img src="https://img.youtube.com/vi/${id}/mqdefault.jpg" alt="${title}" loading="lazy">
@@ -553,9 +569,10 @@ function openPanel(city) {
             </div>
             <div class="video-item-info">
                 <div class="video-item-title">${title}</div>
+                ${dateStr ? `<div class="video-item-date">${dateStr}</div>` : ''}
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
     // Click handlers
     list.querySelectorAll('.video-item').forEach(item => {
         item.addEventListener('click', () => openVideoModal(item.dataset.id));
@@ -608,25 +625,65 @@ function animate() {
     const rect = renderer.domElement.getBoundingClientRect();
     // Label font scales inversely with distance so text is readable when close
     const labelFontSize = Math.max(7, Math.min(13, 70 / camDist));
+    // First pass: update pin visuals + collect screen positions
+    const labelCandidates = [];
     pinObjs.forEach((p, i) => {
         const base = p.city === hoveredPin ? 1.8 * pinScale : pinScale;
         p.mesh.scale.setScalar(base);
         const s = (0.3 + Math.sin(t + i * 0.3) * 0.08) * pinScale;
         if (p.city !== hoveredPin) p.sprite.scale.set(s, s, 1);
         else p.sprite.scale.set(0.35 * pinScale, 0.35 * pinScale, 1);
-        // Update label position & visibility
         const pinDir = p.pos.clone().normalize();
         const facing = camDir.dot(pinDir) > 0.05;
         const projected = p.pos.clone().project(camera);
         if (facing && projected.z < 1) {
-            p.label.style.left = ((projected.x + 1) / 2 * rect.width) + 'px';
-            p.label.style.top = ((-projected.y + 1) / 2 * rect.height - 10 * pinScale - 6) + 'px';
-            p.label.style.fontSize = labelFontSize + 'px';
-            p.label.classList.add('visible');
+            const sx = (projected.x + 1) / 2 * rect.width;
+            const sy = (-projected.y + 1) / 2 * rect.height;
+            labelCandidates.push({ idx: i, sx, sy, dot: camDir.dot(pinDir) });
         } else {
             p.label.classList.remove('visible');
         }
     });
+    // Sort so labels most directly facing camera get placement priority
+    labelCandidates.sort((a, b) => b.dot - a.dot);
+    // Second pass: place labels with collision avoidance
+    const charW = labelFontSize * 0.55;
+    const padX = 12;
+    const labelH = labelFontSize + 8;
+    const gap = 4;
+    const aboveY = -(10 * pinScale + 6);
+    const belowY = labelH + 6;
+    const placed = [];
+    for (const lc of labelCandidates) {
+        const p = pinObjs[lc.idx];
+        const w = p.city.length * charW + padX;
+        const attempts = [
+            { x: lc.sx, y: lc.sy + aboveY },
+            { x: lc.sx, y: lc.sy + belowY },
+            { x: lc.sx - w * 0.8, y: lc.sy + aboveY },
+            { x: lc.sx + w * 0.8, y: lc.sy + aboveY },
+            { x: lc.sx - w * 0.8, y: lc.sy + belowY },
+            { x: lc.sx + w * 0.8, y: lc.sy + belowY },
+        ];
+        let didPlace = false;
+        for (const att of attempts) {
+            let collides = false;
+            for (const pl of placed) {
+                if (Math.abs(att.x - pl.x) < (w + pl.w) / 2 + gap && Math.abs(att.y - pl.y) < labelH + gap) {
+                    collides = true; break;
+                }
+            }
+            if (!collides) {
+                p.label.style.left = att.x + 'px';
+                p.label.style.top = att.y + 'px';
+                p.label.style.fontSize = labelFontSize + 'px';
+                p.label.classList.add('visible');
+                placed.push({ x: att.x, y: att.y, w });
+                didPlace = true; break;
+            }
+        }
+        if (!didPlace) p.label.classList.remove('visible');
+    }
     updateTooltip();
     renderer.render(scene, camera);
 }
