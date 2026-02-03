@@ -184,33 +184,6 @@
             margin-bottom: 32px;
         }
 
-        .module-container {
-            margin-bottom: 40px;
-        }
-
-        .module-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #E6EDF7;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .module-title .emoji {
-            font-size: 24px;
-        }
-
-        .protocol-item.no-click {
-            cursor: default;
-        }
-
-        .protocol-item.no-click:hover {
-            transform: none;
-            border-color: #1A2438;
-            box-shadow: none;
-        }
 
         /* Modal Overlay */
         .modal-overlay {
@@ -386,10 +359,6 @@
                 font-size: 22px;
             }
 
-            .module-title {
-                font-size: 18px;
-            }
-
             .modal {
                 max-height: 85vh;
             }
@@ -536,12 +505,21 @@
                     <div>Loading protocols...</div>
                 </div>
             </div>
-            <hr class="section-divider" id="modules-divider" style="display:none;">
-            <div id="modules-section" style="display:none;">
-                <h2 class="section-title">Modules</h2>
-                <div id="module-1" class="module-container"></div>
-                <div id="module-2" class="module-container"></div>
-                <div id="module-3" class="module-container"></div>
+            <hr class="section-divider">
+            <h2 class="section-title">Modules</h2>
+            <div class="protocol-grid">
+                <a href="happy-body.html" class="protocol-item">
+                    <span class="emoji">🏋️</span>
+                    <span class="label">Module 1 - The Happy Body</span>
+                </a>
+                <a href="stretches.html" class="protocol-item">
+                    <span class="emoji">🧘</span>
+                    <span class="label">Module 2 - Stretches</span>
+                </a>
+                <a href="lifting.html" class="protocol-item">
+                    <span class="emoji">🦾</span>
+                    <span class="label">Module 3 - Lifting</span>
+                </a>
             </div>
         </div>
     </main>
@@ -582,9 +560,6 @@
     <script>
         const SHEET_ID = '1AcVJFt12DyAIpuYivkbGnQDg7I3XzRx7Mlwo2f2VSoc';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
-        const HAPPY_BODY_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=1983667560`;
-        const STRETCHES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=1045949936`;
-        const LIFTING_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=1436589195`;
 
         const protocolList = document.getElementById('protocol-list');
         const modalOverlay = document.getElementById('modal-overlay');
@@ -666,8 +641,6 @@
                 protocolList.innerHTML = '';
                 protocolList.appendChild(grid);
 
-                loadModules();
-
             } catch (err) {
                 console.error('Failed to load protocols:', err);
                 protocolList.innerHTML = `
@@ -676,72 +649,6 @@
                         <a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit?gid=0#gid=0" target="_blank" style="color: #60A5FA; margin-top: 10px; display: inline-block;">Open spreadsheet directly</a>
                     </div>
                 `;
-            }
-        }
-
-        async function loadModules() {
-            document.getElementById('modules-divider').style.display = '';
-            document.getElementById('modules-section').style.display = '';
-            loadModule('module-1', 'Module 1 - The Happy Body', '🏋️', HAPPY_BODY_URL, true);
-            loadModule('module-2', 'Module 2 - Stretches', '🧘', STRETCHES_URL, false);
-            loadModule('module-3', 'Module 3 - Lifting', '🦾', LIFTING_URL, false);
-        }
-
-        async function loadModule(containerId, title, emoji, url, hasDescriptions) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = `<h3 class="module-title"><span class="emoji">${emoji}</span>${escapeHtml(title)}</h3><div class="loading"><div class="loading-spinner"></div><div>Loading...</div></div>`;
-
-            try {
-                const response = await fetch(url);
-                const text = await response.text();
-                const data = parseSheetResponse(text);
-                const rows = data.table.rows;
-
-                const grid = document.createElement('div');
-                grid.className = 'protocol-grid';
-
-                let count = 0;
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    const cells = row.c;
-                    if (!cells) continue;
-
-                    let exerciseName, description;
-
-                    if (hasDescriptions) {
-                        exerciseName = (cells[3] && cells[3].v) ? String(cells[3].v).trim() : '';
-                        description = (cells[5] && cells[5].v) ? String(cells[5].v).trim() : '';
-                    } else {
-                        exerciseName = (cells[0] && cells[0].v) ? String(cells[0].v).trim() : '';
-                        description = '';
-                    }
-
-                    if (!exerciseName) continue;
-                    count++;
-
-                    const item = document.createElement('div');
-                    item.className = hasDescriptions ? 'protocol-item' : 'protocol-item no-click';
-                    item.innerHTML = `
-                        <span class="emoji" style="font-size:16px; color:#3B82F6; font-family:Inter,sans-serif; font-weight:600;">${count}</span>
-                        <span class="label">${escapeHtml(exerciseName)}</span>
-                    `;
-
-                    if (hasDescriptions && description) {
-                        item.addEventListener('click', () => {
-                            openModal(exerciseName, description);
-                        });
-                    }
-
-                    grid.appendChild(item);
-                }
-
-                const heading = `<h3 class="module-title"><span class="emoji">${emoji}</span>${escapeHtml(title)}</h3>`;
-                container.innerHTML = heading;
-                container.appendChild(grid);
-
-            } catch (err) {
-                console.error(`Failed to load ${title}:`, err);
-                container.innerHTML = `<h3 class="module-title"><span class="emoji">${emoji}</span>${escapeHtml(title)}</h3><div class="error-message">Failed to load module.</div>`;
             }
         }
 
