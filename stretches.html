@@ -751,14 +751,25 @@
     <script>
         const SHEET_ID = '1AcVJFt12DyAIpuYivkbGnQDg7I3XzRx7Mlwo2f2VSoc';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=1045949936`;
-        const EXERCISE_TIME = 90;
-
         let exercises = [];
         let currentExerciseIndex = 0;
         let currentModalIndex = -1;
         let timerInterval = null;
-        let timeRemaining = EXERCISE_TIME;
+        let currentExerciseTime = 90;
+        let timeRemaining = 90;
         let isPaused = false;
+
+        function parseTimeToSeconds(val, formatted) {
+            const str = formatted || (typeof val === 'string' ? val : null);
+            if (str) {
+                const parts = str.split(':').map(Number);
+                if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+                if (parts.length === 2) return parts[0] * 60 + parts[1];
+            }
+            if (typeof val === 'number') return Math.round(val * 86400);
+            if (Array.isArray(val)) return (val[0] || 0) * 3600 + (val[1] || 0) * 60 + (val[2] || 0);
+            return 90;
+        }
 
         // DOM elements
         const exerciseList = document.getElementById('exercise-list');
@@ -873,12 +884,16 @@
                     const name = (cells[0] && cells[0].v) ? String(cells[0].v).trim() : '';
                     if (!name || name.toLowerCase() === 'exercise') continue;
 
+                    const timeVal = (cells[1] && cells[1].v != null) ? cells[1].v : null;
+                    const timeFmt = (cells[1] && cells[1].f) ? cells[1].f : null;
+
                     num++;
                     exercises.push({
                         number: num,
                         name: name,
                         image: null,
-                        description: ''
+                        description: '',
+                        time: parseTimeToSeconds(timeVal, timeFmt)
                     });
                 }
 
@@ -937,10 +952,10 @@
 
         function showWorkoutExercise() {
             clearInterval(timerInterval);
-            timeRemaining = EXERCISE_TIME;
-            isPaused = false;
-
             const exercise = exercises[currentExerciseIndex];
+            currentExerciseTime = exercise.time;
+            timeRemaining = currentExerciseTime;
+            isPaused = false;
             const total = exercises.length;
 
             workoutProgressText.textContent = `Stretch ${currentExerciseIndex + 1} of ${total}`;
@@ -966,7 +981,7 @@
                                 stroke-dasharray="${circumference}"
                                 stroke-dashoffset="0"></circle>
                         </svg>
-                        <span class="timer-text" id="timer-text">${formatTime(EXERCISE_TIME)}</span>
+                        <span class="timer-text" id="timer-text">${formatTime(currentExerciseTime)}</span>
                     </div>
                 </div>
                 <div class="workout-nav-inline">
@@ -1015,7 +1030,7 @@
         }
 
         function updateTimerDisplay(circle, text, circumference) {
-            const progress = 1 - (timeRemaining / EXERCISE_TIME);
+            const progress = 1 - (timeRemaining / currentExerciseTime);
             circle.style.strokeDashoffset = circumference * progress;
             text.textContent = formatTime(timeRemaining);
         }
