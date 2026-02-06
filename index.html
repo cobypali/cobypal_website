@@ -296,16 +296,6 @@
             renderer.outputColorSpace = THREE.SRGBColorSpace;
             canvasWrapper.appendChild(renderer.domElement);
 
-            // Handle WebGL context loss
-            renderer.domElement.addEventListener('webglcontextlost', (event) => {
-                event.preventDefault();
-                console.log('WebGL context lost for model:', container.dataset.name);
-            });
-
-            renderer.domElement.addEventListener('webglcontextrestored', () => {
-                console.log('WebGL context restored, reloading...');
-                window.location.reload();
-            });
 
             camera.position.set(0, 0, 4);
 
@@ -635,35 +625,35 @@
 
         animateSocialIcons();
 
-        // Handle page visibility changes - reload if context might be stale
-        let hiddenTime = 0;
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                hiddenTime = Date.now();
-            } else {
-                // If page was hidden for more than 5 minutes, check if contexts are still valid
-                const hiddenDuration = Date.now() - hiddenTime;
-                if (hiddenDuration > 5 * 60 * 1000) {
-                    // Check if any WebGL context is lost
-                    const anyContextLost = modelScenes.some(sceneData => {
-                        const gl = sceneData.renderer.getContext();
-                        return gl && gl.isContextLost();
-                    }) || socialScenes.some(item => {
-                        const gl = item.renderer.getContext();
-                        return gl && gl.isContextLost();
-                    });
-                    if (anyContextLost) {
-                        console.log('Context lost after long inactivity, reloading...');
-                        window.location.reload();
-                    }
-                }
-            }
+        // Handle navigation away and back - reload to get fresh WebGL context
+        window.addEventListener('pagehide', () => {
+            sessionStorage.setItem('index_was_loaded', 'true');
         });
 
-        // Handle back-forward cache restoration - always reload for fresh WebGL context
-        window.addEventListener('pageshow', (event) => {
-            if (event.persisted) {
-                window.location.reload();
+        // On page load, if we previously loaded this page, force a clean reload
+        if (sessionStorage.getItem('index_was_loaded')) {
+            sessionStorage.removeItem('index_was_loaded');
+            setTimeout(() => {
+                const anyContextLost = modelScenes.some(sceneData => {
+                    const gl = sceneData.renderer.getContext();
+                    return !gl || gl.isContextLost();
+                });
+                if (anyContextLost) {
+                    window.location.reload();
+                }
+            }, 100);
+        }
+
+        // Also handle visibility change for when tab is hidden for a long time
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                const anyContextLost = modelScenes.some(sceneData => {
+                    const gl = sceneData.renderer.getContext();
+                    return !gl || gl.isContextLost();
+                });
+                if (anyContextLost) {
+                    window.location.reload();
+                }
             }
         });
     </script>
