@@ -659,6 +659,24 @@
                 }
             }
         });
+
+        // Handle back-forward cache restoration
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                // Page was restored from bfcache - check if any WebGL context is lost
+                const anyContextLost = modelScenes.some(sceneData => {
+                    const gl = sceneData.renderer.getContext();
+                    return !gl || gl.isContextLost();
+                }) || socialScenes.some(item => {
+                    const gl = item.renderer.getContext();
+                    return !gl || gl.isContextLost();
+                });
+                if (anyContextLost) {
+                    console.log('WebGL context lost after bfcache restore, reloading...');
+                    window.location.reload();
+                }
+            }
+        });
     </script>
 </body>
 </html>
