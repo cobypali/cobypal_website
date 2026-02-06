@@ -362,6 +362,40 @@ renderer.setSize(container.clientWidth, container.clientHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
+// Handle WebGL context loss and restoration
+renderer.domElement.addEventListener('webglcontextlost', (event) => {
+    event.preventDefault();
+    console.log('WebGL context lost. Waiting for restoration...');
+    const loader = document.getElementById('globe-loading');
+    if (loader) {
+        loader.classList.remove('hidden');
+        loader.innerHTML = '<div class="spinner"></div><span>Restoring globe&hellip;</span>';
+    }
+});
+
+renderer.domElement.addEventListener('webglcontextrestored', () => {
+    console.log('WebGL context restored. Reloading...');
+    window.location.reload();
+});
+
+// Handle page visibility changes - reload if context might be stale
+let hiddenTime = 0;
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        hiddenTime = Date.now();
+    } else {
+        // If page was hidden for more than 5 minutes, check if context is still valid
+        const hiddenDuration = Date.now() - hiddenTime;
+        if (hiddenDuration > 5 * 60 * 1000) {
+            const gl = renderer.getContext();
+            if (gl && gl.isContextLost()) {
+                console.log('Context lost after long inactivity, reloading...');
+                window.location.reload();
+            }
+        }
+    }
+});
+
 // Controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;

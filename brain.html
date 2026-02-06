@@ -498,6 +498,41 @@
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
+        // Handle WebGL context loss and restoration
+        renderer.domElement.addEventListener('webglcontextlost', (event) => {
+            event.preventDefault();
+            console.log('WebGL context lost. Waiting for restoration...');
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loading').innerHTML = `
+                <div class="spinner"></div>
+                <div>Restoring 3D Brain...</div>
+            `;
+        });
+
+        renderer.domElement.addEventListener('webglcontextrestored', () => {
+            console.log('WebGL context restored. Reloading...');
+            window.location.reload();
+        });
+
+        // Handle page visibility changes - reload if context might be stale
+        let hiddenTime = 0;
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                hiddenTime = Date.now();
+            } else {
+                // If page was hidden for more than 5 minutes, check if context is still valid
+                const hiddenDuration = Date.now() - hiddenTime;
+                if (hiddenDuration > 5 * 60 * 1000) {
+                    // Check if WebGL context is still valid
+                    const gl = renderer.getContext();
+                    if (gl.isContextLost()) {
+                        console.log('Context lost after long inactivity, reloading...');
+                        window.location.reload();
+                    }
+                }
+            }
+        });
+
         // CSS2D renderer for labels
         const labelRenderer = new CSS2DRenderer();
         labelRenderer.setSize(window.innerWidth, window.innerHeight);
