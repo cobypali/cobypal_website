@@ -533,15 +533,10 @@
             }
         });
 
-        // Handle back-forward cache restoration
+        // Handle back-forward cache restoration - always reload for fresh WebGL context
         window.addEventListener('pageshow', (event) => {
             if (event.persisted) {
-                // Page was restored from bfcache - check if WebGL context is still valid
-                const gl = renderer.getContext();
-                if (!gl || gl.isContextLost()) {
-                    console.log('WebGL context lost after bfcache restore, reloading...');
-                    window.location.reload();
-                }
+                window.location.reload();
             }
         });
 
