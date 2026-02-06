@@ -498,32 +498,9 @@
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // Handle navigation away and back - reload to get fresh WebGL context
-        window.addEventListener('pagehide', () => {
-            sessionStorage.setItem('brain_was_loaded', 'true');
-        });
-
-        // On page load, if we previously loaded this page, force a clean reload
-        if (sessionStorage.getItem('brain_was_loaded')) {
-            sessionStorage.removeItem('brain_was_loaded');
-            // Small delay to ensure this runs after bfcache restore
-            setTimeout(() => {
-                const gl = renderer.getContext();
-                if (!gl || gl.isContextLost()) {
-                    window.location.reload();
-                }
-            }, 100);
-        }
-
-        // Also handle visibility change for when tab is hidden for a long time
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                const gl = renderer.getContext();
-                if (!gl || gl.isContextLost()) {
-                    window.location.reload();
-                }
-            }
-        });
+        // Prevent bfcache - forces fresh load when navigating back
+        // This ensures WebGL context is always properly initialized
+        window.addEventListener('unload', () => {});
 
         // CSS2D renderer for labels
         const labelRenderer = new CSS2DRenderer();

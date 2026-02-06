@@ -362,31 +362,9 @@ renderer.setSize(container.clientWidth, container.clientHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 container.appendChild(renderer.domElement);
 
-// Handle navigation away and back - reload to get fresh WebGL context
-window.addEventListener('pagehide', () => {
-    sessionStorage.setItem('adventures_was_loaded', 'true');
-});
-
-// On page load, if we previously loaded this page, force a clean reload
-if (sessionStorage.getItem('adventures_was_loaded')) {
-    sessionStorage.removeItem('adventures_was_loaded');
-    setTimeout(() => {
-        const gl = renderer.getContext();
-        if (!gl || gl.isContextLost()) {
-            window.location.reload();
-        }
-    }, 100);
-}
-
-// Also handle visibility change for when tab is hidden for a long time
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-        const gl = renderer.getContext();
-        if (!gl || gl.isContextLost()) {
-            window.location.reload();
-        }
-    }
-});
+// Prevent bfcache - forces fresh load when navigating back
+// This ensures WebGL context is always properly initialized
+window.addEventListener('unload', () => {});
 
 // Controls
 const controls = new OrbitControls(camera, renderer.domElement);

@@ -625,37 +625,9 @@
 
         animateSocialIcons();
 
-        // Handle navigation away and back - reload to get fresh WebGL context
-        window.addEventListener('pagehide', () => {
-            sessionStorage.setItem('index_was_loaded', 'true');
-        });
-
-        // On page load, if we previously loaded this page, force a clean reload
-        if (sessionStorage.getItem('index_was_loaded')) {
-            sessionStorage.removeItem('index_was_loaded');
-            setTimeout(() => {
-                const anyContextLost = modelScenes.some(sceneData => {
-                    const gl = sceneData.renderer.getContext();
-                    return !gl || gl.isContextLost();
-                });
-                if (anyContextLost) {
-                    window.location.reload();
-                }
-            }, 100);
-        }
-
-        // Also handle visibility change for when tab is hidden for a long time
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                const anyContextLost = modelScenes.some(sceneData => {
-                    const gl = sceneData.renderer.getContext();
-                    return !gl || gl.isContextLost();
-                });
-                if (anyContextLost) {
-                    window.location.reload();
-                }
-            }
-        });
+        // Prevent bfcache - forces fresh load when navigating back
+        // This ensures WebGL context is always properly initialized
+        window.addEventListener('unload', () => {});
     </script>
 </body>
 </html>
