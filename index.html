@@ -625,9 +625,31 @@
 
         animateSocialIcons();
 
-        // Prevent bfcache - forces fresh load when navigating back
-        // This ensures WebGL context is always properly initialized
-        window.addEventListener('unload', () => {});
+        // Handle WebGL context loss - show reload button
+        function showReloadButton() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loading').innerHTML = `
+                <div style="color: #E6EDF7; text-align: center;">
+                    <p style="margin-bottom: 20px;">3D view needs to be refreshed</p>
+                    <button onclick="window.location.reload()" style="
+                        background: #3B82F6;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        cursor: pointer;
+                    ">Reload Page</button>
+                </div>
+            `;
+        }
+
+        modelScenes.forEach(sceneData => {
+            sceneData.renderer.domElement.addEventListener('webglcontextlost', (event) => {
+                event.preventDefault();
+                showReloadButton();
+            });
+        });
     </script>
 </body>
 </html>
