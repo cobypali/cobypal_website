@@ -326,7 +326,7 @@
 
         // Load model
         const loader = new GLTFLoader();
-        loader.load('3d_models/coby_face_v02.glb', (gltf) => {
+        loader.load('3d_models/coby_face_v02_optimized.glb', (gltf) => {
             const model = gltf.scene;
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
