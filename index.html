@@ -316,6 +316,14 @@
             rimLight.position.set(0, 5, -5);
             scene.add(rimLight);
 
+            // Extra lighting for Manny model
+            if (container.dataset.name === 'Kippy Studios') {
+                ambientLight.intensity = 1.2;
+                const frontLight = new THREE.DirectionalLight(0xffffff, 1.0);
+                frontLight.position.set(0, 0, 5);
+                scene.add(frontLight);
+            }
+
             // Store scene data
             const sceneData = {
                 scene,
