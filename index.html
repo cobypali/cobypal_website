@@ -324,6 +324,13 @@
                 scene.add(frontLight);
             }
 
+            // Dimmer lighting for brain model
+            if (container.dataset.name === "Coby's Brain") {
+                ambientLight.intensity = 0.5;
+                fillLight.intensity = 0.8;
+                renderer.toneMappingExposure = 0.9;
+            }
+
             // Store scene data
             const sceneData = {
                 scene,
