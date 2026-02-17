@@ -201,11 +201,14 @@
             const canvasWrapper = container.querySelector('.model-canvas-wrapper');
 
             // Create scene for this model
+            const isMobileInit = window.innerWidth <= 768;
+            const initWidth = isMobileInit ? 260 : 400;
+            const initHeight = isMobileInit ? 240 : 380;
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(50, 400 / 380, 0.1, 1000);
+            const camera = new THREE.PerspectiveCamera(50, initWidth / initHeight, 0.1, 1000);
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-            renderer.setSize(400, 380);
+            renderer.setSize(initWidth, initHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
             renderer.toneMappingExposure = 1.2;
