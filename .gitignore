@@ -1,0 +1,19 @@
+# Source files
+*.psd
+*.ai
+
+# Spreadsheets (planning docs, not site content)
+*.xlsx
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Unused 8K textures
+3d_models/8k_earth_daymap.jpg
+
+# Original PNGs (replaced by WebP)
+happy_body_images/*.png
+
+# Temp scripts
+*.py
