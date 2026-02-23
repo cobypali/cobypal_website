@@ -149,9 +149,9 @@
             <div class="model-canvas-wrapper"></div>
             <div class="model-label">About</div>
         </div>
-        <div class="model-container" data-model="3d_models/Mannyv01_optimized.glb" data-link="kippystudios.html" data-name="Kippy Studios" data-offset-z="0.6">
+        <div class="model-container" data-model="3d_models/Mannyv01_optimized.glb" data-link="kippystudios.html" data-name="Films" data-offset-z="0.6">
             <div class="model-canvas-wrapper"></div>
-            <div class="model-label">Kippy Studios</div>
+            <div class="model-label">Films</div>
         </div>
         <div class="model-container" data-model="3d_models/brain_v01.glb" data-link="brain.html" data-name="Coby's Brain">
             <div class="model-canvas-wrapper"></div>
@@ -235,7 +235,7 @@
             scene.add(rimLight);
 
             // Extra lighting for Manny model
-            if (container.dataset.name === 'Kippy Studios') {
+            if (container.dataset.name === 'Films') {
                 ambientLight.intensity = 1.2;
                 const frontLight = new THREE.DirectionalLight(0xffffff, 1.0);
                 frontLight.position.set(0, 0, 5);
