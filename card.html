@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicons/favicon_v01.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coby Palivathukal</title>
+    <meta name="description" content="Coby Palivathukal - AI content creation expert, filmmaker, and creative technologist.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 30px 40px;
+            width: 100%;
+        }
+
+        .card-inner {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .name-title {
+            text-align: center;
+        }
+
+        .name-title h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #E6EDF7;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            margin-bottom: 8px;
+        }
+
+        .name-title p {
+            font-size: 16px;
+            font-weight: 300;
+            color: #60A5FA;
+            letter-spacing: 1px;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 60px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .model-container {
+            flex-shrink: 0;
+            width: 340px;
+            height: 340px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #1A2438;
+            background: #121A2B;
+            cursor: grab;
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+
+        .model-container:hover {
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+            border-color: #3B82F6;
+        }
+
+        .model-container:active {
+            cursor: grabbing;
+        }
+
+        .card-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .card-text p {
+            font-size: 18px;
+            line-height: 1.9;
+            color: rgba(230, 237, 247, 0.9);
+        }
+
+        .card-text a {
+            color: #60A5FA;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+
+        .card-text a:hover {
+            color: #93C5FD;
+        }
+
+        .explore-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 12px 28px;
+            border: 1px solid #3B82F6;
+            border-radius: 8px;
+            color: #60A5FA;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: background 0.3s, color 0.3s;
+            width: fit-content;
+        }
+
+        .explore-link:hover {
+            background: #3B82F6;
+            color: #fff;
+        }
+
+        footer {
+            width: 100%;
+            padding: 20px 30px 30px;
+            text-align: center;
+            border-top: 1px solid #1A2438;
+        }
+
+        .social-links-3d {
+            margin-bottom: 12px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            main {
+                padding: 40px 20px 140px;
+            }
+
+            .name-title h1 {
+                font-size: 32px;
+                letter-spacing: 3px;
+            }
+
+            .content-wrapper {
+                flex-direction: column;
+                gap: 28px;
+            }
+
+            .model-container {
+                width: 100%;
+                height: 280px;
+            }
+
+            .card-text p {
+                font-size: 15px;
+            }
+
+            footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 15px;
+                background: rgba(11, 18, 32, 0.95);
+                backdrop-filter: blur(10px);
+                z-index: 100;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Loading...</div>
+    </div>
+
+    <main>
+        <div class="card-inner">
+            <div class="name-title">
+                <h1>Coby Palivathukal</h1>
+                <p>Los Angeles-based filmmaker, creative technologist, and producer.</p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="model-container" id="model-container"></div>
+
+                <div class="card-text">
+                    <p>Coby is an expert in leveraging AI for content creation. To connect with him or work with him, contact him via socials or at <a href="mailto:cobysbrain@gmail.com">cobysbrain@gmail.com</a></p>
+                    <a href="index.html" class="explore-link">Explore cobypal.com</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="social-links-3d" id="social-links-3d">
+            <div class="social-icon-container" data-link="https://www.youtube.com/user/cobypalivathukal" data-model="socials/YouTube.glb" title="YouTube"></div>
+            <div class="social-icon-container" data-link="https://www.instagram.com/cobypal" data-model="socials/IG.glb" title="Instagram"></div>
+            <div class="social-icon-container" data-link="https://www.tiktok.com/@cobypal?lang=en" data-model="socials/TikTok.glb" title="TikTok"></div>
+            <div class="social-icon-container" data-link="https://www.twitter.com/cobypal" data-model="socials/X.glb" title="X"></div>
+            <div class="social-icon-container" data-link="http://threads.net/@cobypal" data-model="socials/Threads.glb" title="Threads"></div>
+            <div class="social-icon-container" data-link="https://www.linkedin.com/in/cobypalivathukal/" data-model="socials/LinkedIn.glb" title="LinkedIn"></div>
+            <div class="social-icon-container" data-link="https://www.facebook.com/coby.palivathukal" data-model="socials/Facebook.glb" title="Facebook"></div>
+        </div>
+        <p class="copyright">&copy; 2026 Coby Palivathukal. All rights reserved.</p>
+    </footer>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        const container = document.getElementById('model-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        container.appendChild(renderer.domElement);
+
+        camera.position.set(0, 0, 3);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.enableZoom = false;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 2;
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        keyLight.position.set(2, 2, 2);
+        scene.add(keyLight);
+
+        const fillLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        fillLight.position.set(-2, 0, 2);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.DirectionalLight(0x3B82F6, 0.3);
+        rimLight.position.set(0, 5, -5);
+        scene.add(rimLight);
+
+        const loader = new GLTFLoader();
+        loader.load('3d_models/Coby_Head_v03_v03_optimized.glb', (gltf) => {
+            const model = gltf.scene;
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 2 / maxDim;
+
+            model.scale.setScalar(scale);
+            model.position.sub(center.multiplyScalar(scale));
+            scene.add(model);
+
+            document.getElementById('loading').style.display = 'none';
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        animate();
+
+        import { initSocialIcons } from './social-icons.js';
+        initSocialIcons();
+    </script>
+</body>
+</html>
