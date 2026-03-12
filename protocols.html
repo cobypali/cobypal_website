@@ -443,6 +443,30 @@
     <script>
         const SHEET_ID = '1AcVJFt12DyAIpuYivkbGnQDg7I3XzRx7Mlwo2f2VSoc';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+        const MANUAL_PROTOCOLS = [
+            {
+                name: 'DAILY EYE CARE PROTOCOL',
+                emoji: '👁️',
+                content: `Optimizing for long term vision and overall eye health
+
+ALWAYS wear sunglasses during the day to minimize further redness from pinguecula
+Use blue blockers while working (esp. in the evenings) to ensure I'm blinking
+
+FOR CONSIDERATION (doctor recommended but not currently doing)
+Use warm compress on eyelids and massage afterwards
+To ensure eyes have enough oil in spite of my meibomian gland dysfunction
+OPTASE MGD Advanced Dry Eye Drops when eyes feel dry
+Consume omega 3s`
+            },
+            {
+                name: 'DAILY EAR CARE PROTOCOL',
+                emoji: '👂',
+                content: `Optimizing for long term hearing
+Avoidance of overly loud environments
+Avoidance of cue tips in ears, use of earwax cleaner with camera instead
+Treat ear eczema using ketoconazole and colloidal oatmeal`
+            }
+        ];
 
         const protocolList = document.getElementById('protocol-list');
         const modalOverlay = document.getElementById('modal-overlay');
@@ -479,6 +503,31 @@
             return JSON.parse(jsonStr[1]);
         }
 
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function normalizeProtocolName(name) {
+            return String(name || '').trim().toLowerCase();
+        }
+
+        function createProtocolItem(protocol) {
+            const item = document.createElement('div');
+            item.className = 'protocol-item';
+            item.innerHTML = `
+                <span class="emoji">${protocol.emoji || ''}</span>
+                <span class="label">${escapeHtml(protocol.name)}</span>
+            `;
+
+            item.addEventListener('click', () => {
+                openModal(protocol.name, protocol.content || 'No details available.');
+            });
+
+            return item;
+        }
+
         async function loadProtocols() {
             try {
                 const response = await fetch(SHEET_URL);
@@ -487,12 +536,19 @@
                 const rows = data.table.rows;
 
                 if (!rows || rows.length <= 1) {
-                    protocolList.innerHTML = '<div class="error-message">No protocols found.</div>';
+                    const fallbackGrid = document.createElement('div');
+                    fallbackGrid.className = 'protocol-grid';
+                    MANUAL_PROTOCOLS.forEach((protocol) => {
+                        fallbackGrid.appendChild(createProtocolItem(protocol));
+                    });
+                    protocolList.innerHTML = '';
+                    protocolList.appendChild(fallbackGrid);
                     return;
                 }
 
                 const grid = document.createElement('div');
                 grid.className = 'protocol-grid';
+                const seenProtocols = new Set();
 
                 // Skip row 0 (header), iterate remaining rows
                 for (let i = 1; i < rows.length; i++) {
@@ -506,19 +562,14 @@
                     // Column B (index 1) = emoji, Column C (index 2) = content
                     const emoji = (cells[1] && cells[1].v) ? String(cells[1].v).trim() : '';
                     const content = (cells[2] && cells[2].v) ? String(cells[2].v).trim() : '';
+                    seenProtocols.add(normalizeProtocolName(name));
+                    grid.appendChild(createProtocolItem({ name, emoji, content }));
+                }
 
-                    const item = document.createElement('div');
-                    item.className = 'protocol-item';
-                    item.innerHTML = `
-                        <span class="emoji">${emoji}</span>
-                        <span class="label">${escapeHtml(name)}</span>
-                    `;
-
-                    item.addEventListener('click', () => {
-                        openModal(name, content || 'No details available.');
-                    });
-
-                    grid.appendChild(item);
+                MANUAL_PROTOCOLS.forEach((protocol) => {
+                    if (!seenProtocols.has(normalizeProtocolName(protocol.name))) {
+                        grid.appendChild(createProtocolItem(protocol));
+                    }
                 }
 
                 protocolList.innerHTML = '';
@@ -528,17 +579,17 @@
                 console.error('Failed to load protocols:', err);
                 protocolList.innerHTML = `
                     <div class="error-message">
-                        Failed to load protocols. The spreadsheet may not be publicly accessible.<br>
+                        Failed to load protocols from the spreadsheet. Showing local entries only.<br>
                         <a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit?gid=0#gid=0" target="_blank" style="color: #60A5FA; margin-top: 10px; display: inline-block;">Open spreadsheet directly</a>
                     </div>
                 `;
+                const fallbackGrid = document.createElement('div');
+                fallbackGrid.className = 'protocol-grid';
+                MANUAL_PROTOCOLS.forEach((protocol) => {
+                    fallbackGrid.appendChild(createProtocolItem(protocol));
+                });
+                protocolList.appendChild(fallbackGrid);
             }
-        }
-
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
         }
 
         loadProtocols();
