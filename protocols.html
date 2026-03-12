@@ -446,7 +446,7 @@
         const MANUAL_PROTOCOLS = [
             {
                 name: 'DAILY EYE CARE PROTOCOL',
-                emoji: '👁️',
+                emoji: '\u{1F441}\uFE0F',
                 content: `Optimizing for long term vision and overall eye health
 
 ALWAYS wear sunglasses during the day to minimize further redness from pinguecula
@@ -460,7 +460,7 @@ Consume omega 3s`
             },
             {
                 name: 'DAILY EAR CARE PROTOCOL',
-                emoji: '👂',
+                emoji: '\u{1F442}',
                 content: `Optimizing for long term hearing
 Avoidance of overly loud environments
 Avoidance of cue tips in ears, use of earwax cleaner with camera instead
@@ -570,7 +570,7 @@ Treat ear eczema using ketoconazole and colloidal oatmeal`
                     if (!seenProtocols.has(normalizeProtocolName(protocol.name))) {
                         grid.appendChild(createProtocolItem(protocol));
                     }
-                }
+                });
 
                 protocolList.innerHTML = '';
                 protocolList.appendChild(grid);
