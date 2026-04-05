@@ -29,6 +29,19 @@
         }
         .channel-link a:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,0,0,0.4); }
         .channel-link svg { width: 24px; height: 24px; }
+        .search-bar {
+            display: flex; justify-content: center; margin-bottom: 24px;
+        }
+        .search-input {
+            width: min(520px, 100%); padding: 14px 16px;
+            border-radius: 12px; border: 1px solid #1A2438;
+            background: rgba(18,26,43,0.85); color: #E6EDF7;
+            font-size: 15px; outline: none;
+        }
+        .search-input:focus {
+            border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+        .search-input::placeholder { color: rgba(230,237,247,0.45); }
         .globe-hint {
             text-align: center; color: rgba(230,237,247,0.4); font-size: 13px;
             margin-top: 12px; letter-spacing: 0.5px;
@@ -120,6 +133,11 @@
         .video-item-info { display: flex; flex-direction: column; justify-content: center; }
         .video-item-title { font-size: 13px; font-weight: 500; line-height: 1.4; color: #E6EDF7; }
         .video-item-date { font-size: 11px; color: rgba(230,237,247,0.45); margin-top: 4px; }
+        .video-item-location { font-size: 11px; color: #60A5FA; margin-top: 6px; }
+        .panel-empty {
+            color: rgba(230,237,247,0.6); text-align: center; padding: 32px 20px;
+            font-size: 14px; line-height: 1.6;
+        }
         /* Video Modal */
         .video-modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -166,6 +184,7 @@
         #brain-regions-nav .back-to-brain:hover { background: #2563EB; transform: translateY(-1px); }
         @media (max-width: 768px) {main { padding: 100px 15px 30px; }
             .page-title { font-size: 32px; }
+            .search-input { font-size: 14px; }
             .globe-wrapper { height: 50vh; min-height: 350px; }
             #video-panel { width: 100%; }.social-icon-container { width: 70px; height: 70px; }
             #brain-regions-nav { display: none; }
@@ -207,6 +226,9 @@
                     </svg>
                     Subscribe on YouTube
                 </a>
+            </div>
+            <div class="search-bar">
+                <input type="search" id="adventure-search" class="search-input" placeholder="Search adventures and press Enter">
             </div>
             <div class="globe-wrapper">
                 <div id="globe-container"></div>
@@ -310,12 +332,12 @@ function processCSVData(rows) {
         if (!city || !id || isNaN(lat) || isNaN(lng)) continue;
         if (!publishTime || isNaN(new Date(publishTime))) continue;
         if (!cities[city]) cities[city] = { lat, lng, v: [] };
-        cities[city].v.push([title, id, publishTime]);
+        cities[city].v.push({ title, id, publishTime, city });
     }
     // Sort each city's videos newest to oldest
     for (const city in cities) {
         cities[city].v.sort((a, b) => {
-            const da = new Date(a[2]), db = new Date(b[2]);
+            const da = new Date(a.publishTime), db = new Date(b.publishTime);
             return (isNaN(db) ? 0 : db) - (isNaN(da) ? 0 : da);
         });
     }
@@ -592,10 +614,14 @@ const overlay = document.getElementById('panel-overlay');
 
 function openPanel(city) {
     const data = cityData[city];
-    document.getElementById('panel-city-name').textContent = city;
-    document.getElementById('panel-city-count').textContent = data.v.length + ' video' + (data.v.length !== 1 ? 's' : '');
-    const list = document.getElementById('panel-video-list');
-    list.innerHTML = data.v.map(([title, id, publishTime]) => {
+    openResultsPanel(city, data.v, city + ' video' + (data.v.length !== 1 ? 's' : ''));
+}
+
+function renderVideoItems(videos, showLocation = false) {
+    if (videos.length === 0) {
+        return '<div class="panel-empty">No adventures matched that search.</div>';
+    }
+    return videos.map(({ title, id, publishTime, city }) => {
         let dateStr = '';
         if (publishTime) {
             const d = new Date(publishTime);
@@ -609,16 +635,41 @@ function openPanel(city) {
             </div>
             <div class="video-item-info">
                 <div class="video-item-title">${title}</div>
+                ${showLocation ? `<div class="video-item-location">${city}</div>` : ''}
                 ${dateStr ? `<div class="video-item-date">${dateStr}</div>` : ''}
             </div>
         </div>`;
     }).join('');
-    // Click handlers
+}
+
+function openResultsPanel(title, videos, subtitle, showLocation = false) {
+    document.getElementById('panel-city-name').textContent = title;
+    document.getElementById('panel-city-count').textContent = subtitle;
+    const list = document.getElementById('panel-video-list');
+    list.innerHTML = renderVideoItems(videos, showLocation);
     list.querySelectorAll('.video-item').forEach(item => {
         item.addEventListener('click', () => openVideoModal(item.dataset.id));
     });
     panel.classList.add('active');
     overlay.classList.add('active');
+}
+
+function getAllVideos() {
+    return Object.values(cityData).flatMap((data) => data.v);
+}
+
+function runAdventureSearch() {
+    const input = document.getElementById('adventure-search');
+    const query = input.value.trim().toLowerCase();
+    if (!query) {
+        closePanel();
+        return;
+    }
+    const results = getAllVideos().filter((video) => {
+        return String(video.title || '').toLowerCase().includes(query) ||
+            String(video.city || '').toLowerCase().includes(query);
+    });
+    openResultsPanel(`Search: ${input.value.trim()}`, results, `${results.length} result${results.length !== 1 ? 's' : ''}`, true);
 }
 
 function closePanel() {
@@ -628,6 +679,11 @@ function closePanel() {
 
 document.getElementById('panel-close').addEventListener('click', closePanel);
 overlay.addEventListener('click', closePanel);
+document.getElementById('adventure-search').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        runAdventureSearch();
+    }
+});
 
 // ── Video Modal ────────────────────────────────────────────────────
 function openVideoModal(videoId) {
