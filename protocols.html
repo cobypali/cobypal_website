@@ -467,6 +467,7 @@ Avoidance of cue tips in ears, use of earwax cleaner with camera instead
 Treat ear eczema using ketoconazole and colloidal oatmeal`
             }
         ];
+        const HIDDEN_PROTOCOLS = new Set(['grooming', 'scalp care']);
 
         const protocolList = document.getElementById('protocol-list');
         const modalOverlay = document.getElementById('modal-overlay');
@@ -511,6 +512,10 @@ Treat ear eczema using ketoconazole and colloidal oatmeal`
 
         function normalizeProtocolName(name) {
             return String(name || '').trim().toLowerCase();
+        }
+
+        function shouldHideProtocol(name) {
+            return HIDDEN_PROTOCOLS.has(normalizeProtocolName(name));
         }
 
         function createProtocolItem(protocol) {
@@ -558,6 +563,7 @@ Treat ear eczema using ketoconazole and colloidal oatmeal`
 
                     const name = String(cells[0].v).trim();
                     if (!name) continue;
+                    if (shouldHideProtocol(name)) continue;
 
                     // Column B (index 1) = emoji, Column C (index 2) = content
                     const emoji = (cells[1] && cells[1].v) ? String(cells[1].v).trim() : '';
@@ -567,7 +573,7 @@ Treat ear eczema using ketoconazole and colloidal oatmeal`
                 }
 
                 MANUAL_PROTOCOLS.forEach((protocol) => {
-                    if (!seenProtocols.has(normalizeProtocolName(protocol.name))) {
+                    if (!shouldHideProtocol(protocol.name) && !seenProtocols.has(normalizeProtocolName(protocol.name))) {
                         grid.appendChild(createProtocolItem(protocol));
                     }
                 });
