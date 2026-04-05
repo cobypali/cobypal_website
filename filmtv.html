@@ -702,9 +702,15 @@
             if (!query) return [...allFilms];
 
             return allFilms.filter((film) => {
-                const title = String(film.title || '').toLowerCase();
-                const review = String(film.review || '').toLowerCase();
-                return title.includes(query) || review.includes(query);
+                const searchableText = [
+                    film.title,
+                    film.rating,
+                    film.year,
+                    film.director,
+                    film.reviewDate,
+                    film.review
+                ].map((value) => String(value || '').toLowerCase()).join(' ');
+                return searchableText.includes(query);
             });
         }
 

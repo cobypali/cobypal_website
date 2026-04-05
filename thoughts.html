@@ -632,9 +632,12 @@
             if (!query) return [...allThoughts];
 
             return allThoughts.filter((item) => {
-                const title = String(item.thought || '').toLowerCase();
-                const content = String(item.fullContents || '').toLowerCase();
-                return title.includes(query) || content.includes(query);
+                const searchableText = [
+                    item.thought,
+                    item.date,
+                    item.fullContents
+                ].map((value) => String(value || '').toLowerCase()).join(' ');
+                return searchableText.includes(query);
             });
         }
 

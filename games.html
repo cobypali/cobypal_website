@@ -646,9 +646,13 @@
             if (!query) return [...allGames];
 
             return allGames.filter((game) => {
-                const title = String(game.title || '').toLowerCase();
-                const review = String(game.review || '').toLowerCase();
-                return title.includes(query) || review.includes(query);
+                const searchableText = [
+                    game.title,
+                    game.rating,
+                    game.reviewDate,
+                    game.review
+                ].map((value) => String(value || '').toLowerCase()).join(' ');
+                return searchableText.includes(query);
             });
         }
 

@@ -657,9 +657,15 @@
             if (!query) return [...allBooks];
 
             return allBooks.filter((book) => {
-                const title = String(book.title || '').toLowerCase();
-                const review = String(book.review || '').toLowerCase();
-                return title.includes(query) || review.includes(query);
+                const searchableText = [
+                    book.title,
+                    book.rating,
+                    book.year,
+                    book.author,
+                    book.finishDate,
+                    book.review
+                ].map((value) => String(value || '').toLowerCase()).join(' ');
+                return searchableText.includes(query);
             });
         }
 

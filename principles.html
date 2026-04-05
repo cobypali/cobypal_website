@@ -609,8 +609,12 @@
             if (!query) return [...allPrinciples];
 
             return allPrinciples.filter((item) => {
-                const principle = String(item.principle || '').toLowerCase();
-                return principle.includes(query);
+                const searchableText = [
+                    item.index,
+                    item.principle,
+                    item.date
+                ].map((value) => String(value || '').toLowerCase()).join(' ');
+                return searchableText.includes(query);
             });
         }
 
