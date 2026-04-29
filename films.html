@@ -62,54 +62,76 @@
 
         /* Projects Grid */
         .projects {
-            display: flex;
-            flex-direction: column;
-            gap: 50px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
 
         .project-card {
             background: #121A2B;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
             border: 1px solid #1A2438;
-            transition: border-color 0.3s;
-            max-width: 900px;
-            margin: 0 auto;
-            width: 100%;
+            transition: border-color 0.3s, transform 0.3s;
+            text-decoration: none;
+            display: block;
         }
 
         .project-card:hover {
             border-color: #3B82F6;
+            transform: translateY(-3px);
         }
 
-        .project-video {
+        .project-thumb {
             width: 100%;
             aspect-ratio: 16/9;
             background: #000;
+            position: relative;
+            overflow: hidden;
         }
 
-        .project-video iframe {
+        .project-thumb img {
             width: 100%;
             height: 100%;
-            border: none;
+            object-fit: cover;
+            display: block;
+        }
+
+        .project-thumb .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .project-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .play-overlay svg {
+            width: 48px;
+            height: 48px;
+            fill: white;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
         }
 
         .project-info {
-            padding: 24px;
+            padding: 12px 14px;
         }
 
         .project-info h3 {
             font-family: 'Inter', sans-serif;
-            font-size: 24px;
-            font-weight: 600;
-            color: #60A5FA;
-            margin-bottom: 12px;
-        }
-
-        .project-info p {
-            font-size: 15px;
-            line-height: 1.7;
-            color: rgba(230, 237, 247, 0.85);
+            font-size: 14px;
+            font-weight: 500;
+            color: #E6EDF7;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 .social-icon-container {
             width: 100px;
@@ -131,8 +153,8 @@
             }
 
             .projects {
-                grid-template-columns: 1fr;
-                gap: 30px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
             }.social-icon-container {
                 width: 70px;
                 height: 70px;
@@ -153,8 +175,7 @@
     <main>
         <div class="page-header">
             <h1>Coby's Films</h1>
-            <p>Some of the films that Coby has created.</p>
-            <div class="channel-link">
+<div class="channel-link">
                 <a href="https://www.youtube.com/@CobyPal" target="_blank">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -165,35 +186,125 @@
         </div>
 
         <div class="projects">
-            <div class="project-card">
-                <div class="project-video">
-                    <iframe src="https://www.youtube.com/embed/u429Jm5RdoU" title="The Fridge" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <a class="project-card" href="https://www.youtube.com/watch?v=u429Jm5RdoU" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/u429Jm5RdoU/hqdefault.jpg" alt="The Fridge">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                 </div>
-                <div class="project-info">
-                    <h3>The Fridge</h3>
-                    <p>An existential web series that follows various food items as they seek to cope with suffering, mortality, and the challenging search for meaning.</p>
-                </div>
-            </div>
+                <div class="project-info"><h3>The Fridge</h3></div>
+            </a>
 
-            <div class="project-card">
-                <div class="project-video">
-                    <iframe src="https://www.youtube.com/embed/SQJE7rkXqWk" title="Ron Roach" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <a class="project-card" href="https://www.youtube.com/watch?v=SQJE7rkXqWk" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/SQJE7rkXqWk/hqdefault.jpg" alt="Ron Roach">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                 </div>
-                <div class="project-info">
-                    <h3>Ron Roach</h3>
-                    <p>A short film about a young cockroach with a passion for dancing in a world where dancing has been deemed illegal. Rendered in real-time with Unity.</p>
-                </div>
-            </div>
+                <div class="project-info"><h3>Ron Roach</h3></div>
+            </a>
 
-            <div class="project-card">
-                <div class="project-video">
-                    <iframe src="https://www.youtube.com/embed/gL-tFc7fUgk" title="Paper Penguin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <a class="project-card" href="https://www.youtube.com/watch?v=gL-tFc7fUgk" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/gL-tFc7fUgk/hqdefault.jpg" alt="Paper Penguin">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                 </div>
-                <div class="project-info">
-                    <h3>Paper Penguin</h3>
-                    <p>The story of a penguin rapper attempting to speak out against climate change. Created using Unreal Engine and motion capture.</p>
+                <div class="project-info"><h3>Paper Penguin</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=5laa1jVcASc" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/5laa1jVcASc/hqdefault.jpg" alt="Trent Peltz - Going to Hell">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                 </div>
-            </div>
+                <div class="project-info"><h3>Trent Peltz - Going to Hell</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=F9zXweNgJ4g" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/F9zXweNgJ4g/hqdefault.jpg" alt="Coby's Brain Series">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>Coby's Brain Series</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=fBRjBKJnfLo" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/fBRjBKJnfLo/hqdefault.jpg" alt="The Rigel Report Series">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>The Rigel Report Series</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=eA3OW0gFGow&t=8s" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/eA3OW0gFGow/hqdefault.jpg" alt="Camoo">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>Camoo</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=eN1v9rQpLA0" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/eN1v9rQpLA0/hqdefault.jpg" alt="Man Spider">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>Man Spider</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=qLv6vyPa_T8" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/qLv6vyPa_T8/hqdefault.jpg" alt="How Baby Carrots Are Made">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>How Baby Carrots Are Made</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=YmFqjeqzSb4" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/YmFqjeqzSb4/hqdefault.jpg" alt="Conflict Resolution">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>Conflict Resolution</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=zUleQe-o_gI" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/zUleQe-o_gI/hqdefault.jpg" alt="I Want My Hat Back">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>I Want My Hat Back</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=fyycwtmGkeE" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/fyycwtmGkeE/hqdefault.jpg" alt="Investment Barking">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>Investment Barking</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=Rg1eSEPEmV4" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/Rg1eSEPEmV4/hqdefault.jpg" alt="Glorious Goats">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>Glorious Goats</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=WzVWDEEGQwM" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/WzVWDEEGQwM/hqdefault.jpg" alt="Juulian">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>Juulian</h3></div>
+            </a>
+
+            <a class="project-card" href="https://www.youtube.com/watch?v=LQoJo65nqoM" target="_blank">
+                <div class="project-thumb">
+                    <img src="https://img.youtube.com/vi/LQoJo65nqoM/hqdefault.jpg" alt="The Duel">
+                    <div class="play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                </div>
+                <div class="project-info"><h3>The Duel</h3></div>
+            </a>
         </div>
     </main>
 
