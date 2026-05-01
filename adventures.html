@@ -628,7 +628,7 @@ function renderVideoItems(videos, showLocation = false) {
             if (!isNaN(d)) dateStr = d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         }
         return `
-        <div class="video-item" data-id="${id}">
+        <div class="video-item" data-id="${id}" data-title="${title.replace(/"/g, '&quot;')}">
             <div class="video-thumb">
                 <img src="https://img.youtube.com/vi/${id}/mqdefault.jpg" alt="${title}" loading="lazy">
                 <div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -648,7 +648,13 @@ function openResultsPanel(title, videos, subtitle, showLocation = false) {
     const list = document.getElementById('panel-video-list');
     list.innerHTML = renderVideoItems(videos, showLocation);
     list.querySelectorAll('.video-item').forEach(item => {
-        item.addEventListener('click', () => openVideoModal(item.dataset.id));
+        item.addEventListener('click', () => {
+            if ((item.dataset.title || '').includes('360')) {
+                window.open('https://www.youtube.com/watch?v=' + item.dataset.id, '_blank');
+            } else {
+                openVideoModal(item.dataset.id);
+            }
+        });
     });
     panel.classList.add('active');
     overlay.classList.add('active');
