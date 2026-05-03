@@ -153,13 +153,17 @@ footer {
     }
 
     .social-links-3d {
-        gap: 15px;
-        margin-left: -25px;
+        gap: 8px;
+        flex-wrap: nowrap;
+        margin-left: 0;
     }
 
     .social-icon-container {
-        width: 55px;
-        height: 55px;
+        flex: 1;
+        min-width: 0;
+        width: auto;
+        height: auto;
+        aspect-ratio: 1;
     }
 
     .copyright {
