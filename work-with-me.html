@@ -575,6 +575,8 @@
         scene.add(rimLight);
 
         // Load model
+        const HANDSHAKE_BASE_ROT = -Math.PI / 2;
+        let modelPivot = null;
         const loader = new GLTFLoader();
         loader.load('3d_models/handshake/scene.gltf', (gltf) => {
             const model = gltf.scene;
@@ -591,13 +593,20 @@
             // the left (to face the handshake) and sit it slightly lower in the box
             const pivot = new THREE.Group();
             pivot.add(model);
-            pivot.rotation.y = -Math.PI / 2;
+            pivot.rotation.y = HANDSHAKE_BASE_ROT;
             pivot.position.y = -0.45;
+            pivot.position.x = -0.12;
             scene.add(pivot);
+            modelPivot = pivot;
         });
 
         function animate() {
             requestAnimationFrame(animate);
+            // Gentle idle sway around the forward-facing angle (matches the homepage)
+            if (modelPivot) {
+                const target = HANDSHAKE_BASE_ROT + Math.sin(Date.now() * 0.001) * 0.3;
+                modelPivot.rotation.y += (target - modelPivot.rotation.y) * 0.02;
+            }
             controls.update();
             renderer.render(scene, camera);
         }
