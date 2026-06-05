@@ -99,6 +99,12 @@
             box-shadow: 0 8px 25px rgba(59, 130, 246, 0.45);
         }
 
+        button.cta-button {
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
         /* Section headings */
         .section-title {
             font-family: 'Inter', sans-serif;
@@ -129,6 +135,20 @@
         .stat-card:hover {
             border-color: #3B82F6;
             transform: translateY(-3px);
+        }
+
+        .stat-head {
+            display: block;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .stat-head:hover {
+            opacity: 0.85;
+        }
+
+        .stat-head:hover .platform {
+            text-decoration: underline;
         }
 
         .stat-card .platform {
@@ -187,6 +207,17 @@
             margin-bottom: 0;
         }
 
+        .stat-card .detail a {
+            color: #60A5FA;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .stat-card .detail a:hover {
+            color: #93C5FD;
+            text-decoration: underline;
+        }
+
         /* Partnership cards */
         .partner-grid {
             display: grid;
@@ -241,16 +272,74 @@
             margin: 0 auto 24px;
         }
 
-        .model-credit {
-            text-align: center;
-            font-size: 11px;
-            color: rgba(230, 237, 247, 0.35);
-            margin-top: 10px;
+        /* Contact modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(7, 11, 20, 0.8);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
         }
 
-        .model-credit a {
-            color: rgba(96, 165, 250, 0.6);
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            position: relative;
+            background: #121A2B;
+            border: 1px solid #1A2438;
+            border-radius: 16px;
+            padding: 44px 40px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.15);
+        }
+
+        .modal h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #E6EDF7;
+            margin: 0 0 16px;
+        }
+
+        .modal p {
+            font-size: 17px;
+            line-height: 1.7;
+            color: rgba(230, 237, 247, 0.9);
+            margin: 0;
+        }
+
+        .modal a {
+            color: #60A5FA;
+            font-weight: 600;
             text-decoration: none;
+        }
+
+        .modal a:hover {
+            text-decoration: underline;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: rgba(230, 237, 247, 0.6);
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #E6EDF7;
         }
 
         .social-links-3d {
@@ -321,97 +410,107 @@
         <div class="hero">
             <div class="model-container" id="model-container"></div>
             <div class="hero-text">
-                <p><strong>@cobypal</strong> has built a sizable social media presence across <strong>YouTube</strong>, <strong>TikTok</strong>, and <strong>Instagram</strong> — reaching millions of viewers with original short films and series like <strong>The Fridge</strong>.</p>
+                <p><strong>@cobypal</strong> has built a sizable social media presence across <strong>YouTube</strong>, <strong>TikTok</strong>, and <strong>Instagram</strong> — reaching millions of viewers with original short films and series like <strong>THE FRIDGE</strong> and <strong>THE BATHROOM</strong>.</p>
                 <p>I'd love to work with your brand and help it grow by putting it in front of an engaged, creative-minded audience. Let's build something memorable together.</p>
-                <a class="cta-button" href="mailto:cobysbrain@gmail.com?subject=Brand%20Partnership%20with%20%40cobypal">
+                <button type="button" class="cta-button" id="partner-cta-top">
                     Let's partner up →
-                </a>
+                </button>
             </div>
         </div>
 
         <h2 class="section-title">The Reach</h2>
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="platform">Instagram</div>
-                <div class="handle">@cobypal</div>
-                <div class="count">21.7K<span>followers</span></div>
+                <a class="stat-head" href="https://www.instagram.com/cobypal" target="_blank" rel="noopener noreferrer">
+                    <div class="platform">Instagram</div>
+                    <div class="handle">@cobypal</div>
+                    <div class="count">22.4K<span>followers</span></div>
+                </a>
                 <div class="detail">
                     <h4>Audience</h4>
                     <p>US 46.7% · Canada 7.1% · Australia 6.6%<br>
                     Ages 18–24 (42.5%) &amp; 25–34 (38.7%)<br>
                     56.7% women · 43.3% men</p>
                     <h4>Top Content</h4>
-                    <p>The Fridge EP 2 — 5.1M views, 584K likes<br>
-                    The Fridge EP 5 (2026) — 697K views, 52.9K likes</p>
+                    <p><a href="https://www.instagram.com/p/Cw1KJj6Jp0l/" target="_blank" rel="noopener noreferrer">THE FRIDGE EP 2 — 5.1M views, 584K likes</a></p>
                 </div>
             </div>
 
             <div class="stat-card">
-                <div class="platform">YouTube</div>
-                <div class="handle">@CobyPal</div>
-                <div class="count">7.3K<span>subscribers</span></div>
+                <a class="stat-head" href="https://www.youtube.com/user/cobypalivathukal" target="_blank" rel="noopener noreferrer">
+                    <div class="platform">YouTube</div>
+                    <div class="handle">@CobyPal</div>
+                    <div class="count">7.4K<span>subscribers</span></div>
+                </a>
                 <div class="detail">
                     <h4>Audience</h4>
                     <p>US 51.6% · UK 6.1% · Canada 5%<br>
                     Ages 25–34 (27.2%), 13–17 (25.9%), 18–24 (18.5%)<br>
                     65.7% male · 32.4% female</p>
                     <h4>Top Content</h4>
-                    <p>The Fridge EP 9 — 409.9K views, 6.7K likes<br>
-                    The Fridge (full film, 2026) — 111.2K views, 11K likes</p>
+                    <p><a href="https://www.youtube.com/watch?v=PSyKONIfqiM&t=2s" target="_blank" rel="noopener noreferrer">THE FRIDGE (full film) — 113K views, 11K likes</a></p>
                 </div>
             </div>
 
             <div class="stat-card">
-                <div class="platform">TikTok</div>
-                <div class="handle">@cobypal</div>
-                <div class="count">6.4K<span>followers</span></div>
+                <a class="stat-head" href="https://www.tiktok.com/@cobypal?lang=en" target="_blank" rel="noopener noreferrer">
+                    <div class="platform">TikTok</div>
+                    <div class="handle">@cobypal</div>
+                    <div class="count">6.5K<span>followers</span></div>
+                </a>
                 <div class="detail">
                     <h4>Audience</h4>
                     <p>US 71.7% · Australia 1% · UK 0.9%<br>
                     Ages 25–34 (37.5%), 18–24 (30.3%), 35–44 (22.9%)<br>
                     59% male · 41% female</p>
                     <h4>Top Content</h4>
-                    <p>The Fridge EP 1 — 629.9K views, 102.8K likes<br>
-                    The Fridge EP 3 (2026) — 24.4K views, 3.7K likes</p>
+                    <p><a href="https://www.tiktok.com/@cobypal/video/7267707846173805867?lang=en" target="_blank" rel="noopener noreferrer">THE FRIDGE EP 1 — 629.9K views, 102.8K likes</a></p>
                 </div>
             </div>
         </div>
 
         <h2 class="section-title">Partnership Opportunities</h2>
-        <p class="closing" style="margin-bottom:36px;">Depending on your brand's objectives, we could envision one or more of the following:</p>
+        <p class="closing" style="margin-bottom:36px;">Depending on your brand's goals, we can shape a partnership around one or more of the following:</p>
         <div class="partner-grid">
             <div class="partner-card">
                 <h3>Launch Partner</h3>
                 <ul>
-                    <li>"Presented by YOUR BRAND" sponsorship opportunities</li>
-                    <li>Participation across the release rollout</li>
+                    <li>Headline a release as the official "Presented by [Your Brand]" sponsor</li>
+                    <li>Featured presence woven throughout the entire rollout</li>
                 </ul>
             </div>
             <div class="partner-card">
                 <h3>Giveaway Activation</h3>
                 <ul>
-                    <li>Product giveaway integrated into release content and social posts</li>
-                    <li>Audience engagement activation across platforms</li>
+                    <li>Your product built into the release as a featured giveaway</li>
+                    <li>A coordinated engagement push across every platform</li>
                 </ul>
             </div>
             <div class="partner-card">
                 <h3>Custom Content</h3>
                 <ul>
-                    <li>Dedicated YOUR BRAND content created as part of the rollout</li>
-                    <li>Distributed across YouTube, YouTube Shorts, Instagram, and TikTok</li>
+                    <li>Original content created specifically for your brand</li>
+                    <li>Published across YouTube, YouTube Shorts, Instagram, and TikTok</li>
                 </ul>
             </div>
         </div>
 
         <div class="closing">
             <p>Interested in partnering with @cobypal? Reach out and let's talk about how we can grow your brand together.</p>
-            <a class="cta-button" href="mailto:cobysbrain@gmail.com?subject=Brand%20Partnership%20with%20%40cobypal">
+            <button type="button" class="cta-button" id="partner-cta-bottom">
                 Get in touch →
-            </a>
+            </button>
         </div>
-
-        <p class="model-credit">3D model "Handshake - Ramadhan Series" by <a href="https://sketchfab.com/without_texture" target="_blank" rel="noopener noreferrer">Without texture 3d</a>, licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC-BY-4.0</a>.</p>
     </main>
+
+    <!-- Partnership contact modal -->
+    <div class="modal-overlay" id="partner-modal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <button type="button" class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+            <h3 id="modal-title">Let's work together</h3>
+            <p>Email Coby at<br><a href="mailto:cobysbrain@gmail.com">cobysbrain@gmail.com</a><br>for partnership opportunities.</p>
+        </div>
+    </div>
 
     <footer>
         <div class="social-links-3d" id="social-links-3d">
@@ -488,6 +587,9 @@
 
             model.scale.setScalar(scale);
             model.position.sub(center.multiplyScalar(scale));
+            // Rotate the starting position 90° and sit slightly lower in the box
+            model.rotation.y += Math.PI / 2;
+            model.position.y -= 0.35;
             scene.add(model);
         });
 
@@ -507,6 +609,21 @@
 
         import { initSocialIcons } from './social-icons.js';
         initSocialIcons();
+
+        // Partnership contact modal
+        const modal = document.getElementById('partner-modal');
+        const openModal = () => modal.classList.add('open');
+        const closeModal = () => modal.classList.remove('open');
+
+        document.getElementById('partner-cta-top').addEventListener('click', openModal);
+        document.getElementById('partner-cta-bottom').addEventListener('click', openModal);
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
     </script>
 </body>
 </html>
