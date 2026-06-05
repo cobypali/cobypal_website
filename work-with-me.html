@@ -398,7 +398,7 @@
         <div class="nav-links">
             <a href="about.html">About</a>
             <a href="films.html">Films</a>
-            <a href="work-with-me.html" class="active">Work with Me</a>
+            <a href="work-with-me.html" class="active">Collaborate</a>
             <a href="brain.html">Coby's Brain</a>
         </div>
     </nav>
@@ -556,8 +556,7 @@
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.enableZoom = false;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 2;
+        controls.autoRotate = false;
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
@@ -587,10 +586,14 @@
 
             model.scale.setScalar(scale);
             model.position.sub(center.multiplyScalar(scale));
-            // Rotate the starting position 90° and sit slightly lower in the box
-            model.rotation.y += Math.PI / 2;
-            model.position.y -= 0.35;
-            scene.add(model);
+
+            // Wrap in a pivot so we can cleanly rotate the centered model 90° to
+            // the left (to face the handshake) and sit it slightly lower in the box
+            const pivot = new THREE.Group();
+            pivot.add(model);
+            pivot.rotation.y = -Math.PI / 2;
+            pivot.position.y = -0.45;
+            scene.add(pivot);
         });
 
         function animate() {

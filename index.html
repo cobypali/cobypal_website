@@ -164,7 +164,7 @@
             <div class="model-canvas-wrapper"></div>
             <div class="model-label">Films</div>
         </div>
-        <div class="model-container" data-model="3d_models/handshake/scene.gltf" data-link="work-with-me.html" data-name="Collaborate">
+        <div class="model-container" data-model="3d_models/handshake/scene.gltf" data-link="work-with-me.html" data-name="Collaborate" data-rot-y="-1.5708" data-offset-y="-0.45">
             <div class="model-canvas-wrapper"></div>
             <div class="model-label">Collaborate</div>
         </div>
@@ -290,6 +290,10 @@
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const scale = 2.2 / maxDim;
                 model.scale.setScalar(scale);
+
+                // Apply model-specific base rotation (radians) before centering
+                const rotY = parseFloat(container.dataset.rotY) || 0;
+                model.rotation.y = rotY;
 
                 // Recalculate and center
                 const scaledBox = new THREE.Box3().setFromObject(model);
