@@ -173,7 +173,7 @@
             line-height: 1.1;
         }
 
-        .stat-card .count span {
+        .stat-card .count .count-sub {
             display: block;
             font-size: 14px;
             font-weight: 400;
@@ -424,7 +424,7 @@
                 <a class="stat-head" href="https://www.instagram.com/cobypal" target="_blank" rel="noopener noreferrer">
                     <div class="platform">Instagram</div>
                     <div class="handle">@cobypal</div>
-                    <div class="count">22.4K<span>followers</span></div>
+                    <div class="count"><span class="count-value" data-platform="instagram">22.4K</span><span class="count-sub">followers</span></div>
                 </a>
                 <div class="detail">
                     <h4>Audience</h4>
@@ -440,7 +440,7 @@
                 <a class="stat-head" href="https://www.youtube.com/user/cobypalivathukal" target="_blank" rel="noopener noreferrer">
                     <div class="platform">YouTube</div>
                     <div class="handle">@CobyPal</div>
-                    <div class="count">7.4K<span>subscribers</span></div>
+                    <div class="count"><span class="count-value" data-platform="youtube">7.4K</span><span class="count-sub">subscribers</span></div>
                 </a>
                 <div class="detail">
                     <h4>Audience</h4>
@@ -456,7 +456,7 @@
                 <a class="stat-head" href="https://www.tiktok.com/@cobypal?lang=en" target="_blank" rel="noopener noreferrer">
                     <div class="platform">TikTok</div>
                     <div class="handle">@cobypal</div>
-                    <div class="count">6.5K<span>followers</span></div>
+                    <div class="count"><span class="count-value" data-platform="tiktok">6.5K</span><span class="count-sub">followers</span></div>
                 </a>
                 <div class="detail">
                     <h4>Audience</h4>
@@ -636,6 +636,55 @@
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
         });
+
+        // Live follower/subscriber counts from the socials spreadsheet.
+        // Rows 3-5 are Instagram / YouTube / TikTok (CobyPal account); stats live in
+        // dated column groups ("<date> Followers"). We read the latest-dated column.
+        const STATS_SHEET_ID = '1p9-ZP8VpSXSyOCCTcYCQFLW6eDq6CVJDW8LA9Qq6bhU';
+        const STATS_SHEET_URL = `https://docs.google.com/spreadsheets/d/${STATS_SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+        const STATS_PLATFORMS = new Set(['instagram', 'youtube', 'tiktok']);
+
+        async function loadSocialStats() {
+            try {
+                // Cache-bust so spreadsheet edits show up on the next load.
+                const res = await fetch(`${STATS_SHEET_URL}&_=${Date.now()}`, { cache: 'no-store' });
+                const text = await res.text();
+                const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
+                if (!match) return;
+                const rows = JSON.parse(match[1]).table.rows;
+                if (!rows || !rows.length) return;
+
+                // Find the latest "<date> Followers" column from the header row.
+                const header = rows[0].c || [];
+                let bestCol = -1;
+                let bestTime = -Infinity;
+                header.forEach((cell, idx) => {
+                    const label = cell && cell.v;
+                    if (typeof label !== 'string') return;
+                    const m = label.match(/^(\d{1,2}\/\d{1,2}\/\d{4})\s+Followers/i);
+                    if (!m) return;
+                    const t = new Date(m[1]).getTime();
+                    if (!isNaN(t) && t >= bestTime) { bestTime = t; bestCol = idx; }
+                });
+                if (bestCol < 0) return;
+
+                rows.forEach((row) => {
+                    const c = row.c || [];
+                    const product = c[0] && c[0].v ? String(c[0].v).trim().toLowerCase() : '';
+                    const user = c[1] && c[1].v ? String(c[1].v).trim().toLowerCase() : '';
+                    if (user !== 'cobypal' || !STATS_PLATFORMS.has(product)) return;
+                    const cell = c[bestCol];
+                    const value = cell && cell.v != null ? String(cell.f || cell.v).trim() : '';
+                    if (!value) return;
+                    const el = document.querySelector(`.count-value[data-platform="${product}"]`);
+                    if (el) el.textContent = value;
+                });
+            } catch (err) {
+                console.error('Failed to load social stats:', err);
+                // Leave the hardcoded fallback values in place.
+            }
+        }
+        loadSocialStats();
     </script>
 </body>
 </html>
