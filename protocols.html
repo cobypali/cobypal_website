@@ -362,6 +362,7 @@
         <div class="nav-links">
             <a href="about.html">About</a>
             <a href="films.html">Films</a>
+            <a href="work-with-me.html">Collaborate</a>
             <a href="brain.html">Coby's Brain</a>
         </div>
     </nav>
@@ -473,7 +474,14 @@ Avoidance of cue tips in ears, use of earwax cleaner with camera instead
 Treat ear eczema using ketoconazole and colloidal oatmeal`
             }
         ];
-        const HIDDEN_PROTOCOLS = new Set(['grooming', 'scalp care']);
+        const HIDDEN_PROTOCOLS = new Set([
+            'grooming',
+            'scalp care',
+            'daily skincare protocol',
+            'daily hair care and grooming',
+            'daily eye care protocol',
+            'daily ear care protocol'
+        ]);
 
         const protocolList = document.getElementById('protocol-list');
         const modalOverlay = document.getElementById('modal-overlay');
@@ -550,6 +558,7 @@ Treat ear eczema using ketoconazole and colloidal oatmeal`
                     const fallbackGrid = document.createElement('div');
                     fallbackGrid.className = 'protocol-grid';
                     MANUAL_PROTOCOLS.forEach((protocol) => {
+                        if (shouldHideProtocol(protocol.name)) return;
                         fallbackGrid.appendChild(createProtocolItem(protocol));
                     });
                     protocolList.innerHTML = '';
