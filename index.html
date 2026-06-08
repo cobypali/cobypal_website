@@ -41,11 +41,11 @@
         }
 /* Model containers */
         #models-section {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 400px));
             justify-content: center;
             align-items: center;
             gap: 40px;
-            flex-wrap: wrap;
             padding: 20px;
             min-height: calc(100vh - 300px);
         }
@@ -117,14 +117,15 @@
             }
 
             #models-section {
-                gap: 20px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
                 padding: 10px;
                 padding-bottom: 140px;
             }
 
             .model-container {
                 width: 100%;
-                height: 310px;
+                height: 280px;
             }
 
             .model-canvas-wrapper {
@@ -215,10 +216,9 @@
             const link = container.dataset.link;
             const canvasWrapper = container.querySelector('.model-canvas-wrapper');
 
-            // Create scene for this model
-            const isMobileInit = window.innerWidth <= 768;
-            const initWidth = isMobileInit ? 260 : 400;
-            const initHeight = isMobileInit ? 240 : 380;
+            // Create scene for this model — size to the actual container
+            const initWidth = canvasWrapper.clientWidth || 400;
+            const initHeight = canvasWrapper.clientHeight || 380;
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(50, initWidth / initHeight, 0.1, 1000);
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -269,6 +269,7 @@
                 scene,
                 camera,
                 renderer,
+                canvasWrapper,
                 pivot: null,
                 rotationX: 0,
                 rotationY: 0,
@@ -422,13 +423,12 @@
 
         animateModels();
 
-        // Handle resize
+        // Handle resize — size each renderer to its own container
         window.addEventListener('resize', () => {
-            const isMobile = window.innerWidth <= 768;
-            const width = isMobile ? 260 : 400;
-            const height = isMobile ? 240 : 380;
-
             modelScenes.forEach((sceneData) => {
+                const width = sceneData.canvasWrapper.clientWidth;
+                const height = sceneData.canvasWrapper.clientHeight;
+                if (!width || !height) return;
                 sceneData.camera.aspect = width / height;
                 sceneData.camera.updateProjectionMatrix();
                 sceneData.renderer.setSize(width, height);
