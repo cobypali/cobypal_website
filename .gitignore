@@ -17,3 +17,5 @@ happy_body_images/*.png
 
 # Temp scripts
 *.py
+
+.claude/
