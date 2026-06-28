@@ -118,6 +118,16 @@
             margin-bottom: 36px;
         }
 
+        .data-as-of {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(230, 237, 247, 0.45);
+            margin: -24px 0 32px;
+        }
+
         /* Stats grid */
         .stats-grid {
             display: grid;
@@ -455,52 +465,53 @@
         </div>
 
         <h2 class="section-title">The Reach</h2>
+        <p class="data-as-of" id="data-as-of"></p>
         <div class="stats-grid">
             <div class="stat-card">
-                <a class="stat-head" href="https://www.instagram.com/cobypal" target="_blank" rel="noopener noreferrer">
+                <a class="stat-head" data-platform="instagram" href="https://www.instagram.com/cobypal" target="_blank" rel="noopener noreferrer">
                     <div class="platform">Instagram</div>
                     <div class="handle">@cobypal</div>
                     <div class="count"><span class="count-value" data-platform="instagram">22.4K</span><span class="count-sub">followers</span></div>
                 </a>
                 <div class="detail">
                     <h4>Audience</h4>
-                    <p>US 46.7% · Canada 7.1% · Australia 6.6%<br>
+                    <p class="demographics" data-platform="instagram">US 46.7% · Canada 7.1% · Australia 6.6%<br>
                     Ages 18–24 (42.5%) &amp; 25–34 (38.7%)<br>
                     56.7% women · 43.3% men</p>
                     <h4>Top Content</h4>
-                    <p><a href="https://www.instagram.com/p/Cw1KJj6Jp0l/" target="_blank" rel="noopener noreferrer">THE FRIDGE EP 2 — 5.1M views, 584K likes</a></p>
+                    <p><a class="top-content" data-platform="instagram" href="https://www.instagram.com/p/Cw1KJj6Jp0l/" target="_blank" rel="noopener noreferrer">THE FRIDGE EP 2 — 5.1M views, 584K likes</a></p>
                 </div>
             </div>
 
             <div class="stat-card">
-                <a class="stat-head" href="https://www.youtube.com/user/cobypalivathukal" target="_blank" rel="noopener noreferrer">
+                <a class="stat-head" data-platform="youtube" href="https://www.youtube.com/user/cobypalivathukal" target="_blank" rel="noopener noreferrer">
                     <div class="platform">YouTube</div>
                     <div class="handle">@CobyPal</div>
                     <div class="count"><span class="count-value" data-platform="youtube">7.4K</span><span class="count-sub">subscribers</span></div>
                 </a>
                 <div class="detail">
                     <h4>Audience</h4>
-                    <p>US 51.6% · UK 6.1% · Canada 5%<br>
+                    <p class="demographics" data-platform="youtube">US 51.6% · UK 6.1% · Canada 5%<br>
                     Ages 25–34 (27.2%), 13–17 (25.9%), 18–24 (18.5%)<br>
                     65.7% male · 32.4% female</p>
                     <h4>Top Content</h4>
-                    <p><a href="https://www.youtube.com/watch?v=PSyKONIfqiM&t=2s" target="_blank" rel="noopener noreferrer">THE FRIDGE (full film) — 113K views, 11K likes</a></p>
+                    <p><a class="top-content" data-platform="youtube" href="https://www.youtube.com/watch?v=PSyKONIfqiM&t=2s" target="_blank" rel="noopener noreferrer">THE FRIDGE (full film) — 113K views, 11K likes</a></p>
                 </div>
             </div>
 
             <div class="stat-card">
-                <a class="stat-head" href="https://www.tiktok.com/@cobypal?lang=en" target="_blank" rel="noopener noreferrer">
+                <a class="stat-head" data-platform="tiktok" href="https://www.tiktok.com/@cobypal?lang=en" target="_blank" rel="noopener noreferrer">
                     <div class="platform">TikTok</div>
                     <div class="handle">@cobypal</div>
                     <div class="count"><span class="count-value" data-platform="tiktok">6.5K</span><span class="count-sub">followers</span></div>
                 </a>
                 <div class="detail">
                     <h4>Audience</h4>
-                    <p>US 71.7% · Australia 1% · UK 0.9%<br>
+                    <p class="demographics" data-platform="tiktok">US 71.7% · Australia 1% · UK 0.9%<br>
                     Ages 25–34 (37.5%), 18–24 (30.3%), 35–44 (22.9%)<br>
                     59% male · 41% female</p>
                     <h4>Top Content</h4>
-                    <p><a href="https://www.tiktok.com/@cobypal/video/7267707846173805867?lang=en" target="_blank" rel="noopener noreferrer">THE FRIDGE EP 1 — 629.9K views, 102.8K likes</a></p>
+                    <p><a class="top-content" data-platform="tiktok" href="https://www.tiktok.com/@cobypal/video/7267707846173805867?lang=en" target="_blank" rel="noopener noreferrer">THE FRIDGE EP 1 — 629.9K views, 102.8K likes</a></p>
                 </div>
             </div>
         </div>
@@ -670,16 +681,23 @@
             if (e.key === 'Escape') closeModal();
         });
 
-        // Live follower/subscriber counts from the socials spreadsheet.
-        // Rows 3-5 are Instagram / YouTube / TikTok (CobyPal account); stats live in
-        // dated column groups ("<date> Followers"). We read the latest-dated column.
+        // Live stat cards from the socials spreadsheet.
+        // Instagram / YouTube / TikTok rows for the CobyPal account hold the data in
+        // dated column groups: "<date> Followers", "<date> Demographics",
+        // "<date> Top Content", "<date> Top Content Link". We read the latest-dated set
+        // and poll periodically so spreadsheet edits propagate without a manual refresh.
         const STATS_SHEET_ID = '1p9-ZP8VpSXSyOCCTcYCQFLW6eDq6CVJDW8LA9Qq6bhU';
         const STATS_SHEET_URL = `https://docs.google.com/spreadsheets/d/${STATS_SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
         const STATS_PLATFORMS = new Set(['instagram', 'youtube', 'tiktok']);
+        const STATS_REFRESH_MS = 60000;
+
+        const escapeHtml = (s) => s.replace(/[&<>"']/g, (ch) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[ch]));
 
         async function loadSocialStats() {
             try {
-                // Cache-bust so spreadsheet edits show up on the next load.
+                // Cache-bust so spreadsheet edits show up on each poll.
                 const res = await fetch(`${STATS_SHEET_URL}&_=${Date.now()}`, { cache: 'no-store' });
                 const text = await res.text();
                 const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
@@ -687,30 +705,76 @@
                 const rows = JSON.parse(match[1]).table.rows;
                 if (!rows || !rows.length) return;
 
-                // Find the latest "<date> Followers" column from the header row.
+                // From the header row, find the latest date and the column index for
+                // each of its dated fields.
                 const header = rows[0].c || [];
-                let bestCol = -1;
-                let bestTime = -Infinity;
+                const byDate = {}; // date -> { field: columnIndex }
+                let latestDate = null;
+                let latestTime = -Infinity;
                 header.forEach((cell, idx) => {
                     const label = cell && cell.v;
                     if (typeof label !== 'string') return;
-                    const m = label.match(/^(\d{1,2}\/\d{1,2}\/\d{4})\s+Followers/i);
+                    const m = label.match(/^(\d{1,2}\/\d{1,2}\/\d{4})\s+(.+?)\s*$/);
                     if (!m) return;
-                    const t = new Date(m[1]).getTime();
-                    if (!isNaN(t) && t >= bestTime) { bestTime = t; bestCol = idx; }
+                    const [, date, field] = m;
+                    (byDate[date] = byDate[date] || {})[field] = idx;
+                    const t = new Date(date).getTime();
+                    if (!isNaN(t) && t >= latestTime) { latestTime = t; latestDate = date; }
                 });
-                if (bestCol < 0) return;
+                if (!latestDate) return;
+                const cols = byDate[latestDate];
+
+                // "Data as of <date>" caption, based on the latest dated column header.
+                const asOfEl = document.getElementById('data-as-of');
+                if (asOfEl) {
+                    const d = new Date(latestDate);
+                    const pretty = isNaN(d) ? latestDate : d.toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'long', day: 'numeric'
+                    });
+                    asOfEl.textContent = `Data as of ${pretty}`;
+                }
 
                 rows.forEach((row) => {
                     const c = row.c || [];
                     const product = c[0] && c[0].v ? String(c[0].v).trim().toLowerCase() : '';
                     const user = c[1] && c[1].v ? String(c[1].v).trim().toLowerCase() : '';
                     if (user !== 'cobypal' || !STATS_PLATFORMS.has(product)) return;
-                    const cell = c[bestCol];
-                    const value = cell && cell.v != null ? String(cell.f || cell.v).trim() : '';
-                    if (!value) return;
-                    const el = document.querySelector(`.count-value[data-platform="${product}"]`);
-                    if (el) el.textContent = value;
+
+                    const cellText = (idx) => {
+                        if (idx == null) return '';
+                        const cell = c[idx];
+                        return cell && cell.v != null ? String(cell.f || cell.v).trim() : '';
+                    };
+
+                    // Followers / subscribers
+                    const followers = cellText(cols['Followers']);
+                    if (followers) {
+                        const el = document.querySelector(`.count-value[data-platform="${product}"]`);
+                        if (el) el.textContent = followers;
+                    }
+
+                    // Audience demographics (newline-separated in the sheet)
+                    const demo = cellText(cols['Demographics']);
+                    if (demo) {
+                        const el = document.querySelector(`.demographics[data-platform="${product}"]`);
+                        if (el) el.innerHTML = demo.split('\n').map((line) => escapeHtml(line.trim())).join('<br>');
+                    }
+
+                    // Top content title + link
+                    const topText = cellText(cols['Top Content']);
+                    const topLink = cellText(cols['Top Content Link']);
+                    const topEl = document.querySelector(`.top-content[data-platform="${product}"]`);
+                    if (topEl) {
+                        if (topText) topEl.textContent = topText;
+                        if (topLink) topEl.href = topLink;
+                    }
+
+                    // Profile link
+                    const link = c[2] && c[2].v ? String(c[2].v).trim() : '';
+                    if (link) {
+                        const head = document.querySelector(`.stat-head[data-platform="${product}"]`);
+                        if (head) head.href = link;
+                    }
                 });
             } catch (err) {
                 console.error('Failed to load social stats:', err);
@@ -718,6 +782,7 @@
             }
         }
         loadSocialStats();
+        setInterval(loadSocialStats, STATS_REFRESH_MS);
     </script>
 </body>
 </html>
