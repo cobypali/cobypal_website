@@ -160,10 +160,36 @@
         .platform-linkedin    { background: rgba(10, 102, 194, 0.15);  color: #0A66C2; }
         .platform-facebook    { background: rgba(24, 119, 242, 0.15);  color: #1877F2; }
         .platform-website     { background: rgba(59, 130, 246, 0.15);  color: #3B82F6; }
+        .platform-twitch      { background: rgba(145, 70, 255, 0.15);  color: #9146FF; }
 
         .account-handle {
             font-size: 14px;
             color: rgba(230, 237, 247, 0.7);
+        }
+
+        .account-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 13px;
+            color: rgba(230, 237, 247, 0.72);
+            line-height: 1.5;
+        }
+
+        .stat-line strong {
+            color: #E6EDF7;
+            font-weight: 600;
+        }
+
+        .top-content-link {
+            color: #60A5FA;
+        }
+
+        .dashboard-as-of {
+            font-size: 13px;
+            color: rgba(230, 237, 247, 0.5);
+            text-align: center;
+            margin: -26px 0 38px;
         }
 
         .account-actions {
@@ -671,6 +697,254 @@
     </script>
 
     <script>
+        const DASHBOARD_SHEET_ID = '1p9-ZP8VpSXSyOCCTcYCQFLW6eDq6CVJDW8LA9Qq6bhU';
+        const DASHBOARD_SHEET_URL = `https://docs.google.com/spreadsheets/d/${DASHBOARD_SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+        const DASHBOARD_REFRESH_MS = 60000;
+
+        const escapeHtml = (value) => String(value || '').replace(/[&<>"']/g, (ch) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[ch]));
+
+        function getCell(cells, index) {
+            const cell = cells[index];
+            if (!cell || cell.v == null) return '';
+            return String(cell.f || cell.v).trim();
+        }
+
+        function normalizePlatform(product) {
+            const text = product.trim().toLowerCase();
+            if (text.includes('instagram')) return 'instagram';
+            if (text.includes('threads')) return 'threads';
+            if (text.includes('tiktok')) return 'tiktok';
+            if (text.includes('youtube')) return 'youtube';
+            if (text.includes('twitter') || text === 'x') return 'twitter';
+            if (text.includes('linkedin')) return 'linkedin';
+            if (text.includes('facebook')) return 'facebook';
+            if (text.includes('website')) return 'website';
+            if (text.includes('twitch')) return 'twitch';
+            return text.replace(/[^a-z0-9]+/g, '-');
+        }
+
+        function platformLabel(product) {
+            const normalized = normalizePlatform(product);
+            if (normalized === 'twitter') return 'X / Twitter';
+            if (normalized === 'youtube') return 'YouTube';
+            if (normalized === 'tiktok') return 'TikTok';
+            return product.trim().replace(/\s+/g, ' ');
+        }
+
+        function brandForUser(user) {
+            const clean = user.replace(/\s*\([^)]*\)\s*/g, '').trim();
+            const lower = clean.toLowerCase();
+            if (lower.includes('kippy')) return 'Kippy Studios';
+            if (lower.includes('food')) return "Coby's Food Blog";
+            if (lower.includes('academy')) return 'Coby Academy';
+            if (lower.includes('great goats')) return 'Great Goats';
+            if (lower.includes('irl') || lower.includes('palivathukal')) return 'Coby Palivathukal';
+            return 'CobyPal';
+        }
+
+        function brandClass(brand) {
+            const classes = {
+                'CobyPal': 'bi-cobypal',
+                'Kippy Studios': 'bi-kippy',
+                'Coby Palivathukal': 'bi-cobypalivathukal',
+                "Coby's Food Blog": 'bi-foodblog',
+                'Coby Academy': 'bi-academy',
+                'Great Goats': 'bi-kippy'
+            };
+            return classes[brand] || 'bi-cobypal';
+        }
+
+        function brandInitial(brand) {
+            return brand.replace(/^coby'?s?\s+/i, '').charAt(0).toUpperCase();
+        }
+
+        function findLatestStatColumns(headerCells) {
+            const byDate = {};
+            let latestDate = null;
+            let latestTime = -Infinity;
+
+            headerCells.forEach((cell, index) => {
+                const label = cell && cell.v;
+                if (typeof label !== 'string') return;
+                const match = label.match(/^(\d{1,2}\/\d{1,2}\/\d{4})\s+(.+?)\s*$/);
+                if (!match) return;
+                const [, date, field] = match;
+                byDate[date] = byDate[date] || {};
+                byDate[date][field] = index;
+
+                const time = new Date(date).getTime();
+                if (!isNaN(time) && time >= latestTime) {
+                    latestDate = date;
+                    latestTime = time;
+                }
+            });
+
+            return { latestDate, columns: latestDate ? byDate[latestDate] : {} };
+        }
+
+        function analyticsLinksFor(account) {
+            const platform = normalizePlatform(account.product);
+            const links = [];
+            const userFromLink = () => {
+                const match = account.link.match(/(?:instagram\.com|threads\.(?:net|com)|tiktok\.com)\/@?([^/?#]+)/i);
+                return match ? match[1] : '';
+            };
+
+            if (platform === 'instagram') {
+                const username = userFromLink();
+                if (username) links.push({ label: 'Instagram Professional Dashboard', url: `https://www.instagram.com/${username}/professional-dashboard/` });
+                links.push({ label: 'Meta Business Suite Insights', url: 'https://business.facebook.com/latest/insights/overview' });
+            } else if (platform === 'threads') {
+                links.push({ label: 'Threads Insights', url: 'https://www.threads.net/insights' });
+            } else if (platform === 'tiktok') {
+                links.push({ label: 'TikTok Analytics Dashboard', url: 'https://www.tiktok.com/analytics?lang=en' });
+            } else if (platform === 'youtube') {
+                const channelMatch = account.link.match(/\/channel\/([^/?#]+)/);
+                links.push({
+                    label: 'YouTube Studio Analytics',
+                    url: channelMatch ? `https://studio.youtube.com/channel/${channelMatch[1]}/analytics` : 'https://studio.youtube.com/'
+                });
+            } else if (platform === 'twitter') {
+                links.push({ label: 'X / Twitter Analytics', url: 'https://analytics.twitter.com/' });
+            } else if (platform === 'linkedin') {
+                if (account.link.includes('/company/')) {
+                    links.push({ label: 'LinkedIn Page Analytics', url: account.link.replace(/\/?\?.*$/, '').replace(/\/$/, '') + '/admin/analytics/' });
+                } else {
+                    links.push({ label: 'LinkedIn Profile Activity', url: 'https://www.linkedin.com/in/cobypalivathukal/recent-activity/' });
+                }
+            } else if (platform === 'facebook') {
+                links.push({ label: 'Meta Business Suite Insights', url: 'https://business.facebook.com/latest/insights/overview' });
+            } else if (platform === 'twitch') {
+                links.push({ label: 'Twitch Creator Dashboard', url: 'https://dashboard.twitch.tv/analytics' });
+            }
+
+            return links;
+        }
+
+        function renderDashboard(accounts, latestDate) {
+            const summaryNumbers = document.querySelectorAll('.summary-card .number');
+            const brands = [...new Set(accounts.map((account) => account.brand))];
+            const platforms = [...new Set(accounts.map((account) => normalizePlatform(account.product)))];
+            if (summaryNumbers[0]) summaryNumbers[0].textContent = accounts.length;
+            if (summaryNumbers[1]) summaryNumbers[1].textContent = platforms.length;
+            if (summaryNumbers[2]) summaryNumbers[2].textContent = brands.length;
+
+            let asOfEl = document.getElementById('dashboard-as-of');
+            if (!asOfEl) {
+                asOfEl = document.createElement('p');
+                asOfEl.id = 'dashboard-as-of';
+                asOfEl.className = 'dashboard-as-of';
+                document.querySelector('.summary-row').after(asOfEl);
+            }
+            if (latestDate) {
+                const date = new Date(latestDate);
+                asOfEl.textContent = `Spreadsheet data as of ${isNaN(date) ? latestDate : date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+            }
+
+            document.querySelectorAll('.brand-section').forEach((section) => section.remove());
+            const fragment = document.createDocumentFragment();
+
+            brands.forEach((brand) => {
+                const brandAccounts = accounts.filter((account) => account.brand === brand);
+                const section = document.createElement('div');
+                section.className = 'brand-section';
+                section.innerHTML = `
+                    <div class="brand-header">
+                        <div class="brand-icon ${brandClass(brand)}">${brandInitial(brand)}</div>
+                        <h2 class="brand-name">${escapeHtml(brand)}</h2>
+                        <span class="brand-count">${brandAccounts.length} ${brandAccounts.length === 1 ? 'account' : 'accounts'}</span>
+                    </div>
+                    <div class="accounts-grid">
+                        ${brandAccounts.map(renderAccountCard).join('')}
+                    </div>
+                `;
+                fragment.appendChild(section);
+            });
+
+            document.querySelector('main').appendChild(fragment);
+        }
+
+        function renderAccountCard(account) {
+            const platform = normalizePlatform(account.product);
+            const stats = [];
+            if (account.followers) stats.push(`<div class="stat-line"><strong>Followers:</strong> ${escapeHtml(account.followers)}</div>`);
+            if (account.demographics) stats.push(`<div class="stat-line"><strong>Demographics:</strong><br>${account.demographics.split('\n').map((line) => escapeHtml(line.trim())).join('<br>')}</div>`);
+            if (account.topContent) {
+                const topContent = account.topContentLink
+                    ? `<a href="${escapeHtml(account.topContentLink)}" target="_blank" rel="noopener noreferrer" class="top-content-link">${escapeHtml(account.topContent)}</a>`
+                    : escapeHtml(account.topContent);
+                stats.push(`<div class="stat-line"><strong>Top content:</strong> ${topContent}</div>`);
+            }
+
+            const analyticsLinks = analyticsLinksFor(account);
+            const analyticsPanel = analyticsLinks.length ? `
+                <button class="btn btn-analytics" onclick="toggleAnalytics(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Analytics</button>
+            ` : '';
+
+            return `
+                <div class="account-card">
+                    <div class="account-top">
+                        <span class="platform-badge platform-${platform}">${escapeHtml(platformLabel(account.product))}</span>
+                        <span class="account-handle">${escapeHtml(account.user)}</span>
+                    </div>
+                    ${stats.length ? `<div class="account-stats">${stats.join('')}</div>` : ''}
+                    <div class="account-actions">
+                        <a href="${escapeHtml(account.link)}" target="_blank" rel="noopener noreferrer" class="btn btn-visit"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>Visit</a>
+                        ${analyticsPanel}
+                    </div>
+                    ${analyticsLinks.length ? `
+                        <div class="analytics-panel">
+                            <h4>Analytics Links</h4>
+                            <div class="analytics-links">
+                                ${analyticsLinks.map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer" class="analytics-link"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>${escapeHtml(link.label)}</a>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch(`${DASHBOARD_SHEET_URL}&_=${Date.now()}`, { cache: 'no-store' });
+                const text = await response.text();
+                const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
+                if (!match) throw new Error('Could not parse spreadsheet response');
+
+                const rows = JSON.parse(match[1]).table.rows || [];
+                if (rows.length < 2) return;
+
+                const { latestDate, columns } = findLatestStatColumns(rows[0].c || []);
+                const accounts = rows.slice(1).map((row) => {
+                    const cells = row.c || [];
+                    const product = getCell(cells, 0);
+                    const user = getCell(cells, 1);
+                    const link = getCell(cells, 2);
+                    if (!product || !user || !link) return null;
+                    return {
+                        product,
+                        user,
+                        link,
+                        brand: brandForUser(user),
+                        followers: getCell(cells, columns.Followers),
+                        demographics: getCell(cells, columns.Demographics),
+                        topContent: getCell(cells, columns['Top Content']),
+                        topContentLink: getCell(cells, columns['Top Content Link'])
+                    };
+                }).filter(Boolean);
+
+                if (accounts.length) renderDashboard(accounts, latestDate);
+            } catch (error) {
+                console.error('Failed to load dashboard spreadsheet:', error);
+            }
+        }
+
         function toggleAnalytics(btn) {
             const card = btn.closest('.account-card');
             const panel = card.querySelector('.analytics-panel');
@@ -680,6 +954,9 @@
             btn.style.color = panel.classList.contains('open')
                 ? '#60A5FA' : '';
         }
+
+        loadDashboardData();
+        setInterval(loadDashboardData, DASHBOARD_REFRESH_MS);
     </script>
 
     <script type="module">
