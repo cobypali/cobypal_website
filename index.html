@@ -44,17 +44,21 @@
 /* Model containers */
         #models-section {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 400px));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             justify-content: center;
             align-items: center;
-            gap: 40px;
-            padding: 20px;
+            gap: clamp(10px, 1.5vw, 28px);
+            width: 100%;
+            max-width: 1900px;
+            margin: 0 auto;
+            padding: 20px clamp(16px, 3vw, 50px);
             min-height: calc(100vh - 300px);
         }
 
         .model-container {
-            width: 400px;
-            height: 460px;
+            width: 100%;
+            min-width: 0;
+            height: clamp(300px, 27vw, 460px);
             background: #121A2B;
             border-radius: 20px;
             border: 1px solid #1A2438;
@@ -74,7 +78,8 @@
 
         .model-canvas-wrapper {
             width: 100%;
-            height: 380px;
+            flex: 1;
+            min-height: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -99,9 +104,6 @@
             color: #60A5FA;
         }
 
-        .model-container.store-model {
-            grid-column: 1 / -1;
-        }
         /* Footer */
         footer {
             padding: 20px 30px 25px;
@@ -123,19 +125,36 @@
             }
 
             #models-section {
-                grid-template-columns: repeat(2, 1fr);
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
                 gap: 14px;
-                padding: 10px;
-                padding-bottom: 140px;
+                width: 100%;
+                max-width: none;
+                min-height: 0;
+                padding: 18px 20px 140px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scroll-snap-type: x mandatory;
+                scroll-padding-inline: 20px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            #models-section::-webkit-scrollbar {
+                display: none;
             }
 
             .model-container {
-                width: 100%;
-                height: 280px;
+                flex: 0 0 min(78vw, 320px);
+                width: min(78vw, 320px);
+                height: 340px;
+                scroll-snap-align: start;
+                scroll-snap-stop: always;
             }
 
             .model-canvas-wrapper {
-                height: 240px;
+                touch-action: pan-x;
             }
 
             .model-label {
@@ -171,6 +190,10 @@
             <div class="model-canvas-wrapper"></div>
             <div class="model-label">Films</div>
         </div>
+        <div class="model-container store-model" data-model="3d_models/storefront/scene.gltf" data-link="store/" data-name="Store" data-rot-y="-0.35">
+            <div class="model-canvas-wrapper"></div>
+            <div class="model-label">Store</div>
+        </div>
         <div class="model-container" data-model="3d_models/handshake/scene.gltf" data-link="work-with-me.html" data-name="Collaborate" data-rot-y="-1.5708" data-offset-y="-0.45" data-offset-x="-0.12">
             <div class="model-canvas-wrapper"></div>
             <div class="model-label">Collaborate</div>
@@ -178,10 +201,6 @@
         <div class="model-container" data-model="3d_models/brain_v01.glb" data-link="brain.html" data-name="Coby's Brain">
             <div class="model-canvas-wrapper"></div>
             <div class="model-label">Coby's Brain</div>
-        </div>
-        <div class="model-container store-model" data-model="3d_models/storefront/scene.gltf" data-link="store/" data-name="Store" data-rot-y="-0.35">
-            <div class="model-canvas-wrapper"></div>
-            <div class="model-label">Store</div>
         </div>
     </div>
 
