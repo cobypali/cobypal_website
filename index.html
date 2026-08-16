@@ -98,6 +98,10 @@
         .model-container:hover .model-label {
             color: #60A5FA;
         }
+
+        .model-container.store-model {
+            grid-column: 1 / -1;
+        }
         /* Footer */
         footer {
             padding: 20px 30px 25px;
@@ -174,6 +178,10 @@
         <div class="model-container" data-model="3d_models/brain_v01.glb" data-link="brain.html" data-name="Coby's Brain">
             <div class="model-canvas-wrapper"></div>
             <div class="model-label">Coby's Brain</div>
+        </div>
+        <div class="model-container store-model" data-model="3d_models/storefront/scene.gltf" data-link="store/" data-name="Store" data-rot-y="-0.35">
+            <div class="model-canvas-wrapper"></div>
+            <div class="model-label">Store</div>
         </div>
     </div>
 
