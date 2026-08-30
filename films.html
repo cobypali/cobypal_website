@@ -52,7 +52,15 @@
             line-height: 1.7;
         }
 
-        .channel-link { text-align: center; margin-top: 24px; margin-bottom: 24px; }
+        .channel-link {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
         .channel-link a {
             display: inline-flex; align-items: center; gap: 12px;
             background: linear-gradient(135deg, #FF0000, #CC0000); color: white;
@@ -60,6 +68,11 @@
             transition: all 0.3s; box-shadow: 0 4px 15px rgba(255,0,0,0.3);
         }
         .channel-link a:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,0,0,0.4); }
+        .channel-link a.merch-link {
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
+        }
+        .channel-link a.merch-link:hover { box-shadow: 0 8px 25px rgba(59,130,246,0.4); }
         .channel-link svg { width: 24px; height: 24px; }
 
         /* Projects Grid */
@@ -154,6 +167,23 @@
                 font-size: 16px;
             }
 
+            .channel-link {
+                flex-wrap: nowrap;
+                gap: 8px;
+            }
+
+            .channel-link a {
+                gap: 8px;
+                padding: 12px 14px;
+                font-size: 13px;
+                white-space: nowrap;
+            }
+
+            .channel-link svg {
+                width: 20px;
+                height: 20px;
+            }
+
             .projects {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
@@ -179,11 +209,18 @@
         <div class="page-header">
             <h1>Coby's Films</h1>
 <div class="channel-link">
-                <a href="https://www.youtube.com/@CobyPal" target="_blank">
+                <a href="https://www.youtube.com/@CobyPal" target="_blank" rel="noopener noreferrer">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                     </svg>
                     Subscribe on YouTube
+                </a>
+                <a class="merch-link" href="store/">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M6 8h12l1 13H5L6 8z"/>
+                        <path d="M9 10V6a3 3 0 0 1 6 0v4"/>
+                    </svg>
+                    Buy Merch
                 </a>
             </div>
         </div>

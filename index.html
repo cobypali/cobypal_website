@@ -44,21 +44,20 @@
 /* Model containers */
         #models-section {
             display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 400px));
             justify-content: center;
             align-items: center;
-            gap: clamp(10px, 1.5vw, 28px);
+            gap: 40px;
             width: 100%;
-            max-width: 1900px;
             margin: 0 auto;
-            padding: 20px clamp(16px, 3vw, 50px);
+            padding: 20px;
             min-height: calc(100vh - 300px);
         }
 
         .model-container {
             width: 100%;
             min-width: 0;
-            height: clamp(300px, 27vw, 460px);
+            height: clamp(320px, 46vw, 460px);
             background: #121A2B;
             border-radius: 20px;
             border: 1px solid #1A2438;
@@ -125,36 +124,18 @@
             }
 
             #models-section {
-                display: flex;
-                justify-content: flex-start;
-                align-items: center;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 14px;
-                width: 100%;
-                max-width: none;
-                min-height: 0;
-                padding: 18px 20px 140px;
-                overflow-x: auto;
-                overflow-y: hidden;
-                scroll-snap-type: x mandatory;
-                scroll-padding-inline: 20px;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-            }
-
-            #models-section::-webkit-scrollbar {
-                display: none;
+                padding: 10px 10px 140px;
             }
 
             .model-container {
-                flex: 0 0 min(78vw, 320px);
-                width: min(78vw, 320px);
-                height: 340px;
-                scroll-snap-align: start;
-                scroll-snap-stop: always;
+                width: 100%;
+                height: 280px;
             }
 
             .model-canvas-wrapper {
-                touch-action: pan-x;
+                height: 240px;
             }
 
             .model-label {
@@ -189,10 +170,6 @@
         <div class="model-container" data-model="3d_models/Mannyv01_optimized.glb" data-link="films.html" data-name="Films" data-offset-z="0.6">
             <div class="model-canvas-wrapper"></div>
             <div class="model-label">Films</div>
-        </div>
-        <div class="model-container store-model" data-model="3d_models/storefront/scene.gltf" data-link="store/" data-name="Store" data-rot-y="-0.35">
-            <div class="model-canvas-wrapper"></div>
-            <div class="model-label">Store</div>
         </div>
         <div class="model-container" data-model="3d_models/handshake/scene.gltf" data-link="work-with-me.html" data-name="Collaborate" data-rot-y="-1.5708" data-offset-y="-0.45" data-offset-x="-0.12">
             <div class="model-canvas-wrapper"></div>
