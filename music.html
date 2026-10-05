@@ -7,7 +7,7 @@
     <link rel="icon" href="favicons/favicon_v01.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coby's Music | CobyPal</title>
-    <meta name="description" content="Music recommendations and playlists.">
+    <meta name="description" content="Listen to Coby's favorite songs, plus chill electronic, chill rap, hard rap, hard electronic, and pop playlists.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -148,107 +148,135 @@
             z-index: 1;
         }
 
-        /* Featured Playlist Section */
-        .featured-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
+        /* A larger feature anchors the five genre playlists. */
         .featured-player {
-            background: rgba(26, 36, 56, 0.6);
-            border-radius: 24px;
-            padding: 40px;
-            backdrop-filter: blur(20px);
-            border: 1px solid #1A2438;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: all 0.4s ease;
-            max-width: 700px;
-            width: 100%;
             position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
+            align-items: center;
+            gap: 40px;
+            padding: 40px;
+            border: 1px solid rgba(96, 165, 250, 0.35);
+            border-radius: 28px;
+            background: radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.18), transparent 65%), #121A2B;
+            box-shadow: 0 20px 70px rgba(0, 0, 0, 0.25);
             overflow: hidden;
         }
 
         .featured-player::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #3B82F6, #1DB954, #3B82F6);
-            background-size: 200% 100%;
-            animation: gradientShift 3s ease infinite;
+            inset: 0 0 auto;
+            height: 3px;
+            background: linear-gradient(90deg, #60A5FA, #1DB954);
         }
 
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .featured-player:hover {
-            border-color: #3B82F6;
-            box-shadow: 0 0 60px rgba(59, 130, 246, 0.2), 0 0 100px rgba(29, 185, 84, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .featured-info {
-            margin-bottom: 20px;
+        .eyebrow {
+            display: block;
+            margin-bottom: 16px;
+            color: #86B8FB;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .featured-info h2 {
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 0;
-            color: #E6EDF7;
-            text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+            font-size: clamp(32px, 3.5vw, 48px);
+            line-height: 1.12;
+            letter-spacing: -1.8px;
+            margin-bottom: 18px;
         }
 
-        .featured-embed {
-            width: 100%;
-            border-radius: 16px;
+        .featured-info p {
+            color: #AFBED3;
+            font-size: 16px;
+            line-height: 1.7;
+            max-width: 28ch;
+        }
+
+        .featured-embed, .playlist-embed {
+            min-width: 0;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
+            background: #181818;
         }
 
-        .featured-embed:hover {
-            box-shadow: 0 15px 50px rgba(29, 185, 84, 0.2);
-        }
-
-        .featured-embed iframe {
+        .featured-embed iframe, .playlist-embed iframe {
             display: block;
             width: 100%;
+            border: 0;
         }
 
         .spotify-badge {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            margin-top: 30px;
-            padding: 14px 28px;
+            margin-top: 28px;
+            padding: 13px 22px;
             background: #1DB954;
             border-radius: 50px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
+            color: #07190D;
+            font-size: 14px;
+            font-weight: 700;
             text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(29, 185, 84, 0.3);
+            transition: background 0.2s ease, transform 0.2s ease;
         }
 
-        .spotify-badge:hover {
-            transform: scale(1.08);
-            box-shadow: 0 6px 30px rgba(29, 185, 84, 0.5);
-            background: #1ed760;
+        .spotify-badge:hover { background: #1ed760; transform: translateY(-2px); }
+        .spotify-badge svg { width: 22px; height: 22px; }
+        .profile-link { display: block; width: fit-content; margin-top: 16px; color: #AFBED3; font-size: 13px; }
+        .profile-link:hover { color: #E6EDF7; }
+        a:focus-visible { outline: 2px solid #86B8FB; outline-offset: 5px; }
+
+        .genre-section { margin-top: 64px; }
+        .section-heading { margin-bottom: 26px; }
+        .section-heading h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.6px; }
+        .section-heading p { margin-top: 8px; color: #AFBED3; font-size: 14px; line-height: 1.6; }
+        .playlist-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; }
+
+        .playlist-card {
+            grid-column: span 2;
+            min-width: 0;
+            padding: 22px;
+            border-radius: 20px;
+            border: 1px solid #253148;
+            background: rgba(18, 26, 43, 0.94);
+            transition: border-color 0.2s ease, transform 0.2s ease;
         }
 
-        .spotify-badge svg {
-            width: 24px;
-            height: 24px;
+        .playlist-card:nth-child(4) { grid-column: 2 / span 2; }
+        .playlist-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .playlist-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .playlist-number { color: var(--accent); font-size: 12px; font-weight: 600; letter-spacing: 1px; }
+        .track-count { color: #AFBED3; font-size: 11px; }
+        .playlist-card h3 { font-size: 22px; line-height: 1.25; font-weight: 600; letter-spacing: -0.6px; }
+        .playlist-card p { margin: 9px 0 20px; color: #AFBED3; font-size: 13px; line-height: 1.6; }
+        .playlist-link { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; color: #D4DEED; font-size: 12px; font-weight: 500; }
+        .playlist-link:hover { color: var(--accent); }
+
+        @media (min-width: 1100px) { main { padding-right: 280px; } }
+        @media (max-width: 1099px) {
+            #brain-regions-nav { display: none; }
+            .playlist-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .playlist-card, .playlist-card:nth-child(4) { grid-column: auto; }
+        }
+        @media (max-width: 768px) {
+            .featured-player { grid-template-columns: 1fr; gap: 26px; padding: 24px; border-radius: 22px; }
+            .featured-info h2 { font-size: 36px; }
+            .featured-info p { max-width: none; }
+            .genre-section { margin-top: 44px; }
+            .playlist-grid { grid-template-columns: 1fr; gap: 18px; }
+            .playlist-card { padding: 20px; }
+            nav { flex-wrap: wrap; gap: 12px; }
+            nav .nav-links { margin-left: 0; gap: 14px; flex-wrap: wrap; }
+            nav .nav-links a { font-size: 10px; }
+            main { padding-top: 115px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .music-notes, .visualizer-bg { display: none; }
+            .playlist-card, .spotify-badge { transition: none; }
+            .playlist-card:hover, .spotify-badge:hover { transform: none; }
         }
 
         /* Responsive */
@@ -275,7 +303,7 @@
             }
 
             .featured-info h2 {
-                font-size: 26px;
+                font-size: 36px;
             }
 
             .spotify-badge {
@@ -408,14 +436,23 @@
 
         <div class="music-container">
             <!-- Featured Playlist -->
-            <section class="featured-section">
+            <section class="featured-section" aria-labelledby="favorites-heading">
                 <div class="featured-player">
                     <div class="featured-info">
-                        <h2>Coby's Favorite Songs</h2>
+                        <span class="eyebrow">The main rotation</span>
+                        <h2 id="favorites-heading">Coby's Favorite Songs</h2>
+                        <p>The songs I keep coming back to. A little of everything, all in one place.</p>
+                    <a href="https://open.spotify.com/playlist/58LKqUHnBAd0h0V6HTHZrs" target="_blank" rel="noopener noreferrer" class="spotify-badge">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                        </svg>
+                        Listen on Spotify
+                    </a>
+                    <a class="profile-link" href="https://open.spotify.com/user/dljm8emyhwhe942efy4cbqynk" target="_blank" rel="noopener noreferrer">Follow me on Spotify &rarr;</a>
                     </div>
                     <div class="featured-embed">
                         <iframe
-                            style="border-radius:12px"
+                            title="Coby's Favorite Songs on Spotify"
                             src="https://open.spotify.com/embed/playlist/58LKqUHnBAd0h0V6HTHZrs?utm_source=generator&theme=0"
                             width="100%"
                             height="500"
@@ -425,12 +462,61 @@
                             loading="lazy">
                         </iframe>
                     </div>
-                    <a href="https://open.spotify.com/user/dljm8emyhwhe942efy4cbqynk" target="_blank" class="spotify-badge">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-                        </svg>
-                        Follow on Spotify
-                    </a>
+
+                </div>
+            </section>
+
+            <section class="genre-section" aria-labelledby="genre-heading">
+                <div class="section-heading">
+                    <h2 id="genre-heading">Find your mood</h2>
+                    <p>Five playlists, fifty songs each. Pick what fits the moment.</p>
+                </div>
+                <div class="playlist-grid">
+                    <article class="playlist-card" style="--accent: #7DD3FC" aria-labelledby="playlist-1">
+                        <div class="playlist-meta"><span class="playlist-number">01</span><span class="track-count">50 tracks</span></div>
+                        <h3 id="playlist-1">Chill Electronic</h3>
+                        <p>Atmospheric sounds. Room to slow down.</p>
+                        <div class="playlist-embed">
+                            <iframe title="Chill Electronic on Spotify" src="https://open.spotify.com/embed/playlist/2T30Z1BzXADlFswT1osrgZ?utm_source=generator&amp;theme=0" width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                        <a class="playlist-link" href="https://open.spotify.com/playlist/2T30Z1BzXADlFswT1osrgZ" target="_blank" rel="noopener noreferrer">Open in Spotify <span aria-hidden="true">&nearr;</span></a>
+                    </article>
+                    <article class="playlist-card" style="--accent: #A5B4FC" aria-labelledby="playlist-2">
+                        <div class="playlist-meta"><span class="playlist-number">02</span><span class="track-count">50 tracks</span></div>
+                        <h3 id="playlist-2">Chill Rap</h3>
+                        <p>Mellow beats for a laid-back mood.</p>
+                        <div class="playlist-embed">
+                            <iframe title="Chill Rap on Spotify" src="https://open.spotify.com/embed/playlist/0q06UjDeQP9ehM8KlREubl?utm_source=generator&amp;theme=0" width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                        <a class="playlist-link" href="https://open.spotify.com/playlist/0q06UjDeQP9ehM8KlREubl" target="_blank" rel="noopener noreferrer">Open in Spotify <span aria-hidden="true">&nearr;</span></a>
+                    </article>
+                    <article class="playlist-card" style="--accent: #FB923C" aria-labelledby="playlist-3">
+                        <div class="playlist-meta"><span class="playlist-number">03</span><span class="track-count">50 tracks</span></div>
+                        <h3 id="playlist-3">Hard Rap</h3>
+                        <p>Heavy beats. Turn the energy up.</p>
+                        <div class="playlist-embed">
+                            <iframe title="Hard Rap on Spotify" src="https://open.spotify.com/embed/playlist/3maWvzS4Ls37bpgIWgTL6M?utm_source=generator&amp;theme=0" width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                        <a class="playlist-link" href="https://open.spotify.com/playlist/3maWvzS4Ls37bpgIWgTL6M" target="_blank" rel="noopener noreferrer">Open in Spotify <span aria-hidden="true">&nearr;</span></a>
+                    </article>
+                    <article class="playlist-card" style="--accent: #C084FC" aria-labelledby="playlist-4">
+                        <div class="playlist-meta"><span class="playlist-number">04</span><span class="track-count">50 tracks</span></div>
+                        <h3 id="playlist-4">Hard Electronic</h3>
+                        <p>Big bass and driving club sounds.</p>
+                        <div class="playlist-embed">
+                            <iframe title="Hard Electronic on Spotify" src="https://open.spotify.com/embed/playlist/0boJgdDQrWE4hvLaN667o3?utm_source=generator&amp;theme=0" width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                        <a class="playlist-link" href="https://open.spotify.com/playlist/0boJgdDQrWE4hvLaN667o3" target="_blank" rel="noopener noreferrer">Open in Spotify <span aria-hidden="true">&nearr;</span></a>
+                    </article>
+                    <article class="playlist-card" style="--accent: #F9A8D4" aria-labelledby="playlist-5">
+                        <div class="playlist-meta"><span class="playlist-number">05</span><span class="track-count">50 tracks</span></div>
+                        <h3 id="playlist-5">Pop Music</h3>
+                        <p>Catchy hooks and songs to sing along to.</p>
+                        <div class="playlist-embed">
+                            <iframe title="Pop Music on Spotify" src="https://open.spotify.com/embed/playlist/3RAqLk03ZOCW4AZwBqo97l?utm_source=generator&amp;theme=0" width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                        <a class="playlist-link" href="https://open.spotify.com/playlist/3RAqLk03ZOCW4AZwBqo97l" target="_blank" rel="noopener noreferrer">Open in Spotify <span aria-hidden="true">&nearr;</span></a>
+                    </article>
                 </div>
             </section>
         </div>
