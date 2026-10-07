@@ -112,10 +112,12 @@
             gap: 14px;
         }
 
-        .exercise-card:hover {
-            transform: translateY(-3px);
-            border-color: #3B82F6;
-            box-shadow: 0 6px 24px rgba(59, 130, 246, 0.15);
+        @media (hover: hover) and (pointer: fine) {
+            .exercise-card:hover {
+                transform: translateY(-3px);
+                border-color: #3B82F6;
+                box-shadow: 0 6px 24px rgba(59, 130, 246, 0.15);
+            }
         }
 
         .exercise-number {
@@ -585,10 +587,10 @@
         .day-title { color: #E6EDF7; margin: 24px 0 12px; font-size: 26px; }
         .phase-title { color: #60A5FA; margin: 24px 0 8px; font-size: 18px; }
         .exercise-card { font-family: inherit; text-align: left; width: 100%; }
-        .day-card { min-height: 120px; flex-direction: column; align-items: flex-start; }
-        .day-card small, .source-status { color: rgba(230,237,247,.65); font-size: 13px; line-height: 1.6; }
-        .source-status { text-align: center; margin-top: 24px; }
-        .source-status a { color: #60A5FA; text-decoration: underline; }
+        .day-card { min-height: 120px; flex-direction: column; align-items: flex-start; -webkit-tap-highlight-color: transparent; }
+        .day-card:focus:not(:focus-visible) { outline: none; }
+        .day-card small, .routine-status { color: rgba(230,237,247,.65); font-size: 13px; line-height: 1.6; }
+        .routine-status { text-align: center; margin-top: 24px; }
         .workout-phase { color: #60A5FA; margin-bottom: 16px; }
         .workout-nav-inline { flex-wrap: wrap; gap: 10px; }
         button:focus-visible, a:focus-visible { outline: 2px solid #93C5FD; outline-offset: 4px; }
@@ -628,7 +630,7 @@
                 </div>
             </div>
             </section>
-            <p id="source-status" class="source-status" role="status"></p>
+            <p id="routine-status" class="routine-status" role="status"></p>
         </div>
     </main>
 
@@ -857,22 +859,17 @@
         }
 
         async function loadExercises() {
-            const status = document.getElementById('source-status');
+            const status = document.getElementById('routine-status');
+            status.hidden = false;
             status.textContent = 'Loading routines…';
             try {
                 const [lifting, postureAbs] = await Promise.all([fetchSheet(SHEET_GID), fetchSheet(POSTURE_GID)]);
                 routines = buildRoutines(lifting, postureAbs);
-                status.textContent = 'Routines loaded from your spreadsheet.';
             } catch (err) {
                 routines = buildRoutines(SAVED_LIFTING, SAVED_POSTURE_ABS);
-                status.textContent = 'Spreadsheet unavailable. Using saved routines from October 7, 2026.';
             }
-            const source = document.createElement('a');
-            source.href = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=${SHEET_GID}`;
-            source.target = '_blank';
-            source.rel = 'noopener';
-            source.textContent = ' Open spreadsheet';
-            status.appendChild(source);
+            status.textContent = '';
+            status.hidden = true;
             renderDays();
             selectDayFromHash();
         }
@@ -891,6 +888,7 @@
 
         function selectDayFromHash() {
             if (!routines.size) return;
+            const previousDay = selectedDay;
             stopWorkout();
             modalOverlay.classList.remove('active');
             currentModalIndex = -1;
@@ -899,7 +897,7 @@
             document.getElementById('day-detail').hidden = !selectedDay;
             if (!selectedDay) {
                 exercises = [];
-                document.querySelector('#day-list a')?.focus();
+                if (previousDay) document.querySelector(`#day-list a[href="#${previousDay.id}"]`)?.focus();
                 return;
             }
             exercises = routines.get(selectedDay.id);

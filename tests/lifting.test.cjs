@@ -66,10 +66,13 @@ for(const id of ['sunday','monday','wednesday','thursday']) {
 (async()=>{
     context.fetch=async()=>{throw new Error('offline');};
     await run('loadExercises()');
-    assert.match(document.getElementById('source-status').textContent,/Using saved routines/);
+    assert.strictEqual(document.getElementById('routine-status').textContent, '');
+    assert.strictEqual(document.getElementById('routine-status').hidden, true);
     assert.strictEqual(run('routines.size'),4);
     context.fetch=async url=>({ok:true,text:async()=>run(`'google.visualization.Query.setResponse('+JSON.stringify({table:{rows:${url.includes('798751319')?'SAVED_POSTURE_ABS':'SAVED_LIFTING'}.map(row=>({c:row.map(v=>({v}))}))}})+');'`)});
     await run('loadExercises()');
-    assert.match(document.getElementById('source-status').textContent,/loaded from your spreadsheet/);
+    assert.strictEqual(document.getElementById('routine-status').textContent, '');
+    assert.strictEqual(document.getElementById('routine-status').hidden, true);
+    assert.strictEqual(document.getElementById('routine-status').children.length, 0);
     console.log('PASS: four day mappings, exact labels, duration parsing, pause/resume, timer advance, manual steps, Previous, completion, stop/back cleanup, offline fallback and live loading.');
 })().catch(err=>{console.error(err);process.exitCode=1;});
