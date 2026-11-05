@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="blog-covers.css">
     <link rel="preload" href="https://unpkg.com/three@0.160.0/build/three.module.js" as="script" crossorigin>
     <style>
         body {
@@ -540,9 +541,9 @@
     </main>
 
     <!-- Review Modal -->
-    <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal">
-            <button class="modal-close" id="modal-close">&times;</button>
+            <button class="modal-close" id="modal-close" aria-label="Close review">&times;</button>
             <h2 class="modal-title" id="modal-title"></h2>
             <div class="modal-meta" id="modal-meta"></div>
             <div class="modal-review" id="modal-review"></div>
@@ -572,13 +573,14 @@
     </script>
 
     <script type="module">
+        import { createImageFieldReader, renderCoverTitle, bindCoverFallbacks, renderImageAttribution } from './blog-covers.js';
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
         // Google Sheet configuration
         const SHEET_ID = '1g9WpJ3Si7X42lhDd_5_Ft3wWnzwy6965GApO9rwG0I8';
         const GIDS = {
-            movies: '1517197804',
+            movies: '577417898',
             tv: '353936035'
         };
 
@@ -586,20 +588,27 @@
         let currentSort = { field: 'rating', order: 'desc' };
         let currentType = 'movies';
         let currentSearch = '';
+        let latestRequest = 0;
+        let modalTrigger = null;
 
         // Fetch data from Google Sheet
         async function fetchSheetData() {
+            const request = ++latestRequest;
             try {
                 const gid = GIDS[currentType];
-                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}`;
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}&headers=1`;
                 const response = await fetch(url);
+                if (!response.ok) throw new Error(`Sheet request failed: ${response.status}`);
                 const text = await response.text();
+                if (request !== latestRequest) return;
 
                 const jsonStart = text.indexOf('{');
                 const jsonEnd = text.lastIndexOf('}') + 1;
                 const jsonString = text.substring(jsonStart, jsonEnd);
                 const data = JSON.parse(jsonString);
 
+                if (data.status === 'error' || !data.table) throw new Error('Invalid sheet response');
+                const readImageFields = createImageFieldReader(data.table.cols);
                 const rows = data.table.rows;
                 allFilms = rows.map((row, index) => {
                     const cells = row.c || [];
@@ -629,13 +638,15 @@
                         year: cells[2]?.v ? String(cells[2].v) : '',
                         director: cells[3]?.v || '',
                         reviewDate: reviewDate,
-                        review: reviewText
+                        review: reviewText,
+                        ...readImageFields(cells)
                     };
                 }).filter(film => film.title);
 
                 // Keep all films for sorting and display
                 renderTable();
             } catch (error) {
+                if (request !== latestRequest) return;
                 console.error('Error fetching sheet data:', error);
                 document.getElementById('content').innerHTML = `
                     <div class="error">
@@ -765,7 +776,7 @@
                             ${displayed.map((film, index) => `
                                 <tr>
                                     <td class="row-num">${index + 1}</td>
-                                    <td class="title-cell" data-id="${film.id}">${escapeHtml(film.title)}</td>
+                                    <td class="title-cell">${renderCoverTitle(film)}</td>
                                     <td class="rating-cell ${getRatingClass(film.rating)}">${film.rating ? film.rating.toFixed(1) : '-'}</td>
                                     <td class="year-cell">${escapeHtml(film.year) || '-'}</td>
                                     <td>${escapeHtml(film.director) || '-'}</td>
@@ -776,6 +787,8 @@
                     </table>
                 </div>
             `;
+
+            bindCoverFallbacks(container);
 
             // Add sort handlers to headers
             document.querySelectorAll('th[data-sort]').forEach(th => {
@@ -796,7 +809,7 @@
             });
 
             // Add click handlers to titles
-            document.querySelectorAll('.title-cell').forEach(cell => {
+            container.querySelectorAll('.review-title-button').forEach(cell => {
                 cell.addEventListener('click', () => {
                     const id = parseInt(cell.dataset.id);
                     const film = allFilms.find(f => f.id === id);
@@ -815,6 +828,7 @@
             title.textContent = film.title;
 
             meta.innerHTML = `
+                ${renderImageAttribution(film)}
                 ${film.rating ? `
                     <div class="modal-meta-item">
                         <span class="modal-meta-label">Rating</span>
@@ -849,13 +863,18 @@
                 review.classList.add('no-review');
             }
 
+            modalTrigger = document.activeElement;
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+            document.getElementById('modal-close').focus();
         }
 
         function closeModal() {
-            document.getElementById('modal-overlay').classList.remove('active');
+            const overlay = document.getElementById('modal-overlay');
+            if (!overlay.classList.contains('active')) return;
+            overlay.classList.remove('active');
             document.body.style.overflow = '';
+            if (modalTrigger?.isConnected) modalTrigger.focus();
         }
 
         // Event listeners
@@ -869,6 +888,20 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
+            if (e.key === 'Tab') {
+                const overlay = document.getElementById('modal-overlay');
+                if (!overlay.classList.contains('active')) return;
+                const controls = overlay.querySelectorAll('button, a[href]');
+                const first = controls[0];
+                const last = controls[controls.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
         });
 
         // Toggle handlers
