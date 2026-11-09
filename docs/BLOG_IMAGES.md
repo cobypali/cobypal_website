@@ -25,3 +25,11 @@ Link each image to its source. Source attribution is shown when opening the revi
 Run `node tests/blog-covers.test.cjs`, `node tests/lifting.test.cjs`, and `git diff --check`.
 
 The cover regression suite checks named columns, URL filtering, escaping, lazy loading, missing and broken images, attribution, all three page integrations, search, modal open/close, stale fetch protection, and HTTP errors. Browser QA should additionally cover desktop and mobile widths, movie/TV switching, long titles, keyboard focus, Tab wrapping, Escape dismissal, and the live spreadsheet-to-image path.
+
+## Thoughts
+
+The Thoughts sheet retains its original Title, Date, and Full Contents in A:C. D:K use the same cover fields above; L (`Image Alt`) describes the conceptual image and M (`Image Full URL`) supplies the larger dialog version. No original thought text was changed.
+
+All 355 images were matched by exact title and date against the generated-image archive. `thought-images.json` records that verified mapping. `thought_images/` contains 355 small WebP thumbnails (160px) and 355 full versions (up to 1200px); originals remain in Drive. The site loads only thumbnails in the list and requests the larger version when its thought is opened. The caption identifies the artwork as AI-generated conceptual imagery, not documentary photography.
+
+Run `node tests/thought-images.test.cjs` alongside the existing checks. The new test covers all 355 asset pairs, header mapping, search/sort identity, modal images, escaping, missing/broken images, stale responses, and HTTP failures.

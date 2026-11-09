@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="blog-covers.css">
     <link rel="preload" href="https://unpkg.com/three@0.160.0/build/three.module.js" as="script" crossorigin>
     <style>
         body {
@@ -170,6 +171,17 @@
 
         .thought-cell:hover {
             color: #60A5FA;
+        }
+
+        .thought-cell .blog-cover { flex-basis: 48px; width: 48px; height: 36px; }
+        .thought-cell .blog-cover-image { object-fit: cover; }
+        .thought-image { margin: 0 0 24px; }
+        .thought-image[hidden] { display: none; }
+        .thought-modal-image { display: block; width: 100%; height: auto; max-height: 55vh; object-fit: contain; border-radius: 8px; background: #0B1220; }
+        .thought-image figcaption { margin-top: 8px; font-size: 11px; color: #9FB0CA; }
+        @media (max-width: 768px) {
+            .thought-cell .blog-cover { flex-basis: 40px; width: 40px; height: 30px; }
+            .thought-modal-image { max-height: 42vh; }
         }
 
         /* Date column */
@@ -469,9 +481,11 @@
 
     <!-- Thought Modal -->
     <div class="modal-overlay" id="modal-overlay">
-        <div class="modal">
-            <button class="modal-close" id="modal-close">&times;</button>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <button class="modal-close" id="modal-close" aria-label="Close thought">&times;</button>
+            <h2 class="blog-sr-only" id="modal-title"></h2>
             <p class="modal-date" id="modal-date"></p>
+            <figure class="thought-image" id="thought-image" hidden></figure>
             <div class="modal-content" id="modal-content"></div>
         </div>
     </div>
@@ -499,6 +513,7 @@
     </script>
 
     <script type="module">
+        import { createImageFieldReader, renderCoverTitle, bindCoverFallbacks, renderThoughtImage } from './blog-covers.js?v=thought-images-1';
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -509,20 +524,27 @@
         let allThoughts = [];
         let currentSort = { field: 'date', order: 'desc' };
         let currentSearch = '';
+        let latestRequest = 0;
+        let modalTrigger = null;
 
         // Fetch data from Google Sheet
         async function fetchSheetData() {
+            const request = ++latestRequest;
             try {
                 // Use tqx=out:json and request all rows
                 const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}&headers=1`;
                 const response = await fetch(url);
+                if (!response.ok) throw new Error(`Sheet request failed: ${response.status}`);
                 const text = await response.text();
+                if (request !== latestRequest) return;
 
                 const jsonStart = text.indexOf('{');
                 const jsonEnd = text.lastIndexOf('}') + 1;
                 const jsonString = text.substring(jsonStart, jsonEnd);
                 const data = JSON.parse(jsonString);
 
+                if (data.status === 'error' || !data.table) throw new Error('Invalid sheet response');
+                const readImageFields = createImageFieldReader(data.table.cols);
                 const rows = data.table.rows || [];
                 console.log('Total rows from API:', rows.length);
 
@@ -563,13 +585,15 @@
                         id: i,
                         thought: thought,
                         date: date,
-                        fullContents: fullContents
+                        fullContents: fullContents,
+                        ...readImageFields(cells)
                     });
                 }
 
                 console.log('Total thoughts loaded:', allThoughts.length);
                 renderTable();
             } catch (error) {
+                if (request !== latestRequest) return;
                 console.error('Error fetching sheet data:', error);
                 document.getElementById('content').innerHTML = `
                     <div class="error">
@@ -688,7 +712,7 @@
                             ${displayed.map((item, index) => `
                                 <tr>
                                     <td class="row-num">${index + 1}</td>
-                                    <td class="thought-cell" data-id="${item.id}">${truncateText(item.thought || item.fullContents || '(empty)')}</td>
+                                    <td class="thought-cell title-cell">${renderCoverTitle({...item, title: item.thought || item.fullContents || '(empty)'})}</td>
                                     <td class="date-cell">${formatDate(item.date)}</td>
                                 </tr>
                             `).join('')}
@@ -696,6 +720,8 @@
                     </table>
                 </div>
             `;
+
+            bindCoverFallbacks(container);
 
             // Add sort handlers to headers
             document.querySelectorAll('th[data-sort]').forEach(th => {
@@ -716,7 +742,7 @@
             });
 
             // Add click handlers to thoughts
-            document.querySelectorAll('.thought-cell').forEach(cell => {
+            container.querySelectorAll('.review-title-button').forEach(cell => {
                 cell.addEventListener('click', () => {
                     const id = parseInt(cell.dataset.id);
                     const item = allThoughts.find(t => t.id === id);
@@ -733,14 +759,33 @@
 
             dateEl.textContent = item.date ? formatDate(item.date) : '';
             contentEl.textContent = item.fullContents || item.thought;
+            document.getElementById('modal-title').textContent = item.thought || 'Thought';
+            const figure = document.getElementById('thought-image');
+            figure.innerHTML = renderThoughtImage(item);
+            figure.hidden = !figure.innerHTML;
+            const image = figure.querySelector('img');
+            if (image) {
+                const hideFailedImage = () => { if (figure.contains(image)) figure.hidden = true; };
+                image.addEventListener('error', hideFailedImage, { once: true });
+                if (image.complete && image.naturalWidth === 0) hideFailedImage();
+            }
+            modalTrigger = document.activeElement;
+            overlay.scrollTop = 0;
 
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+            document.getElementById('modal-close').focus();
         }
 
         function closeModal() {
-            document.getElementById('modal-overlay').classList.remove('active');
+            const overlay = document.getElementById('modal-overlay');
+            if (!overlay.classList.contains('active')) return;
+            overlay.classList.remove('active');
             document.body.style.overflow = '';
+            const figure = document.getElementById('thought-image');
+            figure.innerHTML = '';
+            figure.hidden = true;
+            if (modalTrigger?.isConnected) modalTrigger.focus();
         }
 
         // Event listeners
@@ -754,6 +799,10 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
+            if (e.key === 'Tab' && document.getElementById('modal-overlay').classList.contains('active')) {
+                e.preventDefault();
+                document.getElementById('modal-close').focus();
+            }
         });
 
         // Initialize

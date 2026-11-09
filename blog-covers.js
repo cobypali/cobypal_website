@@ -24,6 +24,8 @@ export function createImageFieldReader(columns = []) {
         const value = name => cells[indexes.get(name)]?.v ?? '';
         return {
             imageUrl: safeImageUrl(value('image url')),
+            imageFullUrl: safeImageUrl(value('image full url')),
+            imageAlt: String(value('image alt')),
             imageSource: String(value('image source')),
             imageSourceUrl: safeImageUrl(value('image source url')),
             imageStatus: String(value('image status')),
@@ -76,4 +78,12 @@ export function renderImageAttribution(entry) {
         : '';
     const credit = attribution ? `<span class="blog-image-attribution">${escapeMarkup(attribution)}</span>` : '';
     return `<div class="modal-meta-item blog-image-credit"><span class="modal-meta-label">Cover source</span><span class="modal-meta-value">${source}</span>${credit}${license}</div>`;
+}
+
+// Full-size artwork is requested only after a thought is opened.
+export function renderThoughtImage(entry) {
+    const imageUrl = safeImageUrl(entry.imageFullUrl) || safeImageUrl(entry.imageUrl);
+    if (!imageUrl) return '';
+    const alt = entry.imageAlt || `Conceptual illustration for ${entry.thought || entry.title || 'this thought'}`;
+    return `<img class="thought-modal-image" src="${escapeMarkup(imageUrl)}" alt="${escapeMarkup(alt)}" decoding="async" referrerpolicy="no-referrer"><figcaption>AI-generated conceptual illustration</figcaption>`;
 }
