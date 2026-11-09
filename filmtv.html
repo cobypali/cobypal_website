@@ -238,6 +238,11 @@
             background: transparent;
         }
 
+        .film-poster { display: flex; justify-content: center; margin: 0 0 28px; }
+        .film-poster[hidden] { display: none; }
+        .film-modal-image { display: block; width: 100%; max-width: 400px; height: auto; max-height: 55vh; object-fit: contain; border-radius: 8px; }
+        @media (max-width: 768px) { .film-modal-image { max-height: 45vh; } }
+
         /* Modal */
         .modal-overlay {
             position: fixed;
@@ -545,6 +550,7 @@
         <div class="modal">
             <button class="modal-close" id="modal-close" aria-label="Close review">&times;</button>
             <h2 class="modal-title" id="modal-title"></h2>
+            <figure class="film-poster" id="film-poster" hidden></figure>
             <div class="modal-meta" id="modal-meta"></div>
             <div class="modal-review" id="modal-review"></div>
         </div>
@@ -573,7 +579,7 @@
     </script>
 
     <script type="module">
-        import { createImageFieldReader, renderCoverTitle, bindCoverFallbacks, renderImageAttribution } from './blog-covers.js';
+        import { createImageFieldReader, renderCoverTitle, bindCoverFallbacks, safeImageUrl } from './blog-covers.js';
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -826,9 +832,25 @@
             const review = document.getElementById('modal-review');
 
             title.textContent = film.title;
+            const poster = document.getElementById('film-poster');
+            poster.replaceChildren();
+            const imageUrl = safeImageUrl(film.imageFullUrl) || safeImageUrl(film.imageUrl);
+            poster.hidden = !imageUrl;
+            if (imageUrl) {
+                const image = document.createElement('img');
+                image.className = 'film-modal-image';
+                image.alt = `Artwork for ${film.title}`;
+                image.decoding = 'async';
+                image.referrerPolicy = 'no-referrer';
+                const hideFailedImage = () => { if (poster.contains(image)) poster.hidden = true; };
+                image.addEventListener('error', hideFailedImage, { once: true });
+                image.src = imageUrl;
+                poster.appendChild(image);
+                if (image.complete && image.naturalWidth === 0) hideFailedImage();
+            }
+            overlay.scrollTop = 0;
 
             meta.innerHTML = `
-                ${renderImageAttribution(film)}
                 ${film.rating ? `
                     <div class="modal-meta-item">
                         <span class="modal-meta-label">Rating</span>
@@ -874,6 +896,8 @@
             if (!overlay.classList.contains('active')) return;
             overlay.classList.remove('active');
             document.body.style.overflow = '';
+            document.getElementById('film-poster').replaceChildren();
+            document.getElementById('film-poster').hidden = true;
             if (modalTrigger?.isConnected) modalTrigger.focus();
         }
 

@@ -62,7 +62,8 @@ function element() {
         get innerHTML(){return innerHTML;}, set innerHTML(value){innerHTML=value;},
         get textContent(){return text;}, set textContent(value){text=String(value);innerHTML=text.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));},
         classList:{add:c=>classes.add(c),remove:c=>classes.delete(c),contains:c=>classes.has(c)},
-        focus(){}, addEventListener(){}, querySelectorAll(){return [];}
+        focus(){}, addEventListener(type, fn){this[type]=fn;}, querySelectorAll(){return [];},
+        appendChild(child){this.children.push(child);}, replaceChildren(){this.children=[];}, contains(child){return this.children.includes(child);}
     };
 }
 async function testPage(file,noun,expectedGid) {
@@ -96,10 +97,26 @@ async function testPage(file,noun,expectedGid) {
     assert.match(document.getElementById('content').innerHTML,/blog-cover-image/);
     run(`openModal(${collection}[0])`);
     assert.equal(document.getElementById('modal-title').textContent,'Alpha');
-    assert.match(document.getElementById('modal-meta').innerHTML,/Cover source/);
+    if (noun === 'film') {
+        assert.doesNotMatch(document.getElementById('modal-meta').innerHTML,/Cover source|Copyrighted|Wikipedia/);
+        const poster=document.getElementById('film-poster');
+        assert.equal(poster.children.length,1);
+        assert.equal(poster.children[0].src,coverUrl);
+        assert.equal(poster.children[0].alt,'Artwork for Alpha');
+        assert.equal(poster.children[0].referrerPolicy,'no-referrer');
+        assert.equal(poster.hidden,false);
+        poster.children[0].error();
+        assert.equal(poster.hidden,true);
+        run(`openModal(${collection}[0])`);
+        assert.equal(poster.hidden,false);
+        assert.equal(poster.children.length,1);
+    } else {
+        assert.match(document.getElementById('modal-meta').innerHTML,/Cover source/);
+    }
     assert.equal(document.body.style.overflow,'hidden');
     run('closeModal()');
     assert.equal(document.body.style.overflow,'');
+    if (noun==='film') assert.equal(document.getElementById('film-poster').children.length,0);
     // A stale fetch must not replace a newer search/tab refresh.
     let finishOld;
     context.fetch=()=>new Promise(resolve=>{finishOld=resolve;});
@@ -116,6 +133,7 @@ async function testPage(file,noun,expectedGid) {
     context.fetch=async()=>response({status:'ok',table:{cols:base.map(label=>({label})),rows:[{c:cells.map(v=>({v}))}]}});
     await run('fetchSheetData()');
     assert.equal(run(collection+'[0].imageUrl'),'');
+    if (noun==='film') { run(`openModal(${collection}[0])`); assert.equal(document.getElementById('film-poster').hidden,true); assert.equal(document.getElementById('film-poster').children.length,0); run('closeModal()'); }
     assert.doesNotMatch(document.getElementById('content').innerHTML,/<img/);
     context.fetch=async()=>({ok:false,status:503});
     await run('fetchSheetData()');
